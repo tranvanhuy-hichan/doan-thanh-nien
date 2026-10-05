@@ -5,6 +5,7 @@ import { CalendarDays, MapPin } from "lucide-react";
 import { KIND_LABEL, KIND_PATH, getArticle } from "@/lib/services/public";
 import { formatDate, formatDateTime } from "@/utils";
 import { RichText } from "@/components/public/rich-text";
+import { Attachments } from "@/components/public/attachments";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const a = await getArticle((await params).slug);
@@ -30,6 +31,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       )}
       {a.summary && <p className="my-5 text-lg font-medium text-slate-700">{a.summary}</p>}
       <div className="rounded-lg bg-white/85 p-5"><RichText text={a.content} /></div>
+      <Attachments files={a.attachments.map((f) => ({ id: f.id, name: f.name, url: f.url, size: f.size }))} />
     </article>
   );
 }

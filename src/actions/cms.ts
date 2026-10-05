@@ -19,6 +19,9 @@ export async function saveArticleAction(id: string | null, input: unknown) {
     const d = articleSchema.parse(input);
     if (d.coverPublicId && !isOwnPublicId(d.coverPublicId, "activities")) throw new UserError("Ảnh không hợp lệ");
     if (d.kind === "EVENT" && !d.eventAt) throw new UserError("Sự kiện cần có thời gian diễn ra");
+    for (const f of d.attachments) {
+      if (!isOwnPublicId(f.publicId, "documents") || !f.url.startsWith("https://res.cloudinary.com/")) throw new UserError("Tệp đính kèm không hợp lệ");
+    }
 
     const base = {
       kind: d.kind, title: d.title, summary: d.summary ?? null, content: d.content, coverUrl: d.coverUrl ?? null, coverPublicId: d.coverPublicId ?? null,
@@ -28,13 +31,22 @@ export async function saveArticleAction(id: string | null, input: unknown) {
       const cur = await db.article.findUnique({ where: { id } });
       if (!cur) throw new UserError("Không tìm thấy bài viết");
       const publishedAt = d.published ? cur.publishedAt ?? new Date() : null;
-      await db.article.update({ where: { id }, data: { ...base, publishedAt } });
+      const existing = await db.articleAttachment.findMany({ where: { articleId: id } });
+      const keep = new Set(d.attachments.map((f) => f.publicId));
+      const removed = existing.filter((f) => !keep.has(f.publicId));
+      const known = new Set(existing.map((f) => f.publicId));
+      await db.$transaction([
+        db.article.update({ where: { id }, data: { ...base, publishedAt } }),
+        db.articleAttachment.deleteMany({ where: { id: { in: removed.map((f) => f.id) } } }),
+        db.articleAttachment.createMany({ data: d.attachments.filter((f) => !known.has(f.publicId)).map((f) => ({ ...f, articleId: id })) }),
+      ]);
+      for (const f of removed) await deleteImage(f.publicId);
       if (cur.coverPublicId && cur.coverPublicId !== base.coverPublicId) await deleteImage(cur.coverPublicId);
       await audit(admin.id, "article.update", "Article", id, { title: d.title });
       refreshPublic();
       return { data: { id }, message: "Đã cập nhật bài viết" };
     }
-    const a = await db.article.create({ data: { ...base, slug: uniqueSlug(d.title), publishedAt: d.published ? new Date() : null, authorId: admin.id } });
+    const a = await db.article.create({ data: { ...base, slug: uniqueSlug(d.title), publishedAt: d.published ? new Date() : null, authorId: admin.id, attachments: { create: d.attachments } } });
     if (d.published && d.kind === "ANNOUNCEMENT") {
       const users = await db.user.findMany({ where: { status: "ACTIVE", id: { not: admin.id } }, select: { id: true } });
       await notifyUsers(users.map((u) => u.id), { type: "SYSTEM", title: "Thông báo mới từ Đoàn trường", body: d.title, link: `/bai-viet/${a.slug}` });
@@ -61,10 +73,11 @@ export async function setArticlePublishedAction(id: string, published: boolean) 
 export async function deleteArticleAction(id: string) {
   return run(async () => {
     const admin = await requireRole(["ADMIN"]);
-    const cur = await db.article.findUnique({ where: { id } });
+    const cur = await db.article.findUnique({ where: { id }, include: { attachments: true } });
     if (!cur) throw new UserError("Không tìm thấy bài viết");
     await db.article.delete({ where: { id } });
     await deleteImage(cur.coverPublicId);
+    for (const f of cur.attachments) await deleteImage(f.publicId);
     await audit(admin.id, "article.delete", "Article", id, { title: cur.title });
     refreshPublic();
     revalidatePath("/cms", "layout");

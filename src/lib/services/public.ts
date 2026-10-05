@@ -32,7 +32,7 @@ export async function listArticles(kind: ArticleKind, page: number, size: number
   return { items, total };
 }
 
-export const getArticle = (slug: string) => db.article.findFirst({ where: { slug, ...publishedWhere() }, include: { author: { select: { fullName: true } } } });
+export const getArticle = (slug: string) => db.article.findFirst({ where: { slug, ...publishedWhere() }, include: { author: { select: { fullName: true } }, attachments: { orderBy: { createdAt: "asc" } } } });
 
 export const getSitePage = (slug: string) => db.sitePage.findUnique({ where: { slug } });
 

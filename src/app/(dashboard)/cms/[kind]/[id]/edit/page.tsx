@@ -10,12 +10,12 @@ export default async function EditArticlePage({ params }: { params: Promise<{ ki
   await requireRole(["ADMIN"]);
   const { kind: slug, id } = await params;
   const kind = CMS_SLUG[slug];
-  const a = kind ? await db.article.findFirst({ where: { id, kind } }) : null; // chỉ sửa trong đúng loại của route
+  const a = kind ? await db.article.findFirst({ where: { id, kind }, include: { attachments: { orderBy: { createdAt: "asc" } } } }) : null; // chỉ sửa trong đúng loại của route
   if (!a) notFound();
   return (
     <>
       <PageHeader title={`Sửa ${KIND_LABEL[a.kind].toLowerCase()}`} />
-      <ArticleForm id={a.id} kind={a.kind} image={a.coverUrl && a.coverPublicId ? { imageUrl: a.coverUrl, publicId: a.coverPublicId } : null}
+      <ArticleForm id={a.id} kind={a.kind} files={a.attachments.map((f) => ({ name: f.name, url: f.url, publicId: f.publicId, size: f.size, mime: f.mime ?? undefined }))} image={a.coverUrl && a.coverPublicId ? { imageUrl: a.coverUrl, publicId: a.coverPublicId } : null}
         initial={{ title: a.title, summary: a.summary ?? "", content: a.content, eventAt: a.eventAt ? toLocalInput(a.eventAt) : "", eventLocation: a.eventLocation ?? "", published: a.published }} />
     </>
   );

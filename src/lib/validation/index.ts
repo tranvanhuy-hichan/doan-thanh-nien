@@ -111,6 +111,13 @@ export const articleSchema = z.object({
   eventAt: optionalDate,
   eventLocation: optionalText(200),
   published: z.coerce.boolean().default(true),
+  attachments: z.array(z.object({
+    name: z.string().trim().min(1).max(200),
+    url: z.url().max(600),
+    publicId: z.string().min(1).max(300),
+    size: z.coerce.number().int().min(0).max(50_000_000).default(0),
+    mime: z.string().max(150).optional(),
+  })).max(10, "Tối đa 10 tệp đính kèm").default([]),
 });
 
 export const sitePageSchema = z.object({ content: z.string().max(50000) });

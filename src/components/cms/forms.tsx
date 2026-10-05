@@ -7,6 +7,7 @@ import { saveReportAction } from "@/actions/chapter-reports";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/form";
 import { ImageUpload, type UploadedImage } from "@/components/ui/image-upload";
+import { FileUpload, type AttachmentValue } from "@/components/ui/file-upload";
 import { fromLocalInput } from "@/utils";
 import { KIND_ACTION, kindSlug } from "@/lib/services/kind";
 
@@ -15,14 +16,15 @@ export const FORMAT_HINT = "Định dạng: “## Tiêu đề”, “- gạch đ
 type Errors = Record<string, string>;
 const toErrors = (f?: Record<string, string[]>): Errors => Object.fromEntries(Object.entries(f ?? {}).map(([k, m]) => [k, m[0]]));
 
-export function ArticleForm({ id, kind, initial, image }: {
-  id?: string; kind: "NEWS" | "PLAN" | "EVENT" | "ANNOUNCEMENT";
+export function ArticleForm({ id, kind, initial, image, files }: {
+  id?: string; files?: AttachmentValue[]; kind: "NEWS" | "PLAN" | "EVENT" | "ANNOUNCEMENT";
   initial?: { title: string; summary: string; content: string; eventAt: string; eventLocation: string; published: boolean };
   image?: UploadedImage;
 }) {
   const router = useRouter();
   const [v, setV] = useState(initial ?? { title: "", summary: "", content: "", eventAt: "", eventLocation: "", published: true });
   const [img, setImg] = useState<UploadedImage>(image ?? null);
+  const [attachments, setAttachments] = useState<AttachmentValue[]>(files ?? []);
   const [errors, setErrors] = useState<Errors>({});
   const [busy, setBusy] = useState(false);
   const set = (k: keyof typeof v) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setV({ ...v, [k]: e.target.value });
@@ -30,7 +32,7 @@ export function ArticleForm({ id, kind, initial, image }: {
   async function submit() {
     setBusy(true); setErrors({});
     const res = await saveArticleAction(id ?? null, {
-      ...v, kind, eventAt: v.eventAt ? fromLocalInput(v.eventAt).toISOString() : "", coverUrl: img?.imageUrl ?? "", coverPublicId: img?.publicId ?? "",
+      ...v, kind, eventAt: v.eventAt ? fromLocalInput(v.eventAt).toISOString() : "", coverUrl: img?.imageUrl ?? "", coverPublicId: img?.publicId ?? "", attachments,
     });
     setBusy(false);
     if (!res.ok) { toast.error(res.error); setErrors(toErrors(res.fieldErrors)); return; }
@@ -55,6 +57,7 @@ export function ArticleForm({ id, kind, initial, image }: {
         <Field label="Nội dung" required error={errors.content} className="sm:col-span-2" hint={FORMAT_HINT}><Textarea className="min-h-72" value={v.content} onChange={set("content")} /></Field>
       </div>
       <Field label="Ảnh bìa"><ImageUpload folder="activities" value={img} onChange={setImg} /></Field>
+      <Field label="Tệp đính kèm" hint="Người xem có thể xem trực tiếp hoặc tải về"><FileUpload value={attachments} onChange={setAttachments} /></Field>
       <div className="flex gap-2">
         <Button loading={busy} onClick={submit}>{id ? "Lưu thay đổi" : KIND_ACTION[kind]}</Button>
         <Button variant="secondary" onClick={() => router.back()}>Hủy</Button>

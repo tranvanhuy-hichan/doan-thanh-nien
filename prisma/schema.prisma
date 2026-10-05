@@ -427,7 +427,8 @@ model Article {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  author      User?               @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  attachments ArticleAttachment[]
 
   @@index([kind, published, publishedAt])
 }
@@ -463,4 +464,20 @@ model ChapterReport {
 model SiteSetting {
   key   String @id
   value String
+}
+
+/// Tệp đính kèm của bài viết (PDF, Word, Excel, PowerPoint) lưu trên Cloudinary.
+model ArticleAttachment {
+  id        String   @id @default(cuid())
+  articleId String
+  name      String
+  url       String
+  publicId  String
+  size      Int      @default(0)
+  mime      String?
+  createdAt DateTime @default(now())
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@index([articleId])
 }
