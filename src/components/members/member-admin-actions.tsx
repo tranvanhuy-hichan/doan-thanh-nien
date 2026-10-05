@@ -20,7 +20,7 @@ export function MemberAdminActions({ id, locked, isAdmin }: { id: string; locked
   const [busy, setBusy] = useState(false);
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <>
       {isAdmin && <Link href={`/members/${id}/edit`} className={buttonClass("secondary", "sm")}><Pencil className="size-3.5" />Sửa</Link>}
       <ConfirmButton trigger={<><KeyRound className="size-3.5" />Cấp lại mật khẩu</>} title="Cấp lại mật khẩu tạm thời?"
         description="Mật khẩu cũ sẽ không còn dùng được. Đoàn viên phải đổi mật khẩu ở lần đăng nhập kế tiếp."
@@ -60,6 +60,6 @@ export function MemberAdminActions({ id, locked, isAdmin }: { id: string; locked
           </div>
         </div>
       </Modal>
-    </div>
+    </>
   );
 }

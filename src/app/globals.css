@@ -67,3 +67,8 @@ body::before {
 @media (max-width: 767px) {
   input, select, textarea { font-size: 16px !important; }
 }
+
+/* Nút ở đầu trang gọn hơn trên mobile (chỉ nhắm nút/liên kết trực tiếp, không đụng hộp thoại nằm cùng chỗ) */
+@media (max-width: 639px) {
+  .page-actions > button, .page-actions > a { height: 2rem; padding-inline: 0.625rem; font-size: 13px; }
+}

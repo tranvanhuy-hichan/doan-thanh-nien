@@ -32,7 +32,7 @@ export async function MemberProfile({ member, showAudit }: { member: M; showAudi
         </div>
       </div>
       <Section className="mt-6">
-        <dl className="grid gap-x-8 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="grid grid-cols-2 gap-x-6 gap-y-3 lg:grid-cols-4">
           {info.map(([k, v]) => <div key={k}><dt className="text-xs text-muted">{k}</dt><dd className="mt-0.5">{v}</dd></div>)}
         </dl>
       </Section>

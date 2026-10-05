@@ -32,11 +32,9 @@ export function PageHeader({ title, description, actions }: {
 }) {
   return (
     <div className="mb-5">
-      <div className="flex items-center justify-between gap-2 sm:items-start sm:gap-3">
-        <h1 className="text-xl font-semibold max-sm:whitespace-nowrap">{title}</h1>
-        {actions && (
-          <div className="flex min-w-0 items-center justify-end gap-1.5 sm:flex-wrap sm:gap-2 max-sm:[&>*]:h-8 max-sm:[&>*]:px-2.5 max-sm:[&>*]:text-[13px]">{actions}</div>
-        )}
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:items-start">
+        <h1 className="text-xl font-semibold">{title}</h1>
+        {actions && <div className="page-actions flex max-w-full shrink-0 flex-wrap items-center gap-1.5 sm:gap-2">{actions}</div>}
       </div>
       {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
     </div>
