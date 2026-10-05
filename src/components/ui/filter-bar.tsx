@@ -4,6 +4,19 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { Search, X } from "lucide-react";
 import { Input, Select } from "./form";
 
+/** 24 tháng gần nhất + 3 tháng tới (và giá trị đang chọn nếu nằm ngoài khoảng này). */
+function monthOptions(current: string | null) {
+  const now = new Date();
+  const out: { value: string; label: string }[] = [];
+  for (let i = -3; i < 24; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const m = String(d.getMonth() + 1);
+    out.push({ value: `${d.getFullYear()}-${m.padStart(2, "0")}`, label: `Tháng ${m}/${d.getFullYear()}` });
+  }
+  if (current && /^\d{4}-\d{2}$/.test(current) && !out.some((o) => o.value === current)) out.push({ value: current, label: `Tháng ${+current.slice(5)}/${current.slice(0, 4)}` });
+  return out;
+}
+
 export type FilterField =
   | { type: "search"; name: string; placeholder: string }
   | { type: "select"; name: string; label: string; options: { value: string; label: string }[] }
@@ -44,11 +57,11 @@ export function FilterBar({ fields }: { fields: FilterField[] }) {
             {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </Select>
         ) : (
-          <label key={f.name} className="flex h-9 items-center gap-2 rounded-md border border-border bg-white pl-3 text-sm max-sm:min-w-[calc(50%-0.25rem)] max-sm:flex-1">
-            <span className="text-muted">Tháng</span>
-            <input type="month" aria-label="Tháng" value={sp.get(f.name) ?? ""} onChange={(e) => update(f.name, e.target.value)}
-              className="h-full min-w-0 flex-1 rounded-r-md bg-transparent pr-2 outline-none" />
-          </label>
+          <Select key={f.name} aria-label="Tháng" value={sp.get(f.name) ?? ""} onChange={(e) => update(f.name, e.target.value)}
+            className="w-auto min-w-36 max-sm:min-w-[calc(50%-0.25rem)] max-sm:flex-1">
+            <option value="">Tháng</option>
+            {monthOptions(sp.get(f.name)).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </Select>
         ),
       )}
       {active && (
