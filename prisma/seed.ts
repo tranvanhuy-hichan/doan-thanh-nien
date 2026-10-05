@@ -167,8 +167,9 @@ export async function seedDemo() {
 
 // Chạy trực tiếp: `npm run db:seed`. Khi được import (bootstrap.ts) thì không tự chạy.
 if (process.argv[1]?.endsWith("seed.ts")) {
-  if (process.env.NODE_ENV === "production" && process.env.SEED_CONFIRM !== "yes") {
-    console.error("Từ chối: seed demo sẽ XÓA toàn bộ dữ liệu. Đặt SEED_CONFIRM=yes nếu bạn thật sự muốn.");
+  const remote = !/@(localhost|127\.0\.0\.1)[:/]|host=\//.test(process.env.DATABASE_URL ?? "");
+  if ((process.env.NODE_ENV === "production" || remote) && process.env.SEED_CONFIRM !== "yes") {
+    console.error("Từ chối: database này là production/từ xa, seed demo sẽ XÓA toàn bộ dữ liệu. Đặt SEED_CONFIRM=yes nếu bạn thật sự muốn.");
     process.exit(1);
   }
   seedDemo().catch((e) => { console.error(e); process.exit(1); }).finally(() => db.$disconnect());
