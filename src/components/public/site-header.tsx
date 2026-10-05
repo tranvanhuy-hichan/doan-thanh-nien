@@ -73,10 +73,10 @@ export function SiteHeader({ address }: { address: string }) {
         </div>
       </div>
 
-      {/* Desktop */}
+      {/* Desktop: chỉ các mục chính; Giới thiệu / Báo cáo Chi đoàn / Thi đua nằm ở thanh bên trái. */}
       <nav className="hidden bg-primary-dark lg:block" aria-label="Menu chính">
         <ul className="flex w-full px-4 lg:px-8">
-          {MENU.map((it) => (
+          {MENU.filter((it) => !it.children).map((it) => (
             <li key={it.label} className="group relative">
               <Link href={it.href} className={cn("flex items-center gap-1 px-3 py-3 text-sm font-medium whitespace-nowrap text-white/90 hover:bg-white/10 hover:text-white", isActive(pathname, it.href) && "bg-white/15 text-white")}>
                 {it.label}{it.children && <ChevronDown className="size-3.5 opacity-70" />}
