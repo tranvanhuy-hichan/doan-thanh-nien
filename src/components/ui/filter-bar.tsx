@@ -44,7 +44,11 @@ export function FilterBar({ fields }: { fields: FilterField[] }) {
             {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </Select>
         ) : (
-          <Input key={f.name} type="month" aria-label="Tháng" value={sp.get(f.name) ?? ""} onChange={(e) => update(f.name, e.target.value)} className="w-auto max-sm:min-w-[calc(50%-0.25rem)] max-sm:flex-1" />
+          <label key={f.name} className="flex h-9 items-center gap-2 rounded-md border border-border bg-white pl-3 text-sm max-sm:min-w-[calc(50%-0.25rem)] max-sm:flex-1">
+            <span className="text-muted">Tháng</span>
+            <input type="month" aria-label="Tháng" value={sp.get(f.name) ?? ""} onChange={(e) => update(f.name, e.target.value)}
+              className="h-full min-w-0 flex-1 rounded-r-md bg-transparent pr-2 outline-none" />
+          </label>
         ),
       )}
       {active && (
