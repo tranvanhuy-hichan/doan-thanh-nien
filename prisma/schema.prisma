@@ -1,0 +1,383 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SECRETARY
+  MEMBER
+}
+
+enum AccountStatus {
+  ACTIVE
+  LOCKED
+}
+
+enum MemberStatus {
+  ACTIVE // Đang sinh hoạt
+  TRANSFERRED // Đã chuyển sinh hoạt
+  GRADUATED // Đã ra trường
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  CANCELLED
+}
+
+enum AttendanceMethod {
+  QR
+  MANUAL
+}
+
+enum PointType {
+  ACTIVITY
+  ADJUSTMENT
+}
+
+enum BadgeCriteria {
+  ACTIVITY_COUNT
+  VOLUNTEER_HOURS
+  TOTAL_POINTS
+  CATEGORY_COUNT
+}
+
+enum NotificationType {
+  ACTIVITY_CREATED
+  ACTIVITY_REMINDER
+  ACTIVITY_CANCELLED
+  REGISTRATION
+  CHECKIN
+  POINTS
+  BADGE
+  FEED
+  SYSTEM
+}
+
+model User {
+  id                 String        @id @default(cuid())
+  username           String        @unique
+  passwordHash       String
+  fullName           String
+  role               Role
+  status             AccountStatus @default(ACTIVE)
+  mustChangePassword Boolean       @default(true)
+  lastLoginAt        DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  member            Member?
+  secretaryOf       Department?
+  notifications     Notification[]
+  auditLogs         AuditLog[]
+  createdActivities Activity[]         @relation("ActivityCreator")
+  pointTransactions PointTransaction[] @relation("PointCreator")
+  manualCheckins    Attendance[]       @relation("CheckedInBy")
+  posts             Post[]
+  postLikes         PostLike[]
+  postComments      PostComment[]
+  emulationRecords  EmulationRecord[]
+
+  @@index([role, status])
+}
+
+model Department {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  secretaryId String?  @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  secretary        User?             @relation(fields: [secretaryId], references: [id], onDelete: SetNull)
+  classes          Class[]
+  members          Member[]
+  activities       Activity[]
+  posts            Post[]
+  emulationRecords EmulationRecord[]
+}
+
+model Class {
+  id           String   @id @default(cuid())
+  name         String
+  grade        Int?
+  departmentId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  members    Member[]
+
+  @@unique([departmentId, name])
+}
+
+model Member {
+  id               String       @id @default(cuid())
+  code             String       @unique
+  userId           String       @unique
+  fullName         String
+  gender           String?
+  dateOfBirth      DateTime?
+  joinedAt         DateTime?
+  cohort           Int? // Khóa (năm nhập học)
+  status           MemberStatus @default(ACTIVE)
+  classId          String
+  departmentId     String
+  avatarUrl        String?
+  avatarPublicId   String?
+  qrToken          String       @unique @default(cuid())
+  totalPoints      Int          @default(0)
+  volunteerMinutes Int          @default(0)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class         Class                  @relation(fields: [classId], references: [id], onDelete: Restrict)
+  department    Department             @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  registrations ActivityRegistration[]
+  attendances   Attendance[]
+  points        PointTransaction[]
+  badges        MemberBadge[]
+
+  @@index([departmentId, status])
+  @@index([classId])
+  @@index([cohort])
+  @@index([fullName])
+}
+
+model ActivityCategory {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  defaultPoints Int      @default(3)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  activities Activity[]
+  badges     Badge[]
+}
+
+model Activity {
+  id              String    @id @default(cuid())
+  title           String
+  description     String?
+  location        String
+  startAt         DateTime
+  endAt           DateTime
+  categoryId      String
+  departmentId    String? // null = hoạt động toàn trường
+  maxParticipants Int?
+  points          Int       @default(0)
+  volunteerHours  Float     @default(0)
+  imageUrl        String?
+  imagePublicId   String?
+  cancelledAt     DateTime?
+  checkinOpen     Boolean   @default(false)
+  qrNonce         String    @default(cuid()) // đổi nonce => mọi QR cũ vô hiệu
+  createdById     String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  category          ActivityCategory       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  department        Department?            @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  createdBy         User                   @relation("ActivityCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  registrations     ActivityRegistration[]
+  attendances       Attendance[]
+  images            ActivityImage[]
+  pointTransactions PointTransaction[]
+
+  @@index([startAt])
+  @@index([departmentId, startAt])
+  @@index([categoryId])
+}
+
+model ActivityImage {
+  id         String   @id @default(cuid())
+  activityId String
+  imageUrl   String
+  publicId   String
+  createdAt  DateTime @default(now())
+
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@index([activityId])
+}
+
+model ActivityRegistration {
+  id         String             @id @default(cuid())
+  activityId String
+  memberId   String
+  status     RegistrationStatus @default(REGISTERED)
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  member   Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([activityId, memberId])
+  @@index([memberId])
+}
+
+model Attendance {
+  id            String           @id @default(cuid())
+  activityId    String
+  memberId      String
+  checkedInAt   DateTime         @default(now())
+  method        AttendanceMethod @default(QR)
+  deviceInfo    String? // user-agent
+  ipAddress     String?
+  latitude      Float? // dự phòng cho xác thực GPS
+  longitude     Float?
+  checkedInById String? // người điểm danh hộ (nếu MANUAL)
+  createdAt     DateTime         @default(now())
+
+  activity    Activity          @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  member      Member            @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  checkedInBy User?             @relation("CheckedInBy", fields: [checkedInById], references: [id], onDelete: SetNull)
+  point       PointTransaction?
+
+  @@unique([activityId, memberId])
+  @@index([memberId, checkedInAt])
+}
+
+model PointTransaction {
+  id           String    @id @default(cuid())
+  memberId     String
+  activityId   String?
+  attendanceId String?   @unique
+  type         PointType
+  points       Int
+  reason       String
+  createdById  String?
+  createdAt    DateTime  @default(now())
+
+  member     Member      @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  activity   Activity?   @relation(fields: [activityId], references: [id], onDelete: SetNull)
+  attendance Attendance? @relation(fields: [attendanceId], references: [id], onDelete: SetNull)
+  createdBy  User?       @relation("PointCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([memberId, createdAt])
+}
+
+model Badge {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  description String
+  icon        String        @default("award") // tên icon Lucide
+  criteria    BadgeCriteria
+  threshold   Int
+  categoryId  String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  category ActivityCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  members  MemberBadge[]
+}
+
+model MemberBadge {
+  id        String   @id @default(cuid())
+  memberId  String
+  badgeId   String
+  awardedAt DateTime @default(now())
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  badge  Badge  @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, badgeId])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String?
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  target    String
+  targetId  String?
+  metadata  Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([target, targetId])
+  @@index([userId])
+}
+
+model Post {
+  id            String   @id @default(cuid())
+  authorId      String
+  departmentId  String? // null = toàn trường (chỉ Admin đăng)
+  content       String
+  imageUrl      String?
+  imagePublicId String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  author     User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  department Department?   @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  likes      PostLike[]
+  comments   PostComment[]
+
+  @@index([createdAt])
+  @@index([departmentId, createdAt])
+}
+
+model PostLike {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+}
+
+model PostComment {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt])
+}
+
+/// Điểm thi đua do Đoàn trường ghi nhận cho Chi đoàn (nề nếp, phong trào... – có thể âm).
+model EmulationRecord {
+  id           String   @id @default(cuid())
+  departmentId String
+  points       Int
+  reason       String
+  recordedAt   DateTime
+  createdById  String?
+  createdAt    DateTime @default(now())
+
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  createdBy  User?      @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([departmentId, recordedAt])
+  @@index([recordedAt])
+}
