@@ -32,9 +32,9 @@ export function ImageUpload({ folder, value, onChange, shape = "wide" }: {
     }
   }
 
-  const box = shape === "wide" ? "h-32 w-56" : "size-28";
+  const box = shape === "wide" ? "aspect-video w-full sm:aspect-auto sm:h-32 sm:w-56" : "size-28";
   return (
-    <div className="flex items-start gap-3">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
       <div className={`${box} flex shrink-0 items-center justify-center overflow-hidden rounded-md border border-dashed border-border bg-slate-50`}>
         {value ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -43,11 +43,11 @@ export function ImageUpload({ folder, value, onChange, shape = "wide" }: {
           <ImagePlus className="size-6 text-slate-300" />
         )}
       </div>
-      <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-2 sm:block sm:space-y-2">
         <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => pick(e.target.files?.[0])} />
         <Button variant="secondary" size="sm" loading={busy} onClick={() => input.current?.click()}>{value ? "Đổi ảnh" : "Chọn ảnh"}</Button>
         {value && <Button variant="ghost" size="sm" onClick={() => onChange(null)}><Trash2 className="size-3.5" />Gỡ ảnh</Button>}
-        <p className="text-xs text-muted">JPG, PNG, WebP · tối đa 5MB</p>
+        <p className="w-full text-xs text-muted">JPG, PNG, WebP · tối đa 5MB</p>
       </div>
     </div>
   );

@@ -49,3 +49,8 @@ export const PAGE_TITLES: Record<string, string> = {
   feed: "Bảng tin", emulation: "Thi đua", achievements: "Thành tích", reports: "Báo cáo", settings: "Cài đặt", profile: "Hồ sơ & thẻ số", checkin: "Quét QR điểm danh",
   history: "Lịch sử hoạt động", notifications: "Thông báo", new: "Tạo mới", edit: "Chỉnh sửa",
 };
+
+/** Tiêu đề riêng cho đường dẫn cụ thể (ưu tiên hơn PAGE_TITLES theo đoạn). */
+export const PATH_TITLES: Record<string, string> = {
+  "/feed/new": "Đăng bài", "/members/new": "Thêm đoàn viên", "/activities/new": "Tạo hoạt động",
+};

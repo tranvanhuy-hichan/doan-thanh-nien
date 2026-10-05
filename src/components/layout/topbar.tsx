@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Bell, ChevronDown, ChevronRight, KeyRound, LogOut } from "lucide-react";
 import { cn, relativeTime } from "@/utils";
-import { PAGE_TITLES } from "@/lib/nav";
+import { PAGE_TITLES, PATH_TITLES } from "@/lib/nav";
 import { Avatar } from "@/components/ui/misc";
 import { logoutAction } from "@/actions/auth";
 import { markAllNotificationsRead, markNotificationRead } from "@/actions/notifications";
@@ -21,7 +21,7 @@ function useOutside(ref: React.RefObject<HTMLElement | null>, onOut: () => void)
 
 function Breadcrumb() {
   const segs = usePathname().split("/").filter(Boolean);
-  const crumbs = segs.map((s, i) => ({ href: "/" + segs.slice(0, i + 1).join("/"), label: PAGE_TITLES[s] })).filter((c) => c.label);
+  const crumbs = segs.map((s, i) => { const href = "/" + segs.slice(0, i + 1).join("/"); return { href, label: PATH_TITLES[href] ?? PAGE_TITLES[s] }; }).filter((c) => c.label);
   if (!crumbs.length) return null;
   const last = crumbs[crumbs.length - 1];
   const parents = crumbs.slice(0, -1);

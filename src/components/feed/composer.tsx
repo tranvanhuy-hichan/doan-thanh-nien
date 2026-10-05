@@ -31,20 +31,20 @@ export function PostComposer({ userName, avatarUrl, departments, fixedAudience }
   return (
     <div className="rounded-lg border border-border bg-white/85 p-4">
       <div className="flex gap-3">
-        <Avatar name={userName} src={avatarUrl} size={36} />
+        <div className="max-sm:hidden"><Avatar name={userName} src={avatarUrl} size={36} /></div>
         <div className="min-w-0 flex-1 space-y-3">
           <Textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Chia sẻ thông báo, hình ảnh hoạt động với đoàn viên..." className="min-h-40" maxLength={5000} />
           <ImageUpload folder="activities" value={image} onChange={setImage} />
-          <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
               
               {fixedAudience ? <span className="text-[13px] text-muted">Đăng cho Chi đoàn {fixedAudience}</span> : (
-                <Select value={dept} onChange={(e) => setDept(e.target.value)} className="h-8 w-auto text-[13px]" aria-label="Đối tượng">
+                <Select value={dept} onChange={(e) => setDept(e.target.value)} className="w-full sm:h-8 sm:w-auto sm:text-[13px]" aria-label="Đối tượng">
                   <option value="">Toàn trường</option>{departments.map((d) => <option key={d.id} value={d.id}>Chi đoàn {d.name}</option>)}
                 </Select>
               )}
             </div>
-            <div className="flex gap-2"><Button variant="secondary" onClick={() => router.back()}>Hủy</Button><Button loading={busy} disabled={!content.trim()} onClick={submit}>Đăng bài</Button></div>
+            <div className="grid grid-cols-2 gap-2 sm:flex"><Button variant="secondary" onClick={() => router.back()}>Hủy</Button><Button loading={busy} disabled={!content.trim()} onClick={submit}>Đăng bài</Button></div>
           </div>
         </div>
       </div>
