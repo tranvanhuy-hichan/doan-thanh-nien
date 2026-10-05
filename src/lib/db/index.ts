@@ -8,7 +8,8 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
  * Có thể đặt DB_CONNECTION_LIMIT; hoặc tự thêm connection_limit vào DATABASE_URL.
  */
 function datasourceUrl() {
-  const url = process.env.DATABASE_URL;
+  // Ưu tiên chuỗi qua bộ gom kết nối (pooler) nếu có; DATABASE_URL vẫn là kết nối trực tiếp dùng cho tạo bảng/seed.
+  const url = process.env.DATABASE_POOLED_URL || process.env.DATABASE_URL;
   if (!url || /[?&]connection_limit=/.test(url)) return url;
   const limit = process.env.DB_CONNECTION_LIMIT ?? "2";
   return `${url}${url.includes("?") ? "&" : "?"}connection_limit=${limit}&pool_timeout=20`;
