@@ -26,3 +26,25 @@
 @media print {
   .no-print { display: none !important; }
 }
+
+/* Mobile: bảng -> danh sách thẻ (nhãn lấy từ data-label do ResponsiveTable gắn) */
+@media (max-width: 639px) {
+  .rtable, .rtable tbody { display: block; width: 100%; }
+  .rtable thead { display: none; }
+  .rtable tbody tr {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1rem;
+    margin-bottom: 0.625rem; padding: 0.75rem 0.875rem;
+    background: #fff; border: 1px solid var(--color-border); border-radius: 0.5rem;
+  }
+  .rtable tbody td { display: block; min-width: 0; padding: 0; border: 0; overflow-wrap: anywhere; }
+  .rtable tbody td::before {
+    content: attr(data-label); display: block; margin-bottom: 1px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; color: var(--color-muted);
+  }
+  /* Ô đầu = tiêu đề thẻ; ô cuối rỗng nhãn (nút thao tác) trải hết dòng */
+  .rtable tbody td:first-child { grid-column: 1 / -1; font-size: 15px; }
+  .rtable tbody td:first-child::before, .rtable tbody td[data-label=""]::before { display: none; }
+  .rtable tbody td[data-label=""] { grid-column: 1 / -1; text-align: left; }
+  .rtable tbody td.text-right { text-align: left; }
+  .rtable tbody td:only-child { grid-column: 1 / -1; }
+}

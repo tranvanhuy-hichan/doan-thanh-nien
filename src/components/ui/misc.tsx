@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight, Inbox } from "lucide-react";
 import { cn, initials } from "@/utils";
 import { buttonClass } from "./button";
+import { ResponsiveTable } from "./responsive-table";
 
 const tones = {
   green: "bg-primary-light text-primary-dark",
@@ -90,8 +91,8 @@ export function Alert({ tone = "red", children }: { tone?: "red" | "amber" | "gr
 /** Bảng dữ liệu: bọc để cuộn ngang trên màn hình nhỏ. */
 export function DataTable({ children }: { children: React.ReactNode }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-white">
-      <table className="w-full text-left text-sm [&_tr:last-child_td]:border-b-0">{children}</table>
+    <div className="overflow-x-auto rounded-lg border border-border bg-white max-sm:overflow-visible max-sm:border-0 max-sm:bg-transparent">
+      <ResponsiveTable>{children}</ResponsiveTable>
     </div>
   );
 }
