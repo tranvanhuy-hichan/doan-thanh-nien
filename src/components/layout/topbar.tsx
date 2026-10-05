@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { Bell, ChevronDown, ChevronRight, KeyRound, LogOut } from "lucide-react";
 import { cn, relativeTime } from "@/utils";
 import { PAGE_TITLES, PATH_TITLES } from "@/lib/nav";
+import { DoanLogo } from "./logo";
 import { Avatar } from "@/components/ui/misc";
 import { logoutAction } from "@/actions/auth";
 import { markAllNotificationsRead, markNotificationRead } from "@/actions/notifications";
@@ -90,7 +91,8 @@ export function Topbar({ user, roleLabel, notifications, unread }: {
   useOutside(ref, () => setOpen(false));
   return (
     <header className="no-print sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-border bg-white/90 px-4 backdrop-blur-sm lg:px-6">
-      <div className="flex min-w-0 items-center gap-2">
+      <div className="flex min-w-0 items-center gap-2.5">
+        <Link href="/dashboard" className="shrink-0 md:hidden" aria-label="Trang chủ"><DoanLogo className="h-8" /></Link>
         <Breadcrumb />
       </div>
       <div className="flex items-center gap-1">
