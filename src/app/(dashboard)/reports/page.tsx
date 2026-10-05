@@ -32,7 +32,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
         <Stat label="Tỷ lệ tham gia" value={`${rate}%`} />
       </div>
       <Section title="Chi tiết theo hoạt động" className="mt-8">
-        {rows.length === 0 ? <div className="rounded-lg border border-border bg-white"><EmptyState title="Không có hoạt động trong kỳ báo cáo" /></div> : (
+        {rows.length === 0 ? <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Không có hoạt động trong kỳ báo cáo" /></div> : (
           <>
           <CompactList items={rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((a) => ({
             id: a.id, title: a.title, subtitle: `${formatDateTime(a.startAt)} · ${a.department?.name ?? "Toàn trường"}`, value: `${a.rate}%`, href: `/activities/${a.id}`,

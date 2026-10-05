@@ -39,7 +39,7 @@ export default async function EmulationPage({ searchParams }: { searchParams: Pr
       <PeriodFilter type={period.type} value={period.value} />
 
       {ranking.length === 0 ? (
-        <div className="rounded-lg border border-border bg-white"><EmptyState title="Chưa có Chi đoàn nào" /></div>
+        <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Chưa có Chi đoàn nào" /></div>
       ) : (
         <>
         <RankingList items={ranking.map((r) => ({ ...r, mine: user.departmentId === r.id, canOpen: canManageDepartment(user, r.id) }))} />
@@ -73,9 +73,9 @@ export default async function EmulationPage({ searchParams }: { searchParams: Pr
       </p>
 
       <Section title={admin ? "Điểm thi đua trường đã ghi nhận" : "Điểm thi đua trường của Chi đoàn bạn"} className="mt-8">
-        {records.length === 0 ? <div className="rounded-lg border border-border bg-white"><EmptyState title="Chưa có bản ghi trong kỳ này" /></div> : (
+        {records.length === 0 ? <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Chưa có bản ghi trong kỳ này" /></div> : (
           <>
-          <ul className="divide-y divide-border rounded-lg border border-border bg-white sm:hidden">
+          <ul className="divide-y divide-border rounded-lg border border-border bg-white/85 sm:hidden">
             {records.map((r) => (
               <li key={r.id} className="flex items-center gap-3 px-3 py-2.5">
                 <div className="min-w-0 flex-1">

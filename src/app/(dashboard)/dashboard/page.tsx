@@ -150,7 +150,7 @@ async function MemberDashboard({ user }: { user: Awaited<ReturnType<typeof requi
       </div>
       <Section title="Hoạt động sắp tới" className="mt-8" actions={<Link href="/activities" className="text-[13px] text-primary hover:underline">Xem tất cả</Link>}>
         {upcoming.length === 0 ? <EmptyState title="Chưa có hoạt động sắp tới" /> : (
-          <ul className="divide-y divide-border rounded-lg border border-border bg-white">
+          <ul className="divide-y divide-border rounded-lg border border-border bg-white/85">
             {upcoming.map((a) => (
               <li key={a.id}>
                 <Link href={`/activities/${a.id}`} className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-50">

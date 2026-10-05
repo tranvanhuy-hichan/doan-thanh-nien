@@ -42,7 +42,7 @@ export default async function AchievementsPage() {
         </div>
         <Section title="Huy hiệu" className="mt-8">
           {badges.length === 0 ? <EmptyState title="Chưa có huy hiệu nào được thiết lập" /> : (
-            <ul className="divide-y divide-border rounded-lg border border-border bg-white">
+            <ul className="divide-y divide-border rounded-lg border border-border bg-white/85">
               {badges.map((b) => {
                 const got = owned.get(b.id);
                 const value = Math.min(progress(b), b.threshold);
@@ -80,7 +80,7 @@ export default async function AchievementsPage() {
     <>
       <PageHeader title="Thành tích" description={isAdmin ? "Quản lý huy hiệu và đoàn viên tiêu biểu" : `Đoàn viên tiêu biểu Chi đoàn ${user.departmentName}`} actions={isAdmin && <BadgeFormButton categories={categories} />} />
       <Section title="Huy hiệu">
-        {badges.length === 0 ? <div className="rounded-lg border border-border bg-white"><EmptyState title="Chưa có huy hiệu" description="Tạo huy hiệu để ghi nhận thành tích của đoàn viên." /></div> : (
+        {badges.length === 0 ? <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Chưa có huy hiệu" description="Tạo huy hiệu để ghi nhận thành tích của đoàn viên." /></div> : (
           <>
           <CompactList items={badges.map((b) => ({ id: b.id, title: b.name, subtitle: b.description, leading: <BadgeIcon name={b.icon} className="size-5 text-primary" />, value: b._count.members,
             details: [["Điều kiện", `${CRITERIA_LABEL[b.criteria]}${b.category ? ` (${b.category.name})` : ""} ≥ ${b.threshold}`], ["Đã đạt", b._count.members]],

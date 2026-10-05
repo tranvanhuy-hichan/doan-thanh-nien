@@ -91,7 +91,7 @@ export function Alert({ tone = "red", children }: { tone?: "red" | "amber" | "gr
 /** Bảng dữ liệu: bọc để cuộn ngang trên màn hình nhỏ. */
 export function DataTable({ children }: { children: React.ReactNode }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-white max-sm:overflow-visible max-sm:border-0 max-sm:bg-transparent">
+    <div className="overflow-x-auto rounded-lg border border-border bg-white/85 max-sm:overflow-visible max-sm:border-0 max-sm:bg-transparent">
       <ResponsiveTable>{children}</ResponsiveTable>
     </div>
   );
@@ -100,7 +100,7 @@ export const Th = ({ children, className }: { children?: React.ReactNode; classN
   <th className={cn("border-b border-border bg-slate-50 px-4 py-2.5 text-xs font-semibold tracking-wide text-muted uppercase whitespace-nowrap", className)}>{children}</th>
 );
 export const Td = ({ children, className, colSpan }: { children?: React.ReactNode; className?: string; colSpan?: number }) => (
-  <td colSpan={colSpan} className={cn("border-b border-border px-4 py-2.5 align-middle last:border-b-0", className)}>{children}</td>
+  <td colSpan={colSpan} className={cn("border-b border-border px-4 py-2.5 align-middle", className)}>{children}</td>
 );
 
 export function Pagination({ page, pageSize, total, basePath, params }: {

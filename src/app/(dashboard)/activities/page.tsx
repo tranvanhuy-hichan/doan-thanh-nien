@@ -53,7 +53,7 @@ export default async function ActivitiesPage({ searchParams }: { searchParams: P
         { type: "month", name: "month" },
       ]} />
       {activities.length === 0 ? (
-        <div className="rounded-lg border border-border bg-white"><EmptyState title="Chưa có hoạt động nào" description={canCreate ? "Tạo hoạt động đầu tiên để bắt đầu điểm danh." : "Các hoạt động mới sẽ xuất hiện tại đây."} /></div>
+        <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Chưa có hoạt động nào" description={canCreate ? "Tạo hoạt động đầu tiên để bắt đầu điểm danh." : "Các hoạt động mới sẽ xuất hiện tại đây."} /></div>
       ) : (
         <>
         <CompactList items={activities.map((a) => ({

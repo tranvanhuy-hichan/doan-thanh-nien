@@ -28,7 +28,7 @@ export function CompactList({ items }: { items: CompactItem[] }) {
   const [sel, setSel] = useState<CompactItem | null>(null);
   return (
     <>
-      <ul className="divide-y divide-border rounded-lg border border-border bg-white sm:hidden">
+      <ul className="divide-y divide-border rounded-lg border border-border bg-white/85 sm:hidden">
         {items.map((it) => (
           <li key={it.id}>
             <button onClick={() => setSel(it)} className={cn("flex w-full items-center gap-3 px-3 py-2.5 text-left", it.highlight && "bg-primary-light/50")}>

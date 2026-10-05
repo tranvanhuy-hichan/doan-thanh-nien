@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import { cn } from "@/utils";
 
-const control = "w-full rounded-md border border-border bg-white px-3 text-sm placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:bg-slate-50 disabled:text-muted";
+const control = "w-full rounded-md border border-border bg-white/85 px-3 text-sm placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:bg-slate-50 disabled:text-muted";
 
 export const Input = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(function Input({ className, ...p }, ref) {
   return <input ref={ref} className={cn(control, "h-9", className)} {...p} />;

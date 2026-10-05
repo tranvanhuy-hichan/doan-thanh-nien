@@ -47,7 +47,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
         { type: "select", name: "status", label: "Trạng thái", options: [{ value: "ATTENDED", label: "Tham gia" }, { value: "REGISTERED", label: "Đã đăng ký" }, { value: "ABSENT", label: "Vắng mặt" }] },
       ]} />
       {rows.length === 0 ? (
-        <div className="rounded-lg border border-border bg-white"><EmptyState title="Chưa có hoạt động nào" description="Lịch sử sẽ xuất hiện sau khi bạn đăng ký hoặc điểm danh hoạt động." /></div>
+        <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Chưa có hoạt động nào" description="Lịch sử sẽ xuất hiện sau khi bạn đăng ký hoặc điểm danh hoạt động." /></div>
       ) : (
         <>
         <CompactList items={rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((r) => ({

@@ -43,7 +43,7 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
         actions={staff && <Link href="/feed/new" className={buttonClass()}><Plus className="size-4" />Đăng bài</Link>} />
       <div className="w-full space-y-4">
         {posts.length === 0 ? (
-          <div className="rounded-lg border border-border bg-white"><EmptyState title="Chưa có bài viết nào" description={staff ? "Hãy đăng bài đầu tiên cho đoàn viên." : "Các bài đăng mới sẽ xuất hiện tại đây."} /></div>
+          <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Chưa có bài viết nào" description={staff ? "Hãy đăng bài đầu tiên cho đoàn viên." : "Các bài đăng mới sẽ xuất hiện tại đây."} /></div>
         ) : posts.map((p) => (
           <PostCard key={p.id} meName={user.fullName} meAvatar={user.avatarUrl} post={{
             id: p.id, content: p.content, imageUrl: p.imageUrl, createdAt: p.createdAt.toISOString(),

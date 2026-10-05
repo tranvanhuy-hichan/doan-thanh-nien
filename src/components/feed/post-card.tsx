@@ -41,7 +41,7 @@ export function PostCard({ post, meName, meAvatar }: { post: PostView; meName: s
   });
 
   return (
-    <article className="rounded-lg border border-border bg-white">
+    <article className="rounded-lg border border-border bg-white/85">
       <div className="flex items-start gap-3 p-4 pb-2">
         <Avatar name={post.author.name} src={post.author.avatarUrl} size={36} />
         <div className="min-w-0 flex-1">

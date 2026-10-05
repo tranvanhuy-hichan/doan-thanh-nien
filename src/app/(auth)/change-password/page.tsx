@@ -13,7 +13,7 @@ export default async function ChangePasswordPage() {
         <h1 className="text-lg font-semibold">{user.mustChangePassword ? "Đặt mật khẩu mới" : "Đổi mật khẩu"}</h1>
         {user.mustChangePassword && <p className="mt-1 text-sm text-muted">Đây là lần đăng nhập đầu tiên, bạn cần đổi mật khẩu tạm thời trước khi tiếp tục.</p>}
       </div>
-      <div className="rounded-lg border border-border bg-white p-6">
+      <div className="rounded-lg border border-border bg-white/85 p-6">
         <ChangePasswordForm redirectTo="/dashboard" />
       </div>
     </div>

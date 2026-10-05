@@ -89,7 +89,7 @@ export function Topbar({ user, roleLabel, notifications, unread, onMenu }: {
   const ref = useRef<HTMLDivElement>(null);
   useOutside(ref, () => setOpen(false));
   return (
-    <header className="no-print sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-border bg-white px-4 lg:px-6">
+    <header className="no-print sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-border bg-white/90 px-4 backdrop-blur-sm lg:px-6">
       <div className="flex min-w-0 items-center gap-2">
         <button onClick={onMenu} className="rounded-md p-1.5 hover:bg-slate-100 md:hidden" aria-label="Mở menu"><Menu className="size-5" /></button>
         <Breadcrumb />

@@ -61,7 +61,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
           { value: "GRADUATED", label: "Đã ra trường" }, { value: "LOCKED", label: "Tài khoản bị khóa" }] },
       ]} />
       {members.length === 0 ? (
-        <div className="rounded-lg border border-border bg-white"><EmptyState title="Không có đoàn viên nào" description="Thử đổi bộ lọc, hoặc thêm đoàn viên mới." /></div>
+        <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Không có đoàn viên nào" description="Thử đổi bộ lọc, hoặc thêm đoàn viên mới." /></div>
       ) : (
         <>
         <CompactList items={members.map((m) => ({

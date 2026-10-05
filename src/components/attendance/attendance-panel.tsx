@@ -63,7 +63,7 @@ export function AttendancePanel({ activityId, title, open, canOpen, roster, tota
     <div className="space-y-8">
       <div className="grid gap-5 md:grid-cols-[18rem_1fr] md:gap-8">
         <div className="mx-auto w-full max-w-72 md:mx-0">
-          <div className="flex aspect-square items-center justify-center rounded-xl border border-border bg-white p-3">
+          <div className="flex aspect-square items-center justify-center rounded-xl border border-border bg-white/85 p-3">
             {open && qr ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={qr} alt="Mã QR điểm danh" className="size-full" />
@@ -112,9 +112,9 @@ export function AttendancePanel({ activityId, title, open, canOpen, roster, tota
           <div className="relative w-full sm:w-64"><Search className="pointer-events-none absolute top-2.5 left-2.5 size-4 text-slate-400" />
             <Input className="pl-8" placeholder="Tìm tên hoặc mã..." value={filter} onChange={(e) => { setFilter(e.target.value); setPage(1); }} /></div>
         </div>
-        {rows.length === 0 ? <div className="rounded-lg border border-border bg-white"><EmptyState title="Không có đoàn viên phù hợp" /></div> : (
+        {rows.length === 0 ? <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Không có đoàn viên phù hợp" /></div> : (
           <>
-          <ul className="divide-y divide-border rounded-lg border border-border bg-white sm:hidden">
+          <ul className="divide-y divide-border rounded-lg border border-border bg-white/85 sm:hidden">
             {pageRows.map((r) => (
               <li key={r.memberId} className="flex items-center gap-2 px-3 py-2">
                 <div className="min-w-0 flex-1">

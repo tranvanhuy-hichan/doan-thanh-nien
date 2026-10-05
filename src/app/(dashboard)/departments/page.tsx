@@ -33,7 +33,7 @@ export default async function DepartmentsPage({ searchParams }: { searchParams: 
       <PageHeader title={isAdmin ? "Chi đoàn" : "Chi đoàn của tôi"} description={isAdmin ? `${totalDepts} Chi đoàn` : undefined}
         actions={isAdmin && <DepartmentFormButton />} />
       {departments.length === 0 ? (
-        <div className="rounded-lg border border-border bg-white"><EmptyState title="Chưa có Chi đoàn nào" description="Tạo Chi đoàn đầu tiên để bắt đầu thêm đoàn viên." /></div>
+        <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Chưa có Chi đoàn nào" description="Tạo Chi đoàn đầu tiên để bắt đầu thêm đoàn viên." /></div>
       ) : (
         <>
         <CompactList items={departments.map((d, i) => ({

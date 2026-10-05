@@ -80,7 +80,7 @@ export function PeriodFilter({ type, value }: { type: PeriodType; value: string 
 
   return (
     <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
-      <div className="grid grid-cols-4 overflow-hidden rounded-md border border-border bg-white sm:inline-flex" role="tablist">
+      <div className="grid grid-cols-4 overflow-hidden rounded-md border border-border bg-white/85 sm:inline-flex" role="tablist">
         {(Object.keys(PERIOD_LABEL) as PeriodType[]).map((t) => (
           <button key={t} role="tab" aria-selected={t === type} onClick={() => go(t, currentValue(t))}
             className={`px-2 py-2 text-[13px] sm:px-3.5 sm:py-1.5 sm:text-sm ${t === type ? "bg-primary font-medium text-white" : "hover:bg-slate-50"}`}>{PERIOD_LABEL[t]}</button>

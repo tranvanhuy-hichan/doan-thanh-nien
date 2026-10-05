@@ -11,7 +11,7 @@ export function PageSkeleton() {
       <div className="mb-8 grid max-w-xl grid-cols-3 gap-6">
         {[0, 1, 2].map((i) => <div key={i}><Skeleton className="mb-2 h-3 w-16" /><Skeleton className="h-7 w-14" /></div>)}
       </div>
-      <div className="overflow-hidden rounded-lg border border-border bg-white">
+      <div className="overflow-hidden rounded-lg border border-border bg-white/85">
         <Skeleton className="h-10 w-full rounded-none" />
         {Array.from({ length: 7 }).map((_, i) => (
           <div key={i} className="flex items-center gap-6 border-t border-border px-4 py-3.5">

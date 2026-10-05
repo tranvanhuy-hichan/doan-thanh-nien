@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <h1 className="text-lg font-semibold">Trường THPT Sơn Hà</h1>
         <p className="text-sm text-muted">Đoàn TNCS Hồ Chí Minh</p>
       </div>
-      <div className="rounded-lg border border-border bg-white p-6">
+      <div className="rounded-lg border border-border bg-white/85 p-6">
         <LoginForm next={safeNext} />
       </div>
     </div>

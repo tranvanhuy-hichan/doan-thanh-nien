@@ -24,10 +24,10 @@ export default async function AttendanceIndexPage() {
     <>
       <PageHeader title="Điểm danh" description="Hoạt động đang và sắp diễn ra. Chọn hoạt động để mở mã QR điểm danh." />
       {activities.length === 0 ? (
-        <div className="rounded-lg border border-border bg-white"><EmptyState title="Không có hoạt động cần điểm danh" description="Tạo hoạt động mới để bắt đầu." action={<Link href="/activities/new" className={buttonClass()}>Tạo hoạt động</Link>} /></div>
+        <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Không có hoạt động cần điểm danh" description="Tạo hoạt động mới để bắt đầu." action={<Link href="/activities/new" className={buttonClass()}>Tạo hoạt động</Link>} /></div>
       ) : (
         <>
-        <ul className="divide-y divide-border rounded-lg border border-border bg-white sm:hidden">
+        <ul className="divide-y divide-border rounded-lg border border-border bg-white/85 sm:hidden">
           {activities.map((a) => (
             <li key={a.id} className="flex items-center gap-3 px-3 py-2.5">
               <div className="min-w-0 flex-1">

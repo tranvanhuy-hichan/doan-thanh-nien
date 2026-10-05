@@ -11,9 +11,9 @@ export function MemberCard({ fullName, code, department, className, avatarUrl, q
   const [qr, setQr] = useState("");
   useEffect(() => { QRCode.toDataURL(`doan:${qrToken}`, { margin: 1, width: 240, color: { dark: "#084a8c" } }).then(setQr); }, [qrToken]);
   return (
-    <div className="w-full max-w-sm overflow-hidden rounded-lg border border-border bg-white">
+    <div className="w-full max-w-sm overflow-hidden rounded-lg border border-border bg-white/85">
       <div className="flex items-center gap-2.5 bg-primary px-4 py-2.5 text-white">
-        <span className="flex items-center rounded bg-white p-1"><DoanLogo className="h-7" /></span>
+        <span className="flex items-center rounded bg-white/85 p-1"><DoanLogo className="h-7" /></span>
         <div className="leading-tight">
           <div className="text-[11px] tracking-wide uppercase opacity-90">Đoàn TNCS Hồ Chí Minh</div>
           <div className="text-[13px] font-semibold">Thẻ đoàn viên · THPT Sơn Hà</div>

@@ -29,7 +29,7 @@ export function PostComposer({ userName, avatarUrl, departments, fixedAudience }
   }
 
   return (
-    <div className="rounded-lg border border-border bg-white p-4">
+    <div className="rounded-lg border border-border bg-white/85 p-4">
       <div className="flex gap-3">
         <Avatar name={userName} src={avatarUrl} size={36} />
         <div className="min-w-0 flex-1 space-y-3">

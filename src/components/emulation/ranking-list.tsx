@@ -20,7 +20,7 @@ export function RankingList({ items }: { items: RankItem[] }) {
   ] : [];
   return (
     <>
-      <ul className="divide-y divide-border rounded-lg border border-border bg-white sm:hidden">
+      <ul className="divide-y divide-border rounded-lg border border-border bg-white/85 sm:hidden">
         {items.map((r) => (
           <li key={r.id}>
             <button onClick={() => setSel(r)} className={`block w-full px-3 py-2.5 text-left ${r.mine ? "bg-primary-light/50" : ""}`}>

@@ -50,7 +50,7 @@ export function Sidebar({ items, drawerOpen, onClose }: { items: NavItem[]; draw
   return (
     <>
       {/* Tablet: thu gọn còn icon. Desktop: đầy đủ. */}
-      <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-16 flex-col border-r border-border bg-white md:flex lg:w-60">
+      <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-16 flex-col border-r border-border bg-white/85 md:flex lg:w-60">
         <SidebarBody items={items} labels="hidden lg:inline" />
       </aside>
       {/* Mobile: drawer */}
