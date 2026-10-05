@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth/session";
 import { memberScope } from "@/lib/services/queries";
 import { formatDate, formatHours } from "@/utils";
 import { Avatar, DataTable, EmptyState, PageHeader, Section, Stat, Td, Th } from "@/components/ui/misc";
+import { TopMembersList } from "@/components/members/top-members-list";
 import { BadgeIcon } from "@/components/members/badge-icon";
 import { BadgeFormButton, CRITERIA_LABEL, DeleteBadgeButton } from "@/components/members/badge-manager";
 
@@ -94,6 +95,9 @@ export default async function AchievementsPage() {
       </Section>
       <Section title="Đoàn viên tiêu biểu">
         {top.length === 0 ? <EmptyState title="Chưa có dữ liệu" /> : (
+          <>
+          <TopMembersList items={top.map((m, i) => ({ id: m.id, rank: i + 1, name: m.fullName, avatarUrl: m.avatarUrl, department: m.department.name, attendances: m._count.attendances, badges: m._count.badges, points: m.totalPoints }))} />
+          <div className="max-sm:hidden">
           <DataTable>
             <thead><tr><Th>#</Th><Th>Đoàn viên</Th><Th>Chi đoàn</Th><Th className="text-right">Hoạt động</Th><Th className="text-right">Huy hiệu</Th><Th className="text-right">Điểm</Th></tr></thead>
             <tbody>{top.map((m, i) => (
@@ -101,6 +105,8 @@ export default async function AchievementsPage() {
                 <Td>{m.department.name}</Td><Td className="text-right tabular-nums">{m._count.attendances}</Td><Td className="text-right tabular-nums">{m._count.badges}</Td><Td className="text-right font-medium tabular-nums">{m.totalPoints}</Td></tr>
             ))}</tbody>
           </DataTable>
+          </div>
+          </>
         )}
       </Section>
     </>
