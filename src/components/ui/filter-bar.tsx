@@ -39,12 +39,12 @@ export function FilterBar({ fields }: { fields: FilterField[] }) {
               onChange={(e) => { setQ(e.target.value); clearTimeout(timer.current); timer.current = setTimeout(() => update(f.name, e.target.value.trim()), 350); }} />
           </div>
         ) : f.type === "select" ? (
-          <Select key={f.name} aria-label={f.label} value={sp.get(f.name) ?? ""} onChange={(e) => update(f.name, e.target.value)} className="w-auto min-w-36">
+          <Select key={f.name} aria-label={f.label} value={sp.get(f.name) ?? ""} onChange={(e) => update(f.name, e.target.value)} className="w-auto min-w-36 max-sm:min-w-[calc(50%-0.25rem)] max-sm:flex-1">
             <option value="">{f.label}</option>
             {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </Select>
         ) : (
-          <Input key={f.name} type="month" aria-label="Tháng" value={sp.get(f.name) ?? ""} onChange={(e) => update(f.name, e.target.value)} className="w-auto" />
+          <Input key={f.name} type="month" aria-label="Tháng" value={sp.get(f.name) ?? ""} onChange={(e) => update(f.name, e.target.value)} className="w-auto max-sm:min-w-[calc(50%-0.25rem)] max-sm:flex-1" />
         ),
       )}
       {active && (
