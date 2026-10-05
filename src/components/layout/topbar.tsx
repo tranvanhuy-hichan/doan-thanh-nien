@@ -22,19 +22,23 @@ function useOutside(ref: React.RefObject<HTMLElement | null>, onOut: () => void)
 
 function Breadcrumb() {
   const segs = usePathname().split("/").filter(Boolean);
-  const crumbs = segs.map((s, i) => { const href = "/" + segs.slice(0, i + 1).join("/"); return { href, label: PATH_TITLES[href] ?? PAGE_TITLES[s] }; }).filter((c) => c.label);
+  // Đoạn không có tên (mã/ID) hiển thị là "Chi tiết" và liên kết về trang chi tiết đó.
+  const crumbs = segs.map((s, i) => {
+    const href = "/" + segs.slice(0, i + 1).join("/");
+    return { href, label: PATH_TITLES[href] ?? PAGE_TITLES[s] ?? (i > 0 ? "Chi tiết" : undefined) };
+  }).filter((c): c is { href: string; label: string } => !!c.label);
   if (!crumbs.length) return null;
-  const last = crumbs[crumbs.length - 1];
-  const parents = crumbs.slice(0, -1);
   return (
-    <div className="flex min-w-0 items-center gap-1.5 text-sm">
-      {parents.map((c) => (
-        <span key={c.href} className="hidden items-center gap-1.5 text-muted sm:flex">
-          <Link href={c.href} className="hover:text-primary">{c.label}</Link><ChevronRight className="size-3.5" />
-        </span>
-      ))}
-      <span className="truncate font-semibold">{last.label}</span>
-    </div>
+    <nav aria-label="Đường dẫn" className="flex min-w-0 items-center gap-1 text-[13px] sm:gap-1.5 sm:text-sm">
+      {crumbs.map((c, i) => {
+        const last = i === crumbs.length - 1;
+        return (
+          <span key={c.href} className={cn("min-w-0 items-center gap-1 sm:gap-1.5", last ? "flex" : "flex shrink-0 text-muted", i < crumbs.length - 2 && "max-sm:hidden")}>
+            {last ? <span className="truncate font-semibold">{c.label}</span> : <><Link href={c.href} className="hover:text-primary">{c.label}</Link><ChevronRight className="size-3.5" /></>}
+          </span>
+        );
+      })}
+    </nav>
   );
 }
 

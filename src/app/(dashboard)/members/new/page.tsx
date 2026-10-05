@@ -10,7 +10,7 @@ export default async function NewMemberPage() {
   const departments = await db.department.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } });
   return (
     <>
-      <PageHeader title="Thêm đoàn viên" back={{ href: "/members" }} description="Hệ thống tự sinh mã đoàn viên và tài khoản đăng nhập." />
+      <PageHeader title="Thêm đoàn viên" description="Hệ thống tự sinh mã đoàn viên và tài khoản đăng nhập." />
       <MemberForm departments={departments} />
     </>
   );

@@ -27,16 +27,11 @@ export function Avatar({ name, src, size = 32 }: { name: string; src?: string | 
   );
 }
 
-export function PageHeader({ title, description, actions, back }: {
-  title: string; description?: string; actions?: React.ReactNode; back?: { href: string; label?: string };
+export function PageHeader({ title, description, actions }: {
+  title: string; description?: string; actions?: React.ReactNode;
 }) {
   return (
     <div className="mb-5">
-      {back && (
-        <Link href={back.href} className="mb-2 inline-flex items-center gap-1 text-[13px] text-muted hover:text-primary">
-          <ChevronLeft className="size-4" />{back.label ?? "Quay lại"}
-        </Link>
-      )}
       <div className="flex items-center justify-between gap-2 sm:items-start sm:gap-3">
         <h1 className="text-xl font-semibold max-sm:whitespace-nowrap">{title}</h1>
         {actions && (

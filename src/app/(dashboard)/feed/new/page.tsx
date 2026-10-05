@@ -10,7 +10,7 @@ export default async function NewPostPage() {
   const departments = user.role === "ADMIN" ? await db.department.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }) : [];
   return (
     <>
-      <PageHeader title="Đăng bài" back={{ href: "/feed", label: "Bảng tin" }} />
+      <PageHeader title="Đăng bài" />
       <PostComposer userName={user.fullName} avatarUrl={user.avatarUrl} departments={departments}
         fixedAudience={user.role === "SECRETARY" ? user.departmentName ?? undefined : undefined} />
     </>

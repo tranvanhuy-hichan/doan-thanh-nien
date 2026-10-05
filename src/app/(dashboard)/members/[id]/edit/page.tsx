@@ -17,7 +17,7 @@ export default async function EditMemberPage({ params }: { params: Promise<{ id:
   if (!m) notFound();
   return (
     <>
-      <PageHeader title={`Sửa: ${m.fullName}`} back={{ href: `/members/${id}` }} description={`Mã đoàn viên ${m.code}`} />
+      <PageHeader title={`Sửa: ${m.fullName}`} description={`Mã đoàn viên ${m.code}`} />
       <MemberForm id={id} departments={departments} initial={{
         fullName: m.fullName, gender: m.gender ?? "", dateOfBirth: toDateInput(m.dateOfBirth), joinedAt: toDateInput(m.joinedAt),
         cohort: m.cohort ?? "", departmentId: m.departmentId, className: m.class.name, status: m.status,

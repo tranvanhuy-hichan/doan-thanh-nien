@@ -15,7 +15,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
   if (!member) notFound();
   return (
     <>
-      <PageHeader title="Hồ sơ đoàn viên" back={{ href: "/members", label: "Danh sách đoàn viên" }}
+      <PageHeader title="Hồ sơ đoàn viên"
         actions={<MemberAdminActions id={member.id} locked={member.user.status === "LOCKED"} isAdmin={user.role === "ADMIN"} />} />
       <MemberProfile member={member} showAudit />
     </>

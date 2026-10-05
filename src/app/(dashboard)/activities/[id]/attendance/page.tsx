@@ -27,7 +27,7 @@ export default async function ActivityAttendancePage({ params }: { params: Promi
 
   return (
     <>
-      <PageHeader title="Điểm danh hoạt động" description={`${a.title} · ${formatDateTime(a.startAt)}`} back={{ href: `/activities/${id}`, label: "Chi tiết hoạt động" }} />
+      <PageHeader title="Điểm danh hoạt động" description={`${a.title} · ${formatDateTime(a.startAt)}`} />
       <AttendancePanel activityId={id} title={a.title} open={a.checkinOpen} canOpen={canOpenCheckin(a)} roster={roster} total={members.length} />
     </>
   );

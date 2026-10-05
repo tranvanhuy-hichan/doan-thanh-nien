@@ -14,7 +14,7 @@ export default async function NewActivityPage() {
   ]);
   return (
     <>
-      <PageHeader title="Tạo hoạt động" back={{ href: "/activities" }} description="Sau khi tạo, hệ thống sinh mã QR điểm danh cho hoạt động." />
+      <PageHeader title="Tạo hoạt động" description="Sau khi tạo, hệ thống sinh mã QR điểm danh cho hoạt động." />
       <ActivityForm categories={cats} departments={departments} lockedDepartment={user.role === "SECRETARY" ? user.departmentName ?? undefined : undefined} />
     </>
   );

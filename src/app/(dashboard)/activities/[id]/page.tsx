@@ -37,7 +37,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
 
   return (
     <>
-      <PageHeader title={a.title} back={{ href: "/activities", label: "Quay lại" }} actions={manage && <ManageActivityActions id={a.id} cancelled={!!a.cancelledAt} hasAttendance={a._count.attendances > 0} />} />
+      <PageHeader title={a.title} actions={manage && <ManageActivityActions id={a.id} cancelled={!!a.cancelledAt} hasAttendance={a._count.attendances > 0} />} />
       <div className="-mt-3 mb-5 flex flex-wrap items-center gap-2 text-sm text-muted">
         <ActivityStatusBadge status={status} /><span>{a.category.name}</span><span>·</span><span>{a.department ? `Chi đoàn ${a.department.name}` : "Toàn trường"}</span>
       </div>

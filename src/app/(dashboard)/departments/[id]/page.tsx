@@ -30,7 +30,7 @@ export default async function DepartmentDetailPage({ params, searchParams }: { p
   ]);
   return (
     <>
-      <PageHeader title={`Chi đoàn ${dept.name}`} description={`Bí thư: ${dept.secretary?.fullName ?? "chưa phân công"}`} back={{ href: "/departments" }} />
+      <PageHeader title={`Chi đoàn ${dept.name}`} description={`Bí thư: ${dept.secretary?.fullName ?? "chưa phân công"}`} />
       <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
         <Stat label="Đoàn viên" value={dept._count.members} />
         <Stat label="Hoạt động" value={dept._count.activities} />

@@ -20,7 +20,7 @@ export default async function EditActivityPage({ params }: { params: Promise<{ i
   ]);
   return (
     <>
-      <PageHeader title="Sửa hoạt động" back={{ href: `/activities/${id}` }} />
+      <PageHeader title="Sửa hoạt động" />
       <ActivityForm id={id} categories={cats} departments={departments}
         lockedDepartment={user.role === "SECRETARY" ? user.departmentName ?? undefined : undefined}
         pointsLocked={a._count.attendances > 0}
