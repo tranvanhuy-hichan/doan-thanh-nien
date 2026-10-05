@@ -4,14 +4,15 @@ import { formatDate, formatDateTime } from "@/utils";
 import { KIND_LABEL, articleHref } from "@/lib/services/public";
 import type { ArticleKind } from "@prisma/client";
 import { cn } from "@/utils";
+import { Thumb } from "./thumb";
 
 /** Tiêu đề khối có vạch xanh bên trái, giống bố cục trang trường. */
 export function Block({ title, href, children, className }: { title: string; href?: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={cn("rounded-lg border border-border bg-white/85", className)}>
-      <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
-        <h2 className="border-l-4 border-primary pl-3 text-[15px] font-bold tracking-wide text-primary-dark uppercase">{title}</h2>
-        {href && <Link href={href} className="text-[13px] text-primary hover:underline">Xem tất cả</Link>}
+    <section className={cn("overflow-hidden rounded-lg border border-primary/20 bg-white/85 shadow-sm", className)}>
+      <div className="flex items-center justify-between bg-gradient-to-r from-primary-dark to-primary px-4 py-2.5">
+        <h2 className="border-l-4 border-[#ffd400] pl-3 text-[15px] font-bold tracking-wide text-white uppercase">{title}</h2>
+        {href && <Link href={href} className="text-[13px] font-medium text-[#ffd400] hover:underline">Xem tất cả</Link>}
       </div>
       <div className="p-4">{children}</div>
     </section>
@@ -27,15 +28,12 @@ export function PageTitle({ title, description }: { title: string; description?:
   );
 }
 
-export type CardArticle = { id: string; kind: ArticleKind; title: string; slug: string; summary: string | null; coverUrl: string | null; publishedAt: Date | null; eventAt: Date | null; eventLocation: string | null };
+export type CardArticle = { id: string; kind: ArticleKind; title: string; slug: string; summary: string | null; coverUrl: string | null; attachments?: { url: string; name: string }[]; publishedAt: Date | null; eventAt: Date | null; eventLocation: string | null };
 
 export function ArticleRow({ a, showKind }: { a: CardArticle; showKind?: boolean }) {
   return (
     <article className="flex gap-3 border-b border-border py-3 last:border-0">
-      {a.coverUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={a.coverUrl} alt="" loading="lazy" className="h-20 w-28 shrink-0 rounded-md object-cover sm:h-24 sm:w-36" />
-      )}
+      <Thumb a={a} className="h-20 w-28 sm:h-24 sm:w-36" />
       <div className="min-w-0 flex-1">
         <Link href={articleHref(a.slug)} className="line-clamp-2 font-semibold hover:text-primary">{a.title}</Link>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted">
@@ -47,6 +45,23 @@ export function ArticleRow({ a, showKind }: { a: CardArticle; showKind?: boolean
         {a.summary && <p className="mt-1 line-clamp-2 text-sm text-slate-600">{a.summary}</p>}
       </div>
     </article>
+  );
+}
+
+/** Danh sách bài gọn (ảnh nhỏ + tiêu đề + ngày) cho cột bên. */
+export function SideArticleList({ items }: { items: CardArticle[] }) {
+  return (
+    <ul className="divide-y divide-border">
+      {items.map((a) => (
+        <li key={a.id} className="flex gap-3 py-2.5 first:pt-0 last:pb-0">
+          <Thumb a={a} className="size-14" />
+          <div className="min-w-0">
+            <Link href={articleHref(a.slug)} className="line-clamp-2 text-sm font-medium hover:text-primary">{a.title}</Link>
+            <span className="text-xs text-muted">{a.publishedAt && formatDate(a.publishedAt)}</span>
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
 

@@ -58,7 +58,7 @@ export async function saveActivityAction(id: string | null, input: unknown) {
       const imageChanged = (data.imagePublicId ?? null) !== existing.imagePublicId;
       await db.activity.update({
         where: { id },
-        data: { ...fields, imageUrl: data.imageUrl ?? null, imagePublicId: data.imagePublicId ?? null },
+        data: { ...fields, ...(existing.startAt.getTime() !== data.startAt.getTime() ? { reminderSentAt: null } : {}), imageUrl: data.imageUrl ?? null, imagePublicId: data.imagePublicId ?? null },
       });
       if (imageChanged) await deleteImage(existing.imagePublicId);
       await audit(user.id, "activity.update", "Activity", id, { title: data.title });

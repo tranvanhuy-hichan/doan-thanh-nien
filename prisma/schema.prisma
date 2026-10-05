@@ -55,6 +55,12 @@ enum ArticleKind {
   ANNOUNCEMENT // Thông báo
 }
 
+enum FeedbackStatus {
+  NEW
+  READ
+  RESOLVED
+}
+
 enum NotificationType {
   ACTIVITY_CREATED
   ACTIVITY_REMINDER
@@ -64,6 +70,7 @@ enum NotificationType {
   POINTS
   BADGE
   FEED
+  POLL
   SYSTEM
 }
 
@@ -188,6 +195,7 @@ model Activity {
   imageUrl        String?
   imagePublicId   String?
   cancelledAt     DateTime?
+  reminderSentAt  DateTime? // đã gửi nhắc lịch cho người đăng ký
   checkinOpen     Boolean   @default(false)
   qrNonce         String    @default(cuid()) // đổi nonce => mọi QR cũ vô hiệu
   createdById     String
@@ -493,4 +501,60 @@ model MarqueeItem {
   createdAt DateTime @default(now())
 
   @@index([active, sortOrder])
+}
+
+/// Góp ý từ học sinh (gửi ẩn danh từ trang công khai).
+model Feedback {
+  id        String         @id @default(cuid())
+  category  String?
+  content   String
+  contact   String? // cách liên hệ (không bắt buộc)
+  status    FeedbackStatus @default(NEW)
+  note      String? // ghi chú xử lý của Admin
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model Poll {
+  id          String    @id @default(cuid())
+  question    String
+  description String?
+  multiple    Boolean   @default(false)
+  closesAt    DateTime?
+  closed      Boolean   @default(false)
+  createdById String?
+  createdAt   DateTime  @default(now())
+
+  options PollOption[]
+  votes   PollVote[]
+
+  @@index([createdAt])
+}
+
+model PollOption {
+  id        String @id @default(cuid())
+  pollId    String
+  text      String
+  sortOrder Int    @default(0)
+
+  poll  Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes PollVote[]
+
+  @@index([pollId])
+}
+
+model PollVote {
+  id        String   @id @default(cuid())
+  pollId    String
+  optionId  String
+  userId    String
+  createdAt DateTime @default(now())
+
+  poll   Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, userId, optionId])
+  @@index([pollId, userId])
 }

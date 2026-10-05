@@ -17,6 +17,7 @@ export type CompactItem = {
   highlight?: boolean;
   /** Thông tin đầy đủ hiển thị trong hộp thoại khi bấm vào dòng. */
   details?: [string, React.ReactNode][];
+  /** Có href: bấm vào dòng đi thẳng tới trang chi tiết (không mở hộp thoại). */
   href?: string;
   hrefLabel?: string;
   /** Nút thao tác (sửa/xóa...) đặt trong hộp thoại. */
@@ -31,7 +32,7 @@ export function CompactList({ items }: { items: CompactItem[] }) {
       <ul className="divide-y divide-border rounded-lg border border-border bg-white/85 sm:hidden">
         {items.map((it) => (
           <li key={it.id}>
-            <button onClick={() => setSel(it)} className={cn("flex w-full items-center gap-3 px-3 py-2.5 text-left", it.highlight && "bg-primary-light/50")}>
+            <Row it={it} onSelect={() => setSel(it)}>
               {it.rank !== undefined && (
                 <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold", it.rank <= 3 ? "bg-primary text-white" : "bg-slate-100 text-slate-600")}>{it.rank}</span>
               )}
@@ -42,7 +43,7 @@ export function CompactList({ items }: { items: CompactItem[] }) {
               </span>
               {it.badge}
               {it.value !== undefined && <span className="font-semibold tabular-nums">{it.value}</span>}
-            </button>
+            </Row>
           </li>
         ))}
       </ul>
@@ -67,4 +68,9 @@ export function CompactList({ items }: { items: CompactItem[] }) {
       </Modal>
     </>
   );
+}
+
+function Row({ it, onSelect, children }: { it: CompactItem; onSelect: () => void; children: React.ReactNode }) {
+  const cls = cn("flex w-full items-center gap-3 px-3 py-2.5 text-left", it.highlight && "bg-primary-light/50");
+  return it.href ? <Link href={it.href} className={cls}>{children}</Link> : <button onClick={onSelect} className={cls}>{children}</button>;
 }

@@ -11,13 +11,16 @@ import { SITE_PAGES } from "@/lib/services/public";
 import { uniqueSlug } from "@/lib/slug";
 import { deleteImage, isOwnPublicId } from "@/lib/cloudinary";
 import { notifyUsers } from "@/lib/notify";
+import { kindSlug } from "@/lib/services/kind";
 
 const refreshPublic = () => revalidatePath("/", "layout");
 
 export async function saveArticleAction(id: string | null, input: unknown) {
   return run<{ id: string }>(async () => {
-    const admin = await requireRole(["ADMIN"]);
+    const admin = await requireRole(["ADMIN", "SECRETARY"]);
+    const isSec = admin.role === "SECRETARY"; // Bí thư chỉ lưu bản nháp của chính mình, Admin duyệt rồi mới đăng
     const d = articleSchema.parse(input);
+    if (isSec) d.published = false;
     if (d.coverPublicId && !isOwnPublicId(d.coverPublicId, "activities")) throw new UserError("Ảnh không hợp lệ");
     if (d.kind === "EVENT" && !d.eventAt) throw new UserError("Sự kiện cần có thời gian diễn ra");
     for (const f of d.attachments) {
@@ -31,6 +34,7 @@ export async function saveArticleAction(id: string | null, input: unknown) {
     if (id) {
       const cur = await db.article.findUnique({ where: { id } });
       if (!cur) throw new UserError("Không tìm thấy bài viết");
+      if (isSec && (cur.authorId !== admin.id || cur.published || cur.kind !== d.kind)) throw new UserError("Bạn chỉ sửa được bản nháp của mình");
       const publishedAt = d.published ? cur.publishedAt ?? new Date() : null;
       const existing = await db.articleAttachment.findMany({ where: { articleId: id } });
       const keep = new Set(d.attachments.map((f) => f.publicId));
@@ -45,7 +49,7 @@ export async function saveArticleAction(id: string | null, input: unknown) {
       if (cur.coverPublicId && cur.coverPublicId !== base.coverPublicId) await deleteImage(cur.coverPublicId);
       await audit(admin.id, "article.update", "Article", id, { title: d.title });
       refreshPublic();
-      return { data: { id }, message: "Đã cập nhật bài viết" };
+      return { data: { id }, message: isSec ? "Đã lưu bản nháp" : "Đã cập nhật bài viết" };
     }
     const a = await db.article.create({ data: { ...base, slug: uniqueSlug(d.title), publishedAt: d.published ? new Date() : null, authorId: admin.id, attachments: { create: d.attachments } } });
     if (d.published && d.kind === "ANNOUNCEMENT") {
@@ -53,8 +57,12 @@ export async function saveArticleAction(id: string | null, input: unknown) {
       await notifyUsers(users.map((u) => u.id), { type: "SYSTEM", title: "Thông báo mới từ Đoàn trường", body: d.title, link: `/bai-viet/${a.slug}` });
     }
     await audit(admin.id, "article.create", "Article", a.id, { title: d.title, kind: d.kind });
+    if (isSec) {
+      const admins = await db.user.findMany({ where: { role: "ADMIN", status: "ACTIVE" }, select: { id: true } });
+      await notifyUsers(admins.map((u) => u.id), { type: "SYSTEM", title: "Bài viết chờ duyệt", body: `${admin.fullName}: ${d.title}`, link: `/cms/${kindSlug(d.kind)}/${a.id}` });
+    }
     refreshPublic();
-    return { data: { id: a.id }, message: "Đã đăng bài viết" };
+    return { data: { id: a.id }, message: isSec ? "Đã lưu bản nháp, chờ Admin duyệt" : "Đã đăng bài viết" };
   });
 }
 
@@ -73,9 +81,10 @@ export async function setArticlePublishedAction(id: string, published: boolean) 
 
 export async function deleteArticleAction(id: string) {
   return run(async () => {
-    const admin = await requireRole(["ADMIN"]);
+    const admin = await requireRole(["ADMIN", "SECRETARY"]);
     const cur = await db.article.findUnique({ where: { id }, include: { attachments: true } });
     if (!cur) throw new UserError("Không tìm thấy bài viết");
+    if (admin.role === "SECRETARY" && (cur.authorId !== admin.id || cur.published)) throw new UserError("Bạn chỉ xóa được bản nháp của mình");
     await db.article.delete({ where: { id } });
     await deleteImage(cur.coverPublicId);
     for (const f of cur.attachments) await deleteImage(f.publicId);
@@ -107,6 +116,9 @@ export async function saveSiteSettingsAction(input: Record<string, string>) {
     if (newBanner && (!isOwnPublicId(newBanner, "activities") || !String(input.bannerUrl ?? "").startsWith("https://res.cloudinary.com/"))) throw new UserError("Ảnh banner không hợp lệ");
     for (const f of SETTING_FIELDS) {
       const value = String(input[f.key] ?? "").trim().slice(0, 1000);
+      if ((f.key === "facebook" || f.key === "youtube") && value && !/^https?:\/\//.test(value)) throw new UserError(`${f.label} phải bắt đầu bằng https://`);
+      if (f.key === "countdownLink" && value && !(value.startsWith("/") || /^https?:\/\//.test(value))) throw new UserError("Liên kết phải bắt đầu bằng / hoặc https://");
+      if (f.key === "countdownAt" && value && !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) throw new UserError("Thời điểm đếm ngược không hợp lệ");
       await db.siteSetting.upsert({ where: { key: f.key }, update: { value }, create: { key: f.key, value } });
     }
     if (before.bannerPublicId && before.bannerPublicId !== newBanner) await deleteImage(before.bannerPublicId);

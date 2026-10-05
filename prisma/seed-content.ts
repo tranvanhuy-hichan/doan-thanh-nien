@@ -98,6 +98,32 @@ async function main() {
     await db.marqueeItem.create({ data: { text: m.text, link: m.link, sortOrder: i } });
     marq++;
   }
+  // Ảnh bìa + tệp đính kèm mẫu cho bài [Demo] (ảnh minh họa SVG trong public/demo-covers; PDF mẫu của Cloudinary demo) để xem hiển thị hình thu nhỏ
+  const demo = await db.article.findMany({ where: { title: { startsWith: "[Demo]" } }, orderBy: { createdAt: "asc" }, include: { attachments: { select: { id: true } } } });
+  let withMedia = 0;
+  for (const [i, a] of demo.entries()) {
+    if (a.kind === "NEWS" || a.kind === "EVENT") {
+      // Bỏ qua 1 bài tin để thấy trường hợp "không có hình"
+      if (i % 4 !== 3) {
+        const t = a.title.toLowerCase();
+        const motif = t.includes("chủ nhật xanh") ? "leaf" : t.includes("hiến máu") ? "heart" : t.includes("bóng") ? "ball" : t.includes("giao thông") ? "road" : t.includes("thuốc lá") || t.includes("tuyên truyền") ? "book" : "star";
+        await db.article.update({ where: { id: a.id }, data: { coverUrl: `/demo-covers/${motif}.svg`, coverPublicId: null } });
+        withMedia++;
+      }
+    } else if (a.attachments.length === 0 && i % 2 === 0) {
+      const pdf = a.kind === "PLAN";
+      await db.articleAttachment.create({ data: pdf
+        ? { articleId: a.id, name: "ke-hoach-mau.pdf", url: "https://res.cloudinary.com/demo/image/upload/multi_page_pdf.pdf", publicId: "demo/multi_page_pdf", size: 120000, mime: "application/pdf" }
+        : { articleId: a.id, name: "danh-sach-mau.xlsx", url: "https://res.cloudinary.com/demo/raw/upload/danh-sach-mau.xlsx", publicId: "demo/danh-sach-mau.xlsx", size: 20000, mime: "xlsx" } });
+      withMedia++;
+    }
+  }
+  console.log(`✓ Hình/tệp mẫu: ${withMedia} bài`);
+
+  // Thông tin liên hệ hiển thị ở thanh trên cùng (chỉ điền nếu chưa có)
+  for (const [key, value] of [["phone", "0255.3824775"], ["email", "vanphongso@quangngai.edu.vn"], ["facebook", "https://www.facebook.com/"], ["youtube", "https://www.youtube.com/"]]) {
+    await db.siteSetting.upsert({ where: { key }, update: {}, create: { key, value } });
+  }
   console.log(`✓ Nội dung demo: +${created} bài viết, +${reports} báo cáo Chi đoàn, +${marq} dòng chữ chạy, trang giới thiệu đã có nội dung (nếu trống).`);
 }
 

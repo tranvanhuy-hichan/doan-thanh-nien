@@ -14,7 +14,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ r
       <div className="mt-2 border-b border-border pb-3 text-sm text-muted">Chi đoàn {r.department.name} · {formatDate(r.createdAt)}{r.createdBy ? ` · ${r.createdBy.fullName}` : ""}</div>
       {r.imageUrl && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={r.imageUrl} alt="" className="my-5 w-full rounded-lg border border-border object-cover" />
+        <img src={r.imageUrl} alt="" className="mx-auto my-5 max-h-72 w-auto max-w-full rounded-lg border border-border object-contain sm:max-h-96" />
       )}
       <div className="mt-5 rounded-lg bg-white/85 p-5"><RichText text={r.content} /></div>
     </article>

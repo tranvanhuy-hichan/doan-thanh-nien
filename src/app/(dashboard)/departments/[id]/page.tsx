@@ -6,6 +6,7 @@ import { requireRole } from "@/lib/auth/session";
 import { canManageDepartment } from "@/lib/permissions";
 import { participationRate } from "@/lib/services/queries";
 import { formatDateShort, pageParam } from "@/utils";
+import { DeleteDepartmentButton, DepartmentFormButton, SecretaryButton } from "@/components/members/department-actions";
 import { Avatar, DataTable, EmptyState, PageHeader, Pagination, Section, Stat, Td, Th } from "@/components/ui/misc";
 
 export const metadata = { title: "Chi đoàn" };
@@ -19,18 +20,24 @@ export default async function DepartmentDetailPage({ params, searchParams }: { p
   if (!canManageDepartment(user, id)) notFound(); // bí thư Chi đoàn A mở URL Chi đoàn B -> 404
   const dept = await db.department.findUnique({
     where: { id },
-    include: { secretary: { select: { fullName: true } }, _count: { select: { members: true, activities: true } } },
+    include: { secretary: { select: { id: true, fullName: true, username: true } }, _count: { select: { members: true, activities: true } } },
   });
   if (!dept) notFound();
-  const [rate, points, members, activities] = await Promise.all([
+  const [rate, points, members, activities, freeSecretaries] = await Promise.all([
     participationRate(id),
     db.member.aggregate({ where: { departmentId: id }, _sum: { totalPoints: true } }),
     db.member.findMany({ where: { departmentId: id }, orderBy: [{ totalPoints: "desc" }, { fullName: "asc" }], skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE, include: { class: true } }),
     db.activity.findMany({ where: { departmentId: id }, orderBy: { startAt: "desc" }, take: 5, include: { _count: { select: { attendances: true } } } }),
+    db.user.findMany({ where: { role: "SECRETARY", secretaryOf: null }, select: { id: true, fullName: true, username: true }, orderBy: { fullName: "asc" } }),
   ]);
   return (
     <>
-      <PageHeader title={`Chi đoàn ${dept.name}`} description={`Bí thư: ${dept.secretary?.fullName ?? "chưa phân công"}`} />
+      <PageHeader title={`Chi đoàn ${dept.name}`} description={`Bí thư: ${dept.secretary?.fullName ?? "chưa phân công"}`}
+        actions={<>
+          <SecretaryButton departmentId={dept.id} current={dept.secretary} available={freeSecretaries} />
+          <DepartmentFormButton dept={{ id: dept.id, name: dept.name, description: dept.description }} />
+          <DeleteDepartmentButton id={dept.id} name={dept.name} />
+        </>} />
       <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
         <Stat label="Đoàn viên" value={dept._count.members} />
         <Stat label="Hoạt động" value={dept._count.activities} />

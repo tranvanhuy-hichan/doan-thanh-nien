@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { Bell, ChevronDown, ChevronRight, KeyRound, LogOut } from "lucide-react";
+import { ArrowLeft, Bell, ChevronDown, ChevronRight, KeyRound, LogOut } from "lucide-react";
 import { cn, relativeTime } from "@/utils";
 import { PAGE_TITLES, PATH_TITLES } from "@/lib/nav";
 import { NotificationControls } from "@/components/notifications/controls";
@@ -31,6 +31,7 @@ function Breadcrumb() {
   if (!crumbs.length) return null;
   return (
     <nav aria-label="Đường dẫn" className="flex min-w-0 items-center gap-1 text-[13px] sm:gap-1.5 sm:text-sm">
+      {crumbs.length > 1 && <Link href={crumbs[crumbs.length - 2].href} aria-label="Quay lại" className="mr-0.5 -ml-1 shrink-0 rounded-md p-1.5 text-slate-600 hover:bg-slate-100"><ArrowLeft className="size-4" /></Link>}
       {crumbs.map((c, i) => {
         const last = i === crumbs.length - 1;
         return (

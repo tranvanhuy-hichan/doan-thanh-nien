@@ -1,4 +1,4 @@
-import { FileText, Globe, Settings, Award, BarChart3, CalendarDays, CheckSquare, IdCard, LayoutDashboard, Newspaper, QrCode, Trophy, School, History, Users, type LucideIcon } from "lucide-react";
+import { FileText, Globe, Settings, Award, BarChart3, CalendarDays, CheckSquare, IdCard, LayoutDashboard, Newspaper, QrCode, Trophy, School, History, Users, Vote, MessageSquare, type LucideIcon } from "lucide-react";
 import type { Role } from "@prisma/client";
 
 export type NavItem = { href: string; label: string; icon: LucideIcon; /** Tiền tố đường dẫn coi là đang ở mục này (mặc định = href). */ match?: string; /** Menu con (hiển thị dạng nhóm mở/đóng). */ children?: { href: string; label: string }[] };
@@ -14,6 +14,7 @@ export function navFor(role: Role): NavItem[] {
       { href: "/checkin", label: "Quét QR", icon: QrCode },
       { href: "/history", label: "Lịch sử", icon: History },
       { href: "/achievements", label: "Thành tích", icon: Award },
+      { href: "/polls", label: "Bình chọn", icon: Vote },
     ];
   }
   if (role === "SECRETARY") {
@@ -26,7 +27,12 @@ export function navFor(role: Role): NavItem[] {
       { href: "/attendance", label: "Điểm danh", icon: CheckSquare },
       { href: "/emulation", label: "Thi đua", icon: Trophy },
       { href: "/achievements", label: "Thành tích", icon: Award },
+      { href: "/polls", label: "Bình chọn", icon: Vote },
       { href: "/chapter-reports", label: "Báo cáo Chi đoàn", icon: FileText },
+      {
+        href: "/cms/tin-tuc", label: "Bài viết website", icon: Globe, match: "/cms",
+        children: [{ href: "/cms/tin-tuc", label: "Tin tức" }, { href: "/cms/ke-hoach", label: "Kế hoạch" }, { href: "/cms/su-kien", label: "Sự kiện" }, { href: "/cms/thong-bao", label: "Thông báo" }],
+      },
     ];
   }
   return [
@@ -38,6 +44,8 @@ export function navFor(role: Role): NavItem[] {
     { href: "/attendance", label: "Điểm danh", icon: CheckSquare },
     { href: "/emulation", label: "Thi đua", icon: Trophy },
     { href: "/achievements", label: "Thành tích", icon: Award },
+    { href: "/polls", label: "Bình chọn", icon: Vote },
+    { href: "/feedback", label: "Góp ý", icon: MessageSquare },
     { href: "/reports", label: "Báo cáo", icon: BarChart3 },
     {
       href: "/cms/tin-tuc", label: "Website công khai", icon: Globe, match: "/cms",
@@ -68,7 +76,7 @@ export const ROLE_LABEL: Record<Role, string> = { ADMIN: "Quản trị viên", S
 export const PAGE_TITLES: Record<string, string> = {
   dashboard: "Tổng quan", members: "Đoàn viên", departments: "Chi đoàn", activities: "Hoạt động", attendance: "Điểm danh",
   feed: "Bảng tin", marquee: "Dòng chữ chạy", cms: "Website công khai", "tin-tuc": "Tin tức", "ke-hoach": "Kế hoạch", "su-kien": "Sự kiện", "thong-bao": "Thông báo", pages: "Trang giới thiệu", "chapter-reports": "Báo cáo Chi đoàn", emulation: "Thi đua", achievements: "Thành tích", reports: "Báo cáo", settings: "Cài đặt", profile: "Hồ sơ & thẻ số", checkin: "Quét QR điểm danh",
-  history: "Lịch sử hoạt động", notifications: "Thông báo", new: "Tạo mới", edit: "Chỉnh sửa",
+  history: "Lịch sử hoạt động", notifications: "Thông báo", polls: "Bình chọn", feedback: "Góp ý", new: "Tạo mới", edit: "Chỉnh sửa",
 };
 
 /** Tiêu đề riêng cho đường dẫn cụ thể (ưu tiên hơn PAGE_TITLES theo đoạn). */

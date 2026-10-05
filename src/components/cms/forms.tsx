@@ -16,13 +16,13 @@ export const FORMAT_HINT = "Định dạng: “## Tiêu đề”, “- gạch đ
 type Errors = Record<string, string>;
 const toErrors = (f?: Record<string, string[]>): Errors => Object.fromEntries(Object.entries(f ?? {}).map(([k, m]) => [k, m[0]]));
 
-export function ArticleForm({ id, kind, initial, image, files }: {
-  id?: string; files?: AttachmentValue[]; kind: "NEWS" | "PLAN" | "EVENT" | "ANNOUNCEMENT";
+export function ArticleForm({ id, kind, initial, image, files, draftOnly }: {
+  id?: string; /** Bí thư: chỉ lưu bản nháp, chờ Admin duyệt. */ draftOnly?: boolean; files?: AttachmentValue[]; kind: "NEWS" | "PLAN" | "EVENT" | "ANNOUNCEMENT";
   initial?: { title: string; summary: string; content: string; eventAt: string; eventLocation: string; published: boolean };
   image?: UploadedImage;
 }) {
   const router = useRouter();
-  const [v, setV] = useState(initial ?? { title: "", summary: "", content: "", eventAt: "", eventLocation: "", published: true });
+  const [v, setV] = useState(initial ?? { title: "", summary: "", content: "", eventAt: "", eventLocation: "", published: !draftOnly });
   const [img, setImg] = useState<UploadedImage>(image ?? null);
   const [attachments, setAttachments] = useState<AttachmentValue[]>(files ?? []);
   const [errors, setErrors] = useState<Errors>({});
@@ -42,10 +42,11 @@ export function ArticleForm({ id, kind, initial, image, files }: {
 
   return (
     <div className="w-full space-y-4">
+      {draftOnly && <p className="rounded-md bg-primary-light px-3 py-2 text-sm text-primary-dark">Bài viết được lưu ở dạng bản nháp. Admin sẽ xem và duyệt trước khi hiển thị trên trang công khai.</p>}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Trạng thái">
+        {!draftOnly && <Field label="Trạng thái">
           <Select value={v.published ? "1" : "0"} onChange={(e) => setV({ ...v, published: e.target.value === "1" })}><option value="1">Hiển thị công khai</option><option value="0">Bản nháp (ẩn)</option></Select>
-        </Field>
+        </Field>}
         <Field label="Tiêu đề" required error={errors.title} className="sm:col-span-2"><Input value={v.title} onChange={set("title")} /></Field>
         {kind === "EVENT" && (
           <>
@@ -59,7 +60,7 @@ export function ArticleForm({ id, kind, initial, image, files }: {
       <Field label="Ảnh bìa"><ImageUpload folder="activities" value={img} onChange={setImg} /></Field>
       <Field label="Tệp đính kèm" hint="Người xem có thể xem trực tiếp hoặc tải về"><FileUpload value={attachments} onChange={setAttachments} /></Field>
       <div className="flex gap-2">
-        <Button loading={busy} onClick={submit}>{id ? "Lưu thay đổi" : KIND_ACTION[kind]}</Button>
+        <Button loading={busy} onClick={submit}>{draftOnly ? "Lưu bản nháp" : id ? "Lưu thay đổi" : KIND_ACTION[kind]}</Button>
         <Button variant="secondary" onClick={() => router.back()}>Hủy</Button>
       </div>
     </div>

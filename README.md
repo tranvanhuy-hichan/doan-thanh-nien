@@ -48,6 +48,7 @@ src/lib/qr            QR token ký HMAC, sống 90 giây
 - **Điểm**: luôn lấy từ `Activity.points` ở backend; ghi `PointTransaction` + cập nhật `Member.totalPoints` trong cùng transaction với `Attendance`. Unique `(activityId, memberId)` chặn điểm danh đôi. Hủy điểm danh tạo giao dịch đối ứng, không xóa lịch sử.
 - **Chống check-in hộ** (cơ bản): token ngắn hạn, một lần/đoàn viên, lưu `deviceInfo`, `ipAddress`, và có sẵn cột `latitude/longitude` để thêm GPS sau.
 - **Hoạt động toàn trường** (`departmentId = null`) chỉ Admin quản lý; hoạt động của Chi đoàn do bí thư Chi đoàn đó quản lý.
+- **Bài viết trên website công khai**: Bí thư được soạn Tin tức / Kế hoạch / Sự kiện / Thông báo nhưng chỉ lưu ở dạng **bản nháp** (server ép `published=false`); chỉ sửa/xóa được nháp của chính mình. Admin nhận thông báo "Bài viết chờ duyệt" và bấm Hiển thị để đăng.
 - **Tài khoản**: username = mã đoàn viên (`SH` + năm + 4 số); mật khẩu tạm sinh ngẫu nhiên, hiển thị đúng một lần (kèm CSV khi import), bắt buộc đổi ở lần đăng nhập đầu.
 - **Quên mật khẩu**: không có email nên không tự đặt lại; Admin/Bí thư cấp lại mật khẩu tạm trên trang hồ sơ đoàn viên.
 
@@ -67,3 +68,10 @@ src/lib/qr            QR token ký HMAC, sống 90 giây
 - Mặc định: tạo 1 tài khoản admin (`ADMIN_USERNAME`, mặc định `admin`) với mật khẩu `ADMIN_INITIAL_PASSWORD` hoặc mật khẩu ngẫu nhiên in ra log build (xem ở tab Deployments → Build Logs). Bắt buộc đổi mật khẩu ở lần đăng nhập đầu.
 - Đặt `SEED_DEMO=true` ở lần deploy đầu để nạp dữ liệu demo như local (mật khẩu chung `Doan@2026`). Sau khi trình diễn xong nên xóa biến này và đổi/xóa tài khoản demo.
 - `npm run db:seed` (xóa sạch dữ liệu) bị chặn khi `NODE_ENV=production` trừ khi đặt `SEED_CONFIRM=yes`.
+
+## Nhắc lịch, góp ý, bình chọn, đếm ngược
+
+- **Nhắc lịch**: Vercel Cron gọi `/api/cron/reminders` mỗi ngày 07:00 (giờ VN, `vercel.json`), gửi thông báo + push cho người đã đăng ký hoạt động sắp diễn ra trong 24 giờ. Cần đặt biến `CRON_SECRET` trên Vercel (Vercel tự gửi kèm khi gọi cron). Mỗi hoạt động chỉ nhắc một lần; đổi giờ bắt đầu thì được nhắc lại. Gói Hobby chỉ cho cron mỗi ngày một lần.
+- **Góp ý ẩn danh**: trang công khai `/gop-y` (không đăng nhập, không lưu danh tính, có ô bẫy bot và giới hạn 30 góp ý/giờ). Admin xem/xử lý ở mục **Góp ý**.
+- **Bình chọn**: Admin tạo ở mục **Bình chọn**; mọi tài khoản đăng nhập bỏ phiếu (đổi được lựa chọn khi chưa kết thúc), kết quả hiện dạng thanh phần trăm.
+- **Đếm ngược**: Admin đặt tên + thời điểm tại **Website công khai → Thông tin website**; hiện đầu trang chủ cho tới khi hết giờ.

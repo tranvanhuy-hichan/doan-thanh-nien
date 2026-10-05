@@ -37,14 +37,15 @@ export function uploadImage(buffer: Buffer, folder: UploadFolder): Promise<Uploa
   });
 }
 
-/** Tải tệp tài liệu (PDF/Office) lên dạng "raw". Tên gốc được giữ trong public_id để tải về đúng tên. */
+/** Tải tệp tài liệu lên. PDF tải dạng "image" để Cloudinary dựng được ảnh trang đầu; Office tải dạng "raw". Tên gốc được giữ trong public_id để tải về đúng tên. */
 export function uploadDocument(buffer: Buffer, filename: string): Promise<UploadApiResponse> {
   configure();
   const safe = filename.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").replace(/[^a-zA-Z0-9._-]+/g, "_").slice(-80);
-  const publicId = `${Math.random().toString(36).slice(2, 8)}-${safe}`;
+  const isPdf = /\.pdf$/i.test(safe);
+  const publicId = `${Math.random().toString(36).slice(2, 8)}-${isPdf ? safe.replace(/\.pdf$/i, "") : safe}`; // ảnh/PDF: public_id không kèm đuôi
   return new Promise((resolve, reject) => {
     cloudinary.uploader
-      .upload_stream({ folder: folderPath("documents"), resource_type: "raw", public_id: publicId, use_filename: false },
+      .upload_stream({ folder: folderPath("documents"), resource_type: isPdf ? "image" : "raw", public_id: publicId, use_filename: false },
         (err, res) => (err || !res ? reject(err ?? new Error("Upload thất bại")) : resolve(res)))
       .end(buffer);
   });
@@ -54,8 +55,13 @@ export async function deleteImage(publicId: string | null | undefined) {
   if (!publicId || !isCloudinaryConfigured()) return;
   configure();
   try {
-    // Tài liệu nằm ở thư mục documents và là resource_type "raw".
-    await cloudinary.uploader.destroy(publicId, { resource_type: publicId.startsWith(`${folderPath("documents")}/`) ? "raw" : "image" });
+    // Tài liệu nằm ở thư mục documents: PDF là "image", Office là "raw" -> thử cả hai.
+    if (publicId.startsWith(`${folderPath("documents")}/`)) {
+      const r = await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+      if (r.result !== "ok") await cloudinary.uploader.destroy(publicId, { resource_type: "raw" });
+    } else {
+      await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+    }
   } catch (e) {
     console.error("[cloudinary] delete failed", e);
   }

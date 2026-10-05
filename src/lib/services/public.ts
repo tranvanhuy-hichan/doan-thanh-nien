@@ -17,10 +17,20 @@ const publishedWhere = () => ({ published: true, publishedAt: { lte: new Date() 
 
 export const articleCard = {
   id: true, kind: true, title: true, slug: true, summary: true, coverUrl: true, publishedAt: true, eventAt: true, eventLocation: true,
+  attachments: { take: 4, orderBy: { createdAt: "asc" }, select: { url: true, name: true } },
 } as const;
 
 export function latestArticles(kind: ArticleKind, take: number) {
   return db.article.findMany({ where: { kind, ...publishedWhere() }, orderBy: { publishedAt: "desc" }, take, select: articleCard });
+}
+
+/** Bài khác cho cột bên phải trang chi tiết: cùng loại (4 bài) và 3 loại còn lại (3 bài mỗi loại). */
+export async function relatedArticles(current: { id: string; kind: ArticleKind }) {
+  const kinds = (Object.keys(KIND_LABEL) as ArticleKind[]).sort((a, b) => (a === current.kind ? -1 : b === current.kind ? 1 : 0));
+  return Promise.all(kinds.map(async (kind) => ({
+    kind,
+    items: await db.article.findMany({ where: { kind, id: { not: current.id }, ...publishedWhere() }, orderBy: { publishedAt: "desc" }, take: kind === current.kind ? 4 : 3, select: articleCard }),
+  })));
 }
 
 export async function listArticles(kind: ArticleKind, page: number, size: number) {

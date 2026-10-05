@@ -5,9 +5,9 @@ import { PageHeader } from "@/components/ui/misc";
 import { ArticleForm } from "@/components/cms/forms";
 
 export default async function NewArticlePage({ params }: { params: Promise<{ kind: string }> }) {
-  await requireRole(["ADMIN"]);
+  const user = await requireRole(["ADMIN", "SECRETARY"]);
   const { kind: slug } = await params;
   const kind = CMS_SLUG[slug];
   if (!kind) notFound();
-  return (<><PageHeader title={KIND_ACTION[kind]} description={`${KIND_LABEL[kind]} hiển thị trên trang công khai của Đoàn trường.`} /><ArticleForm kind={kind} /></>);
+  return (<><PageHeader title={KIND_ACTION[kind]} description={user.role === "ADMIN" ? `${KIND_LABEL[kind]} hiển thị trên trang công khai của Đoàn trường.` : "Lưu dưới dạng bản nháp để Admin duyệt."} /><ArticleForm kind={kind} draftOnly={user.role !== "ADMIN"} /></>);
 }

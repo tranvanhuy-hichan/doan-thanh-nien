@@ -143,9 +143,9 @@ async function MemberDashboard({ user }: { user: Awaited<ReturnType<typeof requi
     <>
       <PageHeader title={`Xin chào, ${user.fullName}`} description={`Chi đoàn ${user.departmentName}`}
         actions={<Link href="/checkin" className={buttonClass()}>Quét QR điểm danh</Link>} />
-      <div className="grid grid-cols-3 gap-6 sm:max-w-xl">
-        <Stat label="Điểm của tôi" value={member.totalPoints} />
-        <Stat label="Hoạt động đã tham gia" value={attended} />
+      <div className="grid grid-cols-3 gap-3 sm:max-w-xl sm:gap-6">
+        <Stat label="Điểm" value={member.totalPoints} />
+        <Stat label="Đã tham gia" value={attended} />
         <Stat label="Giờ tình nguyện" value={formatHours(member.volunteerMinutes)} />
       </div>
       <Section title="Hoạt động sắp tới" className="mt-8" actions={<Link href="/activities" className="text-[13px] text-primary hover:underline">Xem tất cả</Link>}>

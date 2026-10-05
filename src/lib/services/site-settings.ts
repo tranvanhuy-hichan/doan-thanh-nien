@@ -7,6 +7,11 @@ export const SETTING_FIELDS = [
   { key: "address", label: "Địa chỉ", default: "Xã Sơn Hà, Tỉnh Quảng Ngãi", multiline: false },
   { key: "phone", label: "Số điện thoại liên hệ", default: "", multiline: false },
   { key: "email", label: "Email liên hệ", default: "", multiline: false },
+  { key: "facebook", label: "Liên kết Facebook", default: "", multiline: false },
+  { key: "youtube", label: "Liên kết Youtube", default: "", multiline: false },
+  { key: "countdownTitle", label: "Tên sự kiện đếm ngược", default: "", multiline: false },
+  { key: "countdownAt", label: "Thời điểm đếm ngược", default: "", multiline: false }, // yyyy-MM-ddTHH:mm, giờ Việt Nam
+  { key: "countdownLink", label: "Liên kết đếm ngược", default: "", multiline: false },
 ] as const;
 
 export type SiteSettings = Record<(typeof SETTING_FIELDS)[number]["key"], string>;

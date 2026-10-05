@@ -5,19 +5,25 @@ import { currentValue, resolvePeriod } from "@/lib/emulation-period";
 import { latestArticles, upcomingActivities, articleHref } from "@/lib/services/public";
 import { formatDate, formatDateTime, formatTime } from "@/utils";
 import { ArticleRow, Block, EmptyPublic } from "@/components/public/blocks";
+import { Thumb } from "@/components/public/thumb";
+import { Countdown } from "@/components/public/countdown";
+import { getSiteSettings } from "@/lib/services/site-settings";
 
 export const revalidate = 60; // trang chủ cache 60 giây
 
 export default async function HomePage() {
   const period = resolvePeriod("month", currentValue("month"))!;
-  const [news, events, announcements, plans, upcoming, ranking] = await Promise.all([
+  const [news, events, announcements, plans, upcoming, ranking, settings] = await Promise.all([
     latestArticles("NEWS", 6), latestArticles("EVENT", 4), latestArticles("ANNOUNCEMENT", 6), latestArticles("PLAN", 4),
-    upcomingActivities(5), emulationRanking(period),
+    upcomingActivities(5), emulationRanking(period), getSiteSettings(),
   ]);
+  // countdownAt nhập theo giờ Việt Nam (UTC+7)
+  const countdownTarget = settings.countdownTitle && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(settings.countdownAt) ? new Date(`${settings.countdownAt}:00+07:00`) : null;
   const [featured, ...restNews] = news;
 
   return (
     <div className="space-y-6">
+      {countdownTarget && countdownTarget.getTime() > Date.now() && <Countdown title={settings.countdownTitle} target={countdownTarget.toISOString()} link={settings.countdownLink || undefined} />}
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="space-y-6 xl:col-span-2">
           <Block title="Tin tức" href="/tin-tuc">
@@ -41,10 +47,10 @@ export default async function HomePage() {
 
           <div className="grid gap-6 md:grid-cols-2">
             <Block title="Sự kiện" href="/su-kien">
-              {events.length === 0 ? <EmptyPublic text="Chưa có sự kiện." /> : events.map((a) => <ArticleRow key={a.id} a={{ ...a, coverUrl: null }} />)}
+              {events.length === 0 ? <EmptyPublic text="Chưa có sự kiện." /> : events.map((a) => <ArticleRow key={a.id} a={a} />)}
             </Block>
             <Block title="Kế hoạch" href="/ke-hoach">
-              {plans.length === 0 ? <EmptyPublic text="Chưa có kế hoạch." /> : plans.map((a) => <ArticleRow key={a.id} a={{ ...a, coverUrl: null }} />)}
+              {plans.length === 0 ? <EmptyPublic text="Chưa có kế hoạch." /> : plans.map((a) => <ArticleRow key={a.id} a={a} />)}
             </Block>
           </div>
         </div>
@@ -54,9 +60,12 @@ export default async function HomePage() {
             {announcements.length === 0 ? <EmptyPublic text="Chưa có thông báo." /> : (
               <ul className="divide-y divide-border">
                 {announcements.map((a) => (
-                  <li key={a.id} className="py-2">
-                    <Link href={articleHref(a.slug)} className="line-clamp-2 text-sm font-medium hover:text-primary">{a.title}</Link>
-                    <span className="text-xs text-muted">{a.publishedAt && formatDate(a.publishedAt)}</span>
+                  <li key={a.id} className="flex gap-3 py-2">
+                    <Thumb a={a} className="size-14" />
+                    <div className="min-w-0">
+                      <Link href={articleHref(a.slug)} className="line-clamp-2 text-sm font-medium hover:text-primary">{a.title}</Link>
+                      <span className="text-xs text-muted">{a.publishedAt && formatDate(a.publishedAt)}</span>
+                    </div>
                   </li>
                 ))}
               </ul>

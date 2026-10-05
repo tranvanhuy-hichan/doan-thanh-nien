@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // Lớp chặn nhanh: chưa có cookie phiên thì chuyển về đăng nhập.
 // Xác thực/ủy quyền thật sự luôn được kiểm tra ở server (requireUser / requireRole / actions).
-const PUBLIC_PREFIXES = ["/login", "/forgot-password", "/gioi-thieu", "/ke-hoach", "/su-kien", "/tin-tuc", "/thong-bao", "/lich-hoat-dong", "/bao-cao-chi-doan", "/thi-dua", "/bai-viet", "/tim-kiem"];
+const PUBLIC_PREFIXES = ["/login", "/forgot-password", "/gioi-thieu", "/ke-hoach", "/su-kien", "/tin-tuc", "/thong-bao", "/lich-hoat-dong", "/bao-cao-chi-doan", "/thi-dua", "/bai-viet", "/tim-kiem", "/gop-y", "/api/cron"];
 
 export function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl;

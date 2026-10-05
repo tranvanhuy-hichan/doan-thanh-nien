@@ -40,15 +40,7 @@ export default async function DepartmentsPage({ searchParams }: { searchParams: 
         <>
         <CompactList items={departments.map((d, i) => ({
           id: d.id, title: `Chi đoàn ${d.name}`, subtitle: d.secretary ? `Bí thư: ${d.secretary.fullName}` : "Chưa phân công bí thư", value: `${rates[i]}%`,
-          href: `/departments/${d.id}`, hrefLabel: "Xem Chi đoàn",
-          details: [["Bí thư", d.secretary?.fullName ?? "Chưa phân công"], ["Đoàn viên", d._count.members], ["Hoạt động", d._count.activities], ["Tỷ lệ tham gia", `${rates[i]}%`]],
-          actions: isAdmin ? (
-            <span className="flex items-center gap-1">
-              <SecretaryButton departmentId={d.id} current={d.secretary} available={freeSecretaries} />
-              <DepartmentFormButton dept={{ id: d.id, name: d.name, description: d.description }} />
-              <DeleteDepartmentButton id={d.id} name={d.name} />
-            </span>
-          ) : undefined,
+          href: `/departments/${d.id}`,
         }))} />
         <div className="max-sm:hidden">
         <DataTable>

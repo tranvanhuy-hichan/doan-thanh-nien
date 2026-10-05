@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { ChevronDown, Home, LogIn, Menu, Search, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronDown, ExternalLink, Home, LogIn, Mail, Menu, Phone, Search, X } from "lucide-react";
 import { cn } from "@/utils";
 import { DoanLogo } from "@/components/layout/logo";
 
@@ -24,6 +24,7 @@ const MENU: Item[] = [
   { label: "Tin tức", href: "/tin-tuc" },
   { label: "Lịch hoạt động", href: "/lich-hoat-dong" },
   { label: "Thông báo", href: "/thong-bao" },
+  { label: "Góp ý", href: "/gop-y" },
   {
     label: "Báo cáo Chi đoàn", href: "/bao-cao-chi-doan",
     children: [
@@ -40,6 +41,14 @@ const MENU: Item[] = [
       { label: "Chi đoàn tiêu biểu", href: "/thi-dua/chi-doan-tieu-bieu" },
     ],
   },
+];
+
+/** Liên kết ngoài hiển thị ở mục "Liên kết" (mở tab mới). */
+const EXTERNAL_LINKS = [
+  { label: "Trường THPT Sơn Hà", href: "https://c3sonha.quangngai.edu.vn/" },
+  { label: "Sở GD&ĐT Quảng Ngãi", href: "https://quangngai.edu.vn/" },
+  { label: "Bộ Giáo dục và Đào tạo", href: "https://moet.gov.vn/" },
+  { label: "Trung ương Đoàn TNCS Hồ Chí Minh", href: "https://doanthanhnien.vn/" },
 ];
 
 const isActive = (pathname: string, href: string) => {
@@ -68,51 +77,63 @@ function SearchBox({ className }: { className?: string }) {
   );
 }
 
-export function SiteHeader({ address, bannerUrl, marquee }: { address: string; bannerUrl?: string; marquee: { id: string; text: string; link: string | null }[] }) {
+export function SiteHeader({ bannerUrl, phone, email, facebook, youtube, marquee }: { address?: string; bannerUrl?: string; phone?: string; email?: string; facebook?: string; youtube?: string; marquee: { id: string; text: string; link: string | null }[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  useEffect(() => setOpen(false), [pathname]);
+  // Chỉ đóng menu khi thật sự chuyển trang (không đóng ngay sau khi vừa bấm mở)
+  const lastPath = useRef(pathname);
+  useEffect(() => {
+    if (lastPath.current !== pathname) { lastPath.current = pathname; setOpen(false); }
+  }, [pathname]);
   const main = MENU.filter((it) => !it.children); // Giới thiệu, Báo cáo Chi đoàn, Thi đua nằm ở thanh bên trái
 
   return (
     <header>
-      {/* Banner lớn */}
-      <div className="relative overflow-hidden bg-primary-dark text-white" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.08) 1.5px, transparent 2px)", backgroundSize: "26px 26px" }}>
-        <div className="flex min-h-36 items-center sm:min-h-52">
-          <div className="relative z-10 flex min-w-0 flex-1 items-center gap-3 px-4 py-4 sm:gap-6 lg:px-8">
-            <Link href="/" className="shrink-0 drop-shadow-lg" aria-label="Trang chủ">
-              <DoanLogo className="h-16 sm:h-28 lg:h-32" />
-            </Link>
-            <div className="min-w-0 leading-tight">
-              <p className="text-[11px] font-semibold tracking-[0.2em] text-blue-200 uppercase sm:text-sm">Đoàn TNCS Hồ Chí Minh</p>
-              <h1 className="mt-1 text-lg font-extrabold tracking-wide text-[#ffd400] uppercase sm:text-2xl lg:text-3xl 2xl:text-4xl">Đoàn trường THPT Sơn Hà</h1>
-              <p className="mt-1.5 text-xs text-blue-100 italic sm:text-base">Địa chỉ: {address}</p>
+      {/* Thanh liên hệ */}
+      {(phone || email || facebook || youtube) && (
+        <div className="bg-[#0a4a94] text-white">
+          <div className="flex w-full flex-wrap items-center justify-between gap-x-6 gap-y-0.5 px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm lg:px-8">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-0.5">
+            {phone && <a href={`tel:${phone.replace(/[^\d+]/g, "")}`} className="inline-flex items-center gap-1.5 hover:underline"><Phone className="size-3.5 text-[#ffd400]" />Hotline: {phone}</a>}
+            {email && <a href={`mailto:${email}`} className="max-sm:hidden inline-flex items-center gap-1.5 hover:underline"><Mail className="size-3.5 text-[#ffd400]" />Email: {email}</a>}
+            </div>
+            <div className="flex items-center gap-4">
+              {facebook && <a href={facebook} target="_blank" rel="noopener noreferrer" className="hover:underline">Facebook</a>}
+              {youtube && <a href={youtube} target="_blank" rel="noopener noreferrer" className="hover:underline">Youtube</a>}
             </div>
           </div>
-          {/* Ảnh bên phải (chỉ màn hình lớn) */}
-          <div className="relative hidden h-52 w-[36%] shrink-0 lg:block">
-            {bannerUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={bannerUrl} alt="" className="size-full object-cover" />
-            ) : (
-              <div className="flex size-full items-center justify-center bg-white/5"><DoanLogo className="h-44 opacity-20" /></div>
-            )}
-          </div>
+        </div>
+      )}
+      {/* Hàng thương hiệu: logo + tên | tìm kiếm | đăng nhập (thấp, gọn) */}
+      <div className="border-b border-border bg-white">
+        <div className="flex w-full items-center gap-4 px-3 py-3 sm:px-4 sm:py-4 lg:px-8">
+          <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5" aria-label="Trang chủ">
+            <DoanLogo className="h-12 shrink-0 sm:h-16" />
+            <div className="min-w-0 leading-tight">
+              <p className="text-[10px] font-semibold tracking-[0.15em] text-slate-500 uppercase sm:text-[13px]">Đoàn TNCS Hồ Chí Minh</p>
+              <h1 className="text-sm font-extrabold tracking-wide text-primary-dark uppercase sm:text-xl">Đoàn trường THPT Sơn Hà</h1>
+            </div>
+          </Link>
+          <SearchBox className="mx-auto hidden w-full max-w-2xl lg:flex" />
+          <Link href="/login" className="ml-auto hidden h-10 shrink-0 items-center gap-1.5 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-dark lg:inline-flex lg:ml-0">
+            <LogIn className="size-4" />Đăng nhập
+          </Link>
         </div>
       </div>
 
       {/* Thanh menu */}
       <div className="sticky top-0 z-40 shadow-md">
         <nav className="bg-[#073a70]" aria-label="Menu chính">
-          <div className="flex w-full items-center px-2 lg:px-6">
-            <button className="rounded-md p-2.5 text-white hover:bg-white/10 lg:hidden" onClick={() => setOpen((o) => !o)} aria-label="Mở menu" aria-expanded={open}>
+          <div className="flex w-full items-center px-1 lg:px-6">
+            <button type="button" className="flex h-11 min-w-24 touch-manipulation items-center gap-3 rounded-md px-3 text-white hover:bg-white/10 active:bg-white/15 lg:hidden" onClick={() => setOpen((o) => !o)} aria-label="Mở menu" aria-expanded={open}>
               {open ? <X className="size-5" /> : <Menu className="size-5" />}
+              <span className="text-sm font-semibold">Menu</span>
             </button>
             <ul className="hidden items-stretch lg:flex">
-              <li><Link href="/" aria-label="Trang chủ" className={cn("flex h-full items-center px-4 py-3.5 text-white hover:bg-white/10", pathname === "/" && "bg-white/15")}><Home className="size-5" /></Link></li>
+              <li><Link href="/" aria-label="Trang chủ" className={cn("flex h-full items-center px-4 py-2.5 text-white hover:bg-white/10", pathname === "/" && "bg-white/15")}><Home className="size-5" /></Link></li>
               {main.filter((it) => it.href !== "/").map((it) => (
                 <li key={it.label} className="group relative">
-                  <Link href={it.href} className={cn("flex h-full items-center gap-1 px-4 py-3.5 text-sm font-semibold tracking-wide whitespace-nowrap text-white/90 uppercase hover:bg-white/10 hover:text-white", isActive(pathname, it.href) && "bg-white text-primary-dark hover:bg-white hover:text-primary-dark")}>
+                  <Link href={it.href} className={cn("flex h-full items-center gap-1 px-4 py-2.5 text-sm font-semibold tracking-wide whitespace-nowrap text-white/90 uppercase hover:bg-white/10 hover:text-white", isActive(pathname, it.href) && "bg-white text-primary-dark hover:bg-white hover:text-primary-dark")}>
                     {it.label}{it.children && <ChevronDown className="size-3.5 opacity-70" />}
                   </Link>
                   {it.children && (
@@ -122,10 +143,17 @@ export function SiteHeader({ address, bannerUrl, marquee }: { address: string; b
                   )}
                 </li>
               ))}
+              <li className="group relative">
+                <button type="button" className="flex h-full items-center gap-1 px-4 py-2.5 text-sm font-semibold tracking-wide whitespace-nowrap text-white/90 uppercase hover:bg-white/10 hover:text-white focus:bg-white/10" aria-haspopup="menu">
+                  Liên kết<ChevronDown className="size-3.5 opacity-70" />
+                </button>
+                <ul className="invisible absolute left-0 z-10 min-w-72 border border-border bg-white py-1 text-foreground opacity-0 shadow-lg transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+                  {EXTERNAL_LINKS.map((c) => <li key={c.href}><a href={c.href} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between gap-3 px-4 py-2 text-sm hover:bg-primary-light hover:text-primary-dark">{c.label}<ExternalLink className="size-3.5 opacity-50" /></a></li>)}
+                </ul>
+              </li>
             </ul>
-            <span className="ml-2 text-sm font-semibold text-white lg:hidden">Menu</span>
-            <Link href="/login" className="ml-auto my-1.5 inline-flex h-9 shrink-0 items-center gap-1.5 rounded bg-[#ffd400] px-3.5 text-sm font-bold text-[#073a70] hover:bg-yellow-300">
-              <LogIn className="size-4" />Đăng nhập
+            <Link href="/login" aria-label="Đăng nhập" className="ml-auto my-1.5 mr-1 inline-flex h-9 shrink-0 lg:hidden items-center gap-1.5 rounded bg-[#ffd400] px-3 text-sm max-sm:w-10 max-sm:justify-center max-sm:px-0 sm:px-3.5 font-bold text-[#073a70] hover:bg-yellow-300">
+              <LogIn className="size-4" /><span className="max-sm:hidden">Đăng nhập</span>
             </Link>
           </div>
           {open && (
@@ -140,17 +168,50 @@ export function SiteHeader({ address, bannerUrl, marquee }: { address: string; b
                   )}
                 </li>
               ))}
+              <li>
+                <div className="px-4 py-3 text-sm font-semibold text-white uppercase">Liên kết</div>
+                <ul className="bg-black/15 pb-1">
+                  {EXTERNAL_LINKS.map((c) => <li key={c.href}><a href={c.href} target="_blank" rel="noopener noreferrer" className="block py-2 pr-4 pl-8 text-[13px] text-blue-100">{c.label}</a></li>)}
+                </ul>
+              </li>
             </ul>
           )}
         </nav>
       </div>
 
+      {/* Banner full chiều ngang (chỉ trang chủ) */}
+      {pathname === "/" && (
+        <div className="relative h-28 w-full overflow-hidden bg-primary-dark sm:h-40 lg:h-52">
+          {bannerUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={bannerUrl} alt="Banner Đoàn trường THPT Sơn Hà" className="size-full object-cover object-center" />
+          ) : (
+            <div className="relative flex size-full items-center justify-center gap-4 bg-gradient-to-r from-primary-dark via-primary to-primary-dark px-4 text-center text-white" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.08) 1.5px, transparent 2px)", backgroundSize: "26px 26px" }}>
+              {/* Trang trí hai bên: sóng cờ và ngôi sao */}
+              {(["left", "right"] as const).map((side) => (
+                <div key={side} aria-hidden className={cn("pointer-events-none absolute inset-y-0 hidden w-1/4 overflow-hidden md:block lg:w-[30%]", side === "left" ? "left-0" : "right-0 -scale-x-100")} style={{ maskImage: "linear-gradient(to right, #000 45%, transparent)", WebkitMaskImage: "linear-gradient(to right, #000 45%, transparent)" }}>
+                  <svg viewBox="0 0 300 208" preserveAspectRatio="none" className="absolute inset-0 size-full">
+                    <path d="M0 150 C 60 110, 120 190, 190 140 S 280 120, 300 130 V208 H0Z" fill="#ffffff" fillOpacity="0.07" />
+                    <path d="M0 175 C 70 140, 130 205, 200 165 S 280 150, 300 160 V208 H0Z" fill="#ffd400" fillOpacity="0.12" />
+                    <path d="M0 40 L 120 0 H 0Z" fill="#ffd400" fillOpacity="0.14" />
+                  </svg>
+                  <svg viewBox="0 0 24 24" className="absolute top-6 right-10 size-5 text-[#ffd400]/60" fill="currentColor"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7.1L12 17.6 5.7 21.3l1.7-7.1L2 9.5l7.1-.6z" /></svg>
+                  <svg viewBox="0 0 24 24" className="absolute right-24 bottom-8 size-3 text-white/50" fill="currentColor"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7.1L12 17.6 5.7 21.3l1.7-7.1L2 9.5l7.1-.6z" /></svg>
+                </div>
+              ))}
+              <DoanLogo className="relative h-16 drop-shadow-lg sm:h-28 lg:h-36" />
+              <div className="relative text-left leading-tight"><p className="text-xs font-bold tracking-[0.18em] text-white uppercase sm:text-xl lg:text-2xl">Cổng thông tin điện tử</p><p className="mt-1 text-lg font-extrabold tracking-wide text-[#ffd400] uppercase sm:text-3xl lg:text-5xl">Đoàn trường THPT Sơn Hà</p><p className="mt-1.5 text-[11px] font-semibold tracking-[0.2em] text-blue-200 uppercase sm:text-sm">Đoàn TNCS Hồ Chí Minh</p></div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Hàng ngày – dòng chữ chạy – tìm kiếm */}
       <div className="border-b border-border bg-slate-100/90">
-        <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 text-sm lg:flex-nowrap lg:px-8">
+        <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2 text-sm sm:px-4 lg:flex-nowrap lg:px-8">
           <span className="text-xs font-semibold text-slate-600 sm:text-sm"><Today /></span>
           <Marquee items={marquee} className="order-last w-full lg:order-none lg:w-auto lg:flex-1" />
-          <SearchBox className="ml-auto w-44 sm:w-64" />
+          <SearchBox className="ml-auto min-w-0 flex-1 sm:w-64 sm:flex-none lg:hidden" />
         </div>
       </div>
     </header>
