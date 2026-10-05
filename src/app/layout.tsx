@@ -3,7 +3,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "Đoàn TNCS Hồ Chí Minh - THPT Sơn Hà", template: "%s · Đoàn THPT Sơn Hà" },
+  title: { default: "Đoàn trường THPT Sơn Hà", template: "%s · Đoàn trường THPT Sơn Hà" },
   description: "Hệ thống quản lý đoàn viên và hoạt động Đoàn - Trường THPT Sơn Hà",
   applicationName: "Đoàn trường THPT Sơn Hà",
   appleWebApp: { capable: true, title: "Đoàn trường THPT Sơn Hà", statusBarStyle: "default" },
