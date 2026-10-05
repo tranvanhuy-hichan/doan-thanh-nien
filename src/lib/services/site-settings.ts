@@ -2,6 +2,8 @@ import "server-only";
 import { db } from "@/lib/db";
 
 export const SETTING_FIELDS = [
+  { key: "bannerUrl", label: "Ảnh banner", default: "", multiline: false },
+  { key: "bannerPublicId", label: "Ảnh banner (mã)", default: "", multiline: false },
   { key: "address", label: "Địa chỉ", default: "Xã Sơn Hà, Tỉnh Quảng Ngãi", multiline: false },
   { key: "phone", label: "Số điện thoại liên hệ", default: "", multiline: false },
   { key: "email", label: "Email liên hệ", default: "", multiline: false },

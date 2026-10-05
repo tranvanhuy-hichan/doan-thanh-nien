@@ -100,11 +100,15 @@ export async function saveSitePageAction(slug: string, input: unknown) {
 export async function saveSiteSettingsAction(input: Record<string, string>) {
   return run(async () => {
     const admin = await requireRole(["ADMIN"]);
-    const { SETTING_FIELDS } = await import("@/lib/services/site-settings");
+    const { SETTING_FIELDS, getSiteSettings } = await import("@/lib/services/site-settings");
+    const before = await getSiteSettings();
+    const newBanner = String(input.bannerPublicId ?? "");
+    if (newBanner && (!isOwnPublicId(newBanner, "activities") || !String(input.bannerUrl ?? "").startsWith("https://res.cloudinary.com/"))) throw new UserError("Ảnh banner không hợp lệ");
     for (const f of SETTING_FIELDS) {
       const value = String(input[f.key] ?? "").trim().slice(0, 1000);
       await db.siteSetting.upsert({ where: { key: f.key }, update: { value }, create: { key: f.key, value } });
     }
+    if (before.bannerPublicId && before.bannerPublicId !== newBanner) await deleteImage(before.bannerPublicId);
     await audit(admin.id, "site.settings", "SiteSetting", null);
     refreshPublic();
     return { message: "Đã lưu thông tin website" };
