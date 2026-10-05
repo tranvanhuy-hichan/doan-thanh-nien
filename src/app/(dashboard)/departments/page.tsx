@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CompactList } from "@/components/ui/compact-list";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/auth/session";
-import { participationRate } from "@/lib/services/queries";
+import { departmentRanking } from "@/lib/services/stats";
 import { pageParam } from "@/utils";
 import { DataTable, EmptyState, PageHeader, Pagination, Td, Th } from "@/components/ui/misc";
 import { DeleteDepartmentButton, DepartmentFormButton, SecretaryButton } from "@/components/members/department-actions";
@@ -16,17 +16,19 @@ export default async function DepartmentsPage({ searchParams }: { searchParams: 
   const isAdmin = user.role === "ADMIN";
   const page = pageParam((await searchParams).page);
   const where = isAdmin ? {} : { id: user.departmentId ?? "__none__" };
-  const totalDepts = await db.department.count({ where });
-  const departments = await db.department.findMany({
-    where, orderBy: { name: "asc" }, skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE,
-    include: { secretary: { select: { id: true, fullName: true, username: true } }, _count: { select: { members: true, activities: true } } },
-  });
-  const [rates, freeSecretaries] = await Promise.all([
-    Promise.all(departments.map((d) => participationRate(d.id))),
+  const [totalDepts, departments, ranking, freeSecretaries] = await Promise.all([
+    db.department.count({ where }),
+    db.department.findMany({
+      where, orderBy: { name: "asc" }, skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE,
+      include: { secretary: { select: { id: true, fullName: true, username: true } }, _count: { select: { members: true, activities: true } } },
+    }),
+    departmentRanking(),
     isAdmin
       ? db.user.findMany({ where: { role: "SECRETARY", secretaryOf: null }, select: { id: true, fullName: true, username: true }, orderBy: { fullName: "asc" } })
       : Promise.resolve([]),
   ]);
+
+  const rates = departments.map((d) => ranking.find((r) => r.id === d.id)?.rate ?? 0);
 
   return (
     <>

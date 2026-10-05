@@ -29,22 +29,10 @@ export function activityScope(user: SessionUser): Prisma.ActivityWhereInput {
 
 export const categories = () => db.activityCategory.findMany({ orderBy: { name: "asc" } });
 
-/** Tỷ lệ tham gia = lượt điểm danh / (số hoạt động đã diễn ra × số đoàn viên thuộc phạm vi hoạt động). */
-export async function participationRate(departmentId?: string) {
-  const now = new Date();
-  const activities = await db.activity.findMany({
-    where: { cancelledAt: null, startAt: { lte: now }, ...(departmentId ? { OR: [{ departmentId }, { departmentId: null }] } : {}) },
-    select: { id: true, departmentId: true },
-  });
-  if (!activities.length) return 0;
-  const [attended, deptCounts, total] = await Promise.all([
-    db.attendance.count({ where: { activityId: { in: activities.map((a) => a.id) }, ...(departmentId ? { member: { departmentId } } : {}) } }),
-    db.member.groupBy({ by: ["departmentId"], where: { status: "ACTIVE" }, _count: true }),
-    db.member.count({ where: { status: "ACTIVE", ...(departmentId ? { departmentId } : {}) } }),
-  ]);
-  const size = new Map(deptCounts.map((d) => [d.departmentId, d._count]));
-  const expected = activities.reduce((s, a) => s + (a.departmentId ? size.get(a.departmentId) ?? 0 : total), 0);
-  return expected ? Math.min(100, Math.round((attended / expected) * 100)) : 0;
+/** Tỷ lệ tham gia của một Chi đoàn (dùng chung công thức với bảng xếp hạng). */
+export async function participationRate(departmentId: string) {
+  const { departmentRanking } = await import("./stats");
+  return (await departmentRanking()).find((d) => d.id === departmentId)?.rate ?? 0;
 }
 
 /** Bài viết mà người dùng được xem: toàn trường + Chi đoàn của mình (Admin xem tất cả). */

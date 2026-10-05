@@ -46,6 +46,17 @@ export async function destroySession() {
   jar.delete(SESSION_COOKIE);
 }
 
+/** Chỉ giải mã JWT (không chạm DB) – để chạy song song các truy vấn khác với việc nạp người dùng. */
+export async function getSessionUserId(): Promise<string | null> {
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  if (!token) return null;
+  try {
+    return (await jwtVerify(token, getAuthSecret())).payload.sub ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /** Đọc session và nạp lại người dùng từ DB (để khóa tài khoản có hiệu lực ngay). */
 export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
   const jar = await cookies();

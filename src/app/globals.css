@@ -26,7 +26,7 @@
 /* Huy hiệu Đoàn làm hình nền mờ phía sau toàn bộ ứng dụng */
 body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: url("/logo-doan.png") 50% 55% / min(70vmin, 560px) no-repeat; opacity: 0.12;
+  background: url("/logo-doan.webp") 50% 55% / min(70vmin, 560px) no-repeat; opacity: 0.12;
 }
 @media (min-width: 1024px) {
   body::before { background-position: calc(50% + 7.5rem) 55%; } /* lệch sang phải theo bề rộng thanh bên */

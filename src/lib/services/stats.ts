@@ -10,15 +10,15 @@ export async function monthlyParticipation(departmentId?: string, months = 6) {
   for (let i = months - 1; i >= 0; i--) keys.push(monthKey(new Date(now.getFullYear(), now.getMonth() - i, 15)));
   const from = new Date(now.getFullYear(), now.getMonth() - (months - 1), 1);
 
-  const [activities, sizes, total] = await Promise.all([
+  const [activities, sizes] = await Promise.all([
     db.activity.findMany({
       where: { cancelledAt: null, startAt: { gte: from, lte: now }, ...(departmentId ? { OR: [{ departmentId }, { departmentId: null }] } : {}) },
       select: { startAt: true, departmentId: true, _count: { select: { attendances: departmentId ? { where: { member: { departmentId } } } : true } } },
     }),
     db.member.groupBy({ by: ["departmentId"], where: { status: "ACTIVE" }, _count: true }),
-    db.member.count({ where: { status: "ACTIVE", ...(departmentId ? { departmentId } : {}) } }),
   ]);
   const size = new Map(sizes.map((s) => [s.departmentId, s._count]));
+  const total = departmentId ? size.get(departmentId) ?? 0 : sizes.reduce((n, s) => n + s._count, 0);
   const agg = new Map(keys.map((k) => [k, { attended: 0, expected: 0, activities: 0 }]));
   for (const a of activities) {
     const row = agg.get(monthKey(a.startAt));
@@ -34,20 +34,25 @@ export async function monthlyParticipation(departmentId?: string, months = 6) {
   });
 }
 
-/** Xếp hạng Chi đoàn theo tỷ lệ tham gia (các hoạt động đã diễn ra). */
+/** Xếp hạng Chi đoàn theo tỷ lệ tham gia (các hoạt động đã diễn ra). 4 truy vấn song song, kết quả gộp sẵn ở DB. */
 export async function departmentRanking() {
-  const now = new Date();
-  const [departments, activities, attendances] = await Promise.all([
-    db.department.findMany({ include: { _count: { select: { members: { where: { status: "ACTIVE" } } } } } }),
-    db.activity.findMany({ where: { cancelledAt: null, startAt: { lte: now } }, select: { id: true, departmentId: true } }),
-    db.attendance.findMany({ where: { activity: { cancelledAt: null, startAt: { lte: now } } }, select: { member: { select: { departmentId: true } }, activityId: true } }),
+  const [departments, activities, attended] = await Promise.all([
+    db.department.findMany({ select: { id: true, name: true, _count: { select: { members: { where: { status: "ACTIVE" } } } } } }),
+    db.activity.groupBy({ by: ["departmentId"], where: { cancelledAt: null, startAt: { lte: new Date() } }, _count: true }),
+    db.$queryRaw<{ departmentId: string; count: number }[]>`
+      SELECT m."departmentId" AS "departmentId", COUNT(*)::int AS count
+      FROM "Attendance" a
+      JOIN "Member" m ON m.id = a."memberId"
+      JOIN "Activity" ac ON ac.id = a."activityId"
+      WHERE ac."cancelledAt" IS NULL AND ac."startAt" <= now()
+      GROUP BY m."departmentId"`,
   ]);
-  const attendedBy = new Map<string, number>();
-  for (const a of attendances) attendedBy.set(a.member.departmentId, (attendedBy.get(a.member.departmentId) ?? 0) + 1);
-  const schoolWide = activities.filter((a) => !a.departmentId).length;
+  const attendedBy = new Map(attended.map((r) => [r.departmentId, r.count]));
+  const own = new Map(activities.map((a) => [a.departmentId, a._count]));
+  const schoolWide = own.get(null) ?? 0;
   return departments.map((d) => {
-    const own = activities.filter((a) => a.departmentId === d.id).length;
-    const expected = (own + schoolWide) * d._count.members;
-    return { id: d.id, name: d.name, members: d._count.members, attended: attendedBy.get(d.id) ?? 0, rate: expected ? Math.min(100, Math.round(((attendedBy.get(d.id) ?? 0) / expected) * 100)) : 0 };
+    const expected = ((own.get(d.id) ?? 0) + schoolWide) * d._count.members;
+    const done = attendedBy.get(d.id) ?? 0;
+    return { id: d.id, name: d.name, members: d._count.members, attended: done, rate: expected ? Math.min(100, Math.round((done / expected) * 100)) : 0 };
   }).sort((a, b) => b.rate - a.rate || b.attended - a.attended);
 }
