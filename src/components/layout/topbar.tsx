@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { Bell, ChevronDown, ChevronRight, KeyRound, LogOut } from "lucide-react";
 import { cn, relativeTime } from "@/utils";
 import { PAGE_TITLES, PATH_TITLES } from "@/lib/nav";
+import { NotificationControls } from "@/components/notifications/controls";
 import { DoanLogo } from "./logo";
 import { Avatar } from "@/components/ui/misc";
 import { logoutAction } from "@/actions/auth";
@@ -81,6 +82,7 @@ function Notifications({ items, unread }: { items: NotificationItem[]; unread: n
                 : <div key={n.id} className={cls} onClick={onClick}>{inner}</div>;
             })}
           </div>
+          <div className="border-t border-border p-3"><NotificationControls compact /></div>
         </div>
       )}
     </div>

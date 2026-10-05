@@ -25,6 +25,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       user={{ fullName: user.fullName, avatarUrl: user.avatarUrl }}
       roleLabel={ROLE_LABEL[user.role]}
       unread={unread}
+      pushKey={process.env.VAPID_PUBLIC_KEY ?? null}
       notifications={items.map((n) => ({ id: n.id, title: n.title, body: n.body, link: n.link, read: !!n.readAt, createdAt: n.createdAt.toISOString() }))}
     >
       {children}

@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth/session";
 import { ROLE_LABEL } from "@/lib/nav";
 import { formatDateTime } from "@/utils";
 import { DataTable, PageHeader, Section, Td, Th } from "@/components/ui/misc";
+import { NotificationControls } from "@/components/notifications/controls";
 import { ChangePasswordForm } from "@/components/members/change-password-form";
 import { CategoryFormButton, DeleteCategoryButton } from "@/components/members/category-manager";
 
@@ -26,6 +27,7 @@ export default async function SettingsPage() {
           {user.departmentName && <><dt className="text-muted">Chi đoàn</dt><dd>{user.departmentName}</dd></>}
         </dl>
       </Section>
+      <Section title="Thông báo"><div className="max-w-sm"><NotificationControls /></div></Section>
       <Section title="Đổi mật khẩu"><div className="max-w-sm"><ChangePasswordForm /></div></Section>
       {admin && (
         <>

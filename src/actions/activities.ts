@@ -74,7 +74,11 @@ export async function saveActivityAction(id: string | null, input: unknown) {
       where: { status: "ACTIVE", ...(departmentId ? { departmentId } : {}), user: { status: "ACTIVE" } },
       select: { userId: true },
     });
-    await notifyUsers(recipients.map((r) => r.userId), {
+    const extra = departmentId ? await db.department.findUnique({ where: { id: departmentId }, select: { secretaryId: true } }) : null;
+    const ids = new Set(recipients.map((r) => r.userId));
+    if (extra?.secretaryId) ids.add(extra.secretaryId); // bí thư Chi đoàn cũng được báo
+    ids.delete(user.id);
+    await notifyUsers([...ids], {
       type: "ACTIVITY_CREATED", title: "Hoạt động mới", body: `${activity.title} · ${formatDateTime(activity.startAt)}`, link: `/activities/${activity.id}`,
     });
     await audit(user.id, "activity.create", "Activity", activity.id, { title: activity.title });

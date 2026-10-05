@@ -8,7 +8,7 @@ import { requireRole, requireUser, type SessionUser } from "@/lib/auth/session";
 import { ForbiddenError, canManageDepartment } from "@/lib/permissions";
 import { commentSchema, postSchema } from "@/lib/validation";
 import { deleteImage, isOwnPublicId } from "@/lib/cloudinary";
-import { notifyUser } from "@/lib/notify";
+import { notifyUser, notifyUsers } from "@/lib/notify";
 import { postScope } from "@/lib/services/queries";
 
 async function visiblePost(user: SessionUser, id: string) {
@@ -29,6 +29,17 @@ export async function createPostAction(input: unknown) {
 
     const post = await db.post.create({
       data: { authorId: user.id, departmentId, content: data.content, imageUrl: data.imageUrl ?? null, imagePublicId: data.imagePublicId ?? null },
+    });
+    // Báo bài mới cho đối tượng xem được (trừ người đăng): toàn trường = mọi tài khoản đang hoạt động.
+    const audience = await db.user.findMany({
+      where: {
+        status: "ACTIVE", id: { not: user.id },
+        ...(departmentId ? { OR: [{ member: { departmentId } }, { secretaryOf: { id: departmentId } }] } : {}),
+      },
+      select: { id: true },
+    });
+    await notifyUsers(audience.map((u) => u.id), {
+      type: "FEED", title: `${user.fullName} đã đăng bài mới`, body: data.content.slice(0, 100), link: "/feed",
     });
     await audit(user.id, "post.create", "Post", post.id, { departmentId });
     revalidatePath("/feed");

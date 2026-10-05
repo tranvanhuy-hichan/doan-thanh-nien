@@ -3,12 +3,14 @@ import type { Role } from "@prisma/client";
 import { Sidebar } from "./sidebar";
 import { Topbar, type NotificationItem } from "./topbar";
 import { BottomNav } from "./bottom-nav";
+import { NotificationProvider } from "@/components/notifications/notification-center";
 
-export function AppShell({ role, user, roleLabel, notifications, unread, children }: {
+export function AppShell({ role, user, roleLabel, notifications, unread, pushKey, children }: {
   role: Role; user: { fullName: string; avatarUrl: string | null }; roleLabel: string;
-  notifications: NotificationItem[]; unread: number; children: React.ReactNode;
+  notifications: NotificationItem[]; unread: number; pushKey: string | null; children: React.ReactNode;
 }) {
   return (
+    <NotificationProvider publicKey={pushKey} latestId={notifications[0]?.id ?? null}>
     <div className="min-h-screen">
       <Sidebar role={role} />
       <div className="md:pl-16 lg:pl-60">
@@ -18,5 +20,6 @@ export function AppShell({ role, user, roleLabel, notifications, unread, childre
       </div>
       <BottomNav role={role} />
     </div>
+    </NotificationProvider>
   );
 }
