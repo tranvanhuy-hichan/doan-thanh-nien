@@ -15,14 +15,14 @@ export function PeriodFilter({ type, value, options }: { type: PeriodType; value
     start(() => router.replace(`${pathname}?${next}`));
   };
   return (
-    <div className="mb-5 flex flex-wrap items-center gap-2">
-      <div className="inline-flex overflow-hidden rounded-md border border-border bg-white" role="tablist">
+    <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div className="grid grid-cols-4 overflow-hidden rounded-md border border-border bg-white sm:inline-flex" role="tablist">
         {(Object.keys(PERIOD_LABEL) as PeriodType[]).map((t) => (
           <button key={t} role="tab" aria-selected={t === type} onClick={() => go(t, options[t][0].value)}
-            className={`px-3.5 py-1.5 text-sm ${t === type ? "bg-primary text-white" : "hover:bg-slate-50"}`}>{PERIOD_LABEL[t]}</button>
+            className={`px-2 py-2 text-[13px] sm:px-3.5 sm:py-1.5 sm:text-sm ${t === type ? "bg-primary font-medium text-white" : "hover:bg-slate-50"}`}>{PERIOD_LABEL[t]}</button>
         ))}
       </div>
-      <Select value={value} onChange={(e) => go(type, e.target.value)} className="w-auto min-w-64" aria-label="Kỳ thi đua">
+      <Select value={value} onChange={(e) => go(type, e.target.value)} className="w-full sm:w-auto sm:min-w-64" aria-label="Kỳ thi đua">
         {!options[type].some((o) => o.value === value) && <option value={value}>{value}</option>}
         {options[type].map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
       </Select>

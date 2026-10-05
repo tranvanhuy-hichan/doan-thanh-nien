@@ -16,7 +16,7 @@ export function AddRecordButton({ departments, today }: { departments: { id: str
   const set = (k: keyof typeof v) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setV({ ...v, [k]: e.target.value });
   return (
     <>
-      <Button onClick={() => setOpen(true)}><Plus className="size-4" />Ghi điểm thi đua</Button>
+      <Button onClick={() => setOpen(true)}><Plus className="size-4" />Ghi điểm<span className="max-sm:hidden"> thi đua</span></Button>
       <Modal open={open} onClose={() => setOpen(false)} title="Ghi nhận điểm thi đua" className="max-w-md">
         <div className="space-y-3">
           <Field label="Chi đoàn" required><Select value={v.departmentId} onChange={set("departmentId")}><option value="">Chọn Chi đoàn</option>{departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}</Select></Field>
