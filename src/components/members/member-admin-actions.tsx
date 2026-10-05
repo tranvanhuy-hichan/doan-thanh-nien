@@ -21,19 +21,19 @@ export function MemberAdminActions({ id, locked, isAdmin }: { id: string; locked
 
   return (
     <>
-      {isAdmin && <Link href={`/members/${id}/edit`} className={buttonClass("secondary", "sm")}><Pencil className="size-3.5" />Sửa</Link>}
-      <ConfirmButton trigger={<><KeyRound className="size-3.5" />Cấp lại mật khẩu</>} title="Cấp lại mật khẩu tạm thời?"
+      {isAdmin && <Link href={`/members/${id}/edit`} aria-label="Sửa" className={buttonClass("secondary", "sm")}><Pencil className="size-3.5" /><span className="max-sm:hidden">Sửa</span></Link>}
+      <ConfirmButton triggerLabel="Cấp lại mật khẩu" trigger={<><KeyRound className="size-3.5" /><span className="max-sm:hidden">Cấp lại mật khẩu</span></>} title="Cấp lại mật khẩu tạm thời?"
         description="Mật khẩu cũ sẽ không còn dùng được. Đoàn viên phải đổi mật khẩu ở lần đăng nhập kế tiếp."
         onConfirm={async () => { const res = await resetMemberPasswordAction(id); if (reportResult(res)) setPw(res.ok ? res.data!.password : null); }} />
       {isAdmin && (
         <>
-          <Button variant="secondary" size="sm" onClick={() => setAdjust(true)}><PlusCircle className="size-3.5" />Điều chỉnh điểm</Button>
-          <ConfirmButton trigger={locked ? <><LockOpen className="size-3.5" />Kích hoạt</> : <><Lock className="size-3.5" />Khóa tài khoản</>}
+          <Button variant="secondary" size="sm" aria-label="Điều chỉnh điểm" title="Điều chỉnh điểm" onClick={() => setAdjust(true)}><PlusCircle className="size-3.5" /><span className="max-sm:hidden">Điều chỉnh điểm</span></Button>
+          <ConfirmButton triggerLabel={locked ? "Kích hoạt tài khoản" : "Khóa tài khoản"} trigger={locked ? <><LockOpen className="size-3.5" /><span className="max-sm:hidden">Kích hoạt</span></> : <><Lock className="size-3.5" /><span className="max-sm:hidden">Khóa tài khoản</span></>}
             title={locked ? "Kích hoạt lại tài khoản?" : "Khóa tài khoản?"}
             description={locked ? "Đoàn viên có thể đăng nhập trở lại." : "Đoàn viên sẽ không thể đăng nhập cho đến khi được kích hoạt lại."}
             danger={!locked} confirmLabel={locked ? "Kích hoạt" : "Khóa"}
             onConfirm={async () => { reportResult(await setMemberAccountStatusAction(id, locked ? "ACTIVE" : "LOCKED")); router.refresh(); }} />
-          <ConfirmButton trigger={<><Trash2 className="size-3.5" />Xóa</>} triggerClassName="text-danger" title="Xóa đoàn viên?" danger confirmLabel="Xóa vĩnh viễn"
+          <ConfirmButton triggerLabel="Xóa đoàn viên" trigger={<><Trash2 className="size-3.5" /><span className="max-sm:hidden">Xóa</span></>} triggerClassName="text-danger" title="Xóa đoàn viên?" danger confirmLabel="Xóa vĩnh viễn"
             description="Toàn bộ hồ sơ, tài khoản, lịch sử điểm danh và điểm của đoàn viên này sẽ bị xóa và không thể khôi phục."
             onConfirm={async () => { if (reportResult(await deleteMemberAction(id))) { router.push("/members"); router.refresh(); } }} />
         </>

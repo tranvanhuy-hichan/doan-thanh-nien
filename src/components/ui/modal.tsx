@@ -32,15 +32,15 @@ export function Modal({ open, onClose, title, children, className }: {
 }
 
 /** Hộp thoại xác nhận (thay cho window.confirm). */
-export function ConfirmButton({ trigger, title, description, confirmLabel = "Xác nhận", danger, onConfirm, triggerClassName, triggerVariant = "secondary", size = "sm" }: {
+export function ConfirmButton({ trigger, title, description, confirmLabel = "Xác nhận", danger, onConfirm, triggerClassName, triggerVariant = "secondary", size = "sm", triggerLabel }: {
   trigger: React.ReactNode; title: string; description?: string; confirmLabel?: string; danger?: boolean;
-  onConfirm: () => Promise<void> | void; triggerClassName?: string; triggerVariant?: "secondary" | "ghost" | "danger" | "primary"; size?: "sm" | "md";
+  onConfirm: () => Promise<void> | void; triggerClassName?: string; triggerVariant?: "secondary" | "ghost" | "danger" | "primary"; size?: "sm" | "md"; triggerLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
   return (
     <>
-      <Button variant={triggerVariant} size={size} className={triggerClassName} onClick={() => setOpen(true)}>{trigger}</Button>
+      <Button variant={triggerVariant} size={size} className={triggerClassName} aria-label={triggerLabel} title={triggerLabel} onClick={() => setOpen(true)}>{trigger}</Button>
       <Modal open={open} onClose={() => !pending && setOpen(false)} title={title} className="max-w-md">
         {description && <p className="text-sm text-muted">{description}</p>}
         <div className="mt-5 flex justify-end gap-2">
