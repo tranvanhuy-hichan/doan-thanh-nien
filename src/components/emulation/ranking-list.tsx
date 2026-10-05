@@ -26,7 +26,7 @@ export function RankingList({ items }: { items: RankItem[] }) {
             <button onClick={() => setSel(r)} className={`block w-full px-3 py-2.5 text-left ${r.mine ? "bg-primary-light/50" : ""}`}>
               <div className="flex items-center gap-3">
                 <span className={`flex size-7 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold ${r.rank <= 3 ? "bg-primary text-white" : "bg-slate-100 text-slate-600"}`}>{r.rank}</span>
-                <span className="min-w-0 flex-1 truncate font-medium">{r.name}</span>
+                <span className="min-w-0 flex-1 truncate font-medium">Chi đoàn {r.name}</span>
                 <span className="text-lg font-semibold tabular-nums">{r.total}</span>
               </div>
               <div className="mt-2 ml-10 h-1 overflow-hidden rounded-full bg-slate-100"><div className={`h-full ${r.total < 0 ? "bg-danger" : "bg-primary"}`} style={{ width: `${(Math.abs(r.total) / max) * 100}%` }} /></div>
