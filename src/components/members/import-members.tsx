@@ -31,7 +31,7 @@ export function ImportMembersButton() {
 
   return (
     <>
-      <Button variant="secondary" onClick={() => setOpen(true)}><Upload className="size-4" />Import Excel</Button>
+      <Button variant="secondary" onClick={() => setOpen(true)}><Upload className="size-4" />Import<span className="max-sm:hidden"> Excel</span></Button>
       <Modal open={open} onClose={close} title="Import đoàn viên từ Excel" className="max-w-2xl">
         {!result ? (
           <div className="space-y-4">

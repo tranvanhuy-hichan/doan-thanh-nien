@@ -47,7 +47,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
         actions={user.role === "ADMIN" && (
           <>
             <ImportMembersButton />
-            <Link href="/members/new" className={buttonClass()}><Plus className="size-4" />Thêm đoàn viên</Link>
+            <Link href="/members/new" className={buttonClass()}><Plus className="size-4" />Thêm<span className="max-sm:hidden"> đoàn viên</span></Link>
           </>
         )}
       />
