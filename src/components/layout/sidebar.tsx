@@ -1,12 +1,41 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, Settings } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ChevronDown, LogOut, Settings } from "lucide-react";
 import type { Role } from "@prisma/client";
 import { cn } from "@/utils";
 import { navFor, type NavItem } from "@/lib/nav";
 import { logoutAction } from "@/actions/auth";
 import { DoanLogo } from "./logo";
+
+function NavGroup({ item, labels }: { item: NavItem; labels: string }) {
+  const pathname = usePathname();
+  const children = item.children ?? [];
+  const inside = children.some((c) => pathname === c.href || pathname.startsWith(c.href + "/")) || pathname.startsWith((item.match ?? item.href) + "/");
+  const [open, setOpen] = useState(inside);
+  useEffect(() => { if (inside) setOpen(true); }, [inside]);
+  return (
+    <div>
+      <div className={cn("flex items-center rounded-md text-sm transition-colors", inside ? "bg-white/15 font-medium text-white" : "text-blue-50 hover:bg-white/10")}>
+        {/* Tablet (thanh bên thu gọn): bấm icon để vào mục con đầu tiên */}
+        <Link href={children[0]?.href ?? item.href} title={item.label} className="flex min-w-0 flex-1 items-center gap-3 px-3 py-2 lg:hidden"><item.icon className="size-[18px] shrink-0" /></Link>
+        <button onClick={() => setOpen((o) => !o)} aria-expanded={open} className="hidden min-w-0 flex-1 items-center gap-3 px-3 py-2 text-left lg:flex">
+          <item.icon className="size-[18px] shrink-0" /><span className="flex-1">{item.label}</span>
+          <ChevronDown className={cn("size-4 shrink-0 transition-transform", open && "rotate-180")} />
+        </button>
+      </div>
+      {open && (
+        <div className={cn("mt-0.5 mb-1 space-y-0.5 border-l border-white/20 pl-2", labels === "inline" ? "ml-5" : "ml-5 max-lg:hidden")}>
+          {children.map((c) => {
+            const active = pathname === c.href || pathname.startsWith(c.href + "/");
+            return <Link key={c.href} href={c.href} className={cn("block rounded-md px-3 py-1.5 text-[13px] transition-colors", active ? "bg-white font-medium text-primary-dark" : "text-blue-100 hover:bg-white/10")}>{c.label}</Link>;
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function NavLinks({ items, labels, onNavigate }: { items: NavItem[]; labels: string; onNavigate?: () => void }) {
   const pathname = usePathname();
@@ -19,7 +48,7 @@ function NavLinks({ items, labels, onNavigate }: { items: NavItem[]; labels: str
       <span className={labels}>{it.label}</span>
     </Link>
   );
-  return <>{items.map(link)}</>;
+  return <>{items.map((it) => (it.children ? <NavGroup key={it.href} item={it} labels={labels} /> : link(it)))}</>;
 }
 
 function SidebarBody({ items, labels, onNavigate }: { items: NavItem[]; labels: string; onNavigate?: () => void }) {

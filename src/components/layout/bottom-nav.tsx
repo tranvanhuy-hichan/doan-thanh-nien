@@ -35,7 +35,16 @@ export function BottomNav({ role }: { role: Role }) {
           <div className="absolute inset-x-0 bottom-0 rounded-t-2xl bg-white pb-[calc(5.5rem+env(safe-area-inset-bottom))] shadow-2xl" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Chức năng khác">
             <div className="mx-auto my-2 h-1 w-10 rounded-full bg-slate-200" />
             <div className="grid grid-cols-3 gap-2 px-4 pt-2">
-              {more.map((it) => (
+              {more.map((it) => it.children ? (
+                <div key={it.href} className="col-span-3 rounded-xl bg-slate-50 p-2">
+                  <div className="flex items-center gap-2 px-2 pb-1.5 text-xs font-semibold text-slate-600"><it.icon className="size-4" />{it.label}</div>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {it.children.map((c) => (
+                      <Link key={c.href} href={c.href} className={cn("rounded-lg px-3 py-2 text-center text-xs", pathname === c.href || pathname.startsWith(c.href + "/") ? "bg-primary-light font-semibold text-primary-dark" : "bg-white text-slate-700 active:bg-slate-100")}>{c.label}</Link>
+                    ))}
+                  </div>
+                </div>
+              ) : (
                 <Link key={it.href} href={it.href} className={cn("flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 text-center text-xs", isActive(pathname, it) ? "bg-primary-light font-semibold text-primary-dark" : "bg-slate-50 text-slate-700 active:bg-slate-100")}>
                   <it.icon className="size-6" />{it.label}
                 </Link>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Plus } from "lucide-react";
+import { ExternalLink, Plus } from "lucide-react";
 import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/auth/session";
@@ -11,7 +11,6 @@ import { CompactList } from "@/components/ui/compact-list";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { DataTable, EmptyState, PageHeader, Pagination, StatusBadge, Td, Th } from "@/components/ui/misc";
 import { ArticleRowActions } from "@/components/cms/row-actions";
-import { CmsTabs } from "@/components/cms/tabs";
 
 const PAGE_SIZE = 12;
 
@@ -32,8 +31,10 @@ export default async function CmsKindPage({ params, searchParams }: { params: Pr
   return (
     <>
       <PageHeader title={KIND_LABEL[kind]} description="Quản lý nội dung hiển thị trên trang công khai"
-        actions={<Link href={`${base}/new`} className={buttonClass()}><Plus className="size-4" />{KIND_ACTION[kind]}</Link>} />
-      <CmsTabs active={base} />
+        actions={<>
+          <Link href={`/${slug}`} target="_blank" className={buttonClass("secondary")}><ExternalLink className="size-4" /><span className="max-sm:hidden">Xem trang công khai</span></Link>
+          <Link href={`${base}/new`} className={buttonClass()}><Plus className="size-4" />{KIND_ACTION[kind]}</Link>
+        </>} />
       <FilterBar fields={[{ type: "search", name: "q", placeholder: "Tìm theo tiêu đề..." }]} />
       {items.length === 0 ? <div className="rounded-lg border border-border bg-white/85"><EmptyState title={`Chưa có ${KIND_LABEL[kind].toLowerCase()}`} description="Nội dung đăng ở đây sẽ hiển thị trên trang công khai." /></div> : (
         <>

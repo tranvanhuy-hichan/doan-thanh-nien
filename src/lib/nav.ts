@@ -1,7 +1,7 @@
 import { FileText, Globe, Settings, Award, BarChart3, CalendarDays, CheckSquare, IdCard, LayoutDashboard, Newspaper, QrCode, Trophy, School, History, Users, type LucideIcon } from "lucide-react";
 import type { Role } from "@prisma/client";
 
-export type NavItem = { href: string; label: string; icon: LucideIcon; /** Tiền tố đường dẫn coi là đang ở mục này (mặc định = href). */ match?: string };
+export type NavItem = { href: string; label: string; icon: LucideIcon; /** Tiền tố đường dẫn coi là đang ở mục này (mặc định = href). */ match?: string; /** Menu con (hiển thị dạng nhóm mở/đóng). */ children?: { href: string; label: string }[] };
 
 export function navFor(role: Role): NavItem[] {
   if (role === "MEMBER") {
@@ -39,8 +39,14 @@ export function navFor(role: Role): NavItem[] {
     { href: "/emulation", label: "Thi đua", icon: Trophy },
     { href: "/achievements", label: "Thành tích", icon: Award },
     { href: "/reports", label: "Báo cáo", icon: BarChart3 },
-    { href: "/chapter-reports", label: "Báo cáo Chi đoàn", icon: FileText },
-    { href: "/cms/tin-tuc", label: "Website công khai", icon: Globe, match: "/cms" },
+    {
+      href: "/cms/tin-tuc", label: "Website công khai", icon: Globe, match: "/cms",
+      children: [
+        { href: "/cms/tin-tuc", label: "Tin tức" }, { href: "/cms/ke-hoach", label: "Kế hoạch" }, { href: "/cms/su-kien", label: "Sự kiện" },
+        { href: "/cms/thong-bao", label: "Thông báo" }, { href: "/cms/pages", label: "Trang giới thiệu" },
+        { href: "/chapter-reports", label: "Báo cáo Chi đoàn" }, { href: "/cms/settings", label: "Thông tin website" },
+      ],
+    },
   ];
 }
 
