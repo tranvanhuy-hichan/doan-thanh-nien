@@ -80,8 +80,8 @@ export function SiteHeader({ address, bannerUrl, marquee }: { address: string; b
       <div className="relative overflow-hidden bg-primary-dark text-white" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.08) 1.5px, transparent 2px)", backgroundSize: "26px 26px" }}>
         <div className="flex min-h-36 items-center sm:min-h-52">
           <div className="relative z-10 flex min-w-0 flex-1 items-center gap-3 px-4 py-4 sm:gap-6 lg:px-8">
-            <Link href="/" className="shrink-0 rounded-full bg-white p-2 shadow-lg sm:p-3" aria-label="Trang chủ">
-              <DoanLogo className="h-14 sm:h-24 lg:h-28" />
+            <Link href="/" className="shrink-0 drop-shadow-lg" aria-label="Trang chủ">
+              <DoanLogo className="h-16 sm:h-28 lg:h-32" />
             </Link>
             <div className="min-w-0 leading-tight">
               <p className="text-[11px] font-semibold tracking-[0.2em] text-blue-200 uppercase sm:text-sm">Đoàn TNCS Hồ Chí Minh</p>
