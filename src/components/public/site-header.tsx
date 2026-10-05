@@ -85,7 +85,7 @@ export function SiteHeader({ address, bannerUrl }: { address: string; bannerUrl?
             </Link>
             <div className="min-w-0 leading-tight">
               <p className="text-[11px] font-semibold tracking-[0.2em] text-blue-200 uppercase sm:text-sm">Đoàn TNCS Hồ Chí Minh</p>
-              <h1 className="mt-1 text-lg font-extrabold tracking-wide text-[#ffd400] uppercase sm:text-3xl lg:text-4xl 2xl:text-5xl">Đoàn trường THPT Sơn Hà</h1>
+              <h1 className="mt-1 text-lg font-extrabold tracking-wide text-[#ffd400] uppercase sm:text-2xl lg:text-3xl 2xl:text-4xl">Đoàn trường THPT Sơn Hà</h1>
               <p className="mt-1.5 text-xs text-blue-100 italic sm:text-base">Địa chỉ: {address}</p>
             </div>
           </div>
