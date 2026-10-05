@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Field, Input, Textarea } from "@/components/ui/form";
 
 const FIELDS: { key: string; label: string; multiline?: boolean }[] = [
-  { key: "heroTitle", label: "Tiêu đề banner trang chủ" },
-  { key: "heroSubtitle", label: "Mô tả banner trang chủ", multiline: true },
   { key: "address", label: "Địa chỉ" },
   { key: "phone", label: "Số điện thoại liên hệ" },
   { key: "email", label: "Email liên hệ" },

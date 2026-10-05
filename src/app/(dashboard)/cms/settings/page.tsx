@@ -9,7 +9,7 @@ export default async function CmsSettingsPage() {
   await requireRole(["ADMIN"]);
   return (
     <>
-      <PageHeader title="Thông tin website" description="Thông tin chung hiển thị trên trang chủ và chân trang" />
+      <PageHeader title="Thông tin website" description="Địa chỉ và thông tin liên hệ hiển thị ở đầu trang và chân trang" />
       <SiteSettingsForm initial={await getSiteSettings()} />
     </>
   );
