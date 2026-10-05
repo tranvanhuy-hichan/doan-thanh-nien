@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { formatDate, formatDateTime, formatHours } from "@/utils";
+import { CompactList } from "@/components/ui/compact-list";
 import { Avatar, DataTable, EmptyState, Section, Stat, Td, Th } from "@/components/ui/misc";
 import { MemberStatusBadge } from "./member-status";
 import { BadgeIcon } from "@/components/members/badge-icon";
@@ -57,6 +58,14 @@ export async function MemberProfile({ member, showAudit }: { member: M; showAudi
       )}
       <Section title="Lịch sử điểm gần đây">
         {points.length === 0 ? <EmptyState title="Chưa có giao dịch điểm" /> : (
+          <>
+          <CompactList items={points.map((p) => ({
+            id: p.id, title: p.reason, subtitle: formatDateTime(p.createdAt),
+            value: <span className={p.points < 0 ? "text-danger" : "text-primary"}>{p.points > 0 ? "+" : ""}{p.points}</span>,
+            details: [["Thời gian", formatDateTime(p.createdAt)], ["Nội dung", p.reason], ["Điểm", `${p.points > 0 ? "+" : ""}${p.points}`],
+              ...(showAudit && p.createdBy ? [["Người thực hiện", p.createdBy.fullName] as [string, string]] : [])],
+          }))} />
+          <div className="max-sm:hidden">
           <DataTable>
             <thead><tr><Th>Thời gian</Th><Th>Nội dung</Th><Th className="text-right">Điểm</Th>{showAudit && <Th>Người thực hiện</Th>}</tr></thead>
             <tbody>{points.map((p) => (
@@ -67,6 +76,8 @@ export async function MemberProfile({ member, showAudit }: { member: M; showAudi
               </tr>
             ))}</tbody>
           </DataTable>
+          </div>
+          </>
         )}
       </Section>
     </>
