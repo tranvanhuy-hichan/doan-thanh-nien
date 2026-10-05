@@ -3,7 +3,16 @@ import { spawnSync } from "node:child_process";
 
 // Prisma cần DIRECT_URL (kết nối trực tiếp, không qua pooler) để tạo/cập nhật bảng.
 // Nếu chưa đặt thì dùng chung DATABASE_URL (trường hợp chưa dùng pooler).
-const env = { ...process.env, DIRECT_URL: process.env.DIRECT_URL || process.env.DATABASE_URL };
+import { readFileSync } from "node:fs";
+const fromFile = {};
+try {
+  for (const line of readFileSync(".env", "utf8").split("\n")) {
+    const m = line.match(/^([A-Z_]+)=(.*)$/);
+    if (m) fromFile[m[1]] = m[2].replace(/^"|"$/g, "");
+  }
+} catch {}
+const get = (k) => process.env[k] || fromFile[k];
+const env = { ...process.env, DIRECT_URL: get("DIRECT_URL") || get("DATABASE_URL") };
 
 const MAX = 6;
 for (let i = 1; i <= MAX; i++) {
