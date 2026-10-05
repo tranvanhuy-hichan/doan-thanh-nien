@@ -30,6 +30,17 @@ src/lib/services      điểm danh + cộng điểm (transaction), huy hiệu, t
 src/lib/qr            QR token ký HMAC, sống 90 giây
 ```
 
+## Phân quyền
+
+| | Admin | Bí thư Chi đoàn | Đoàn viên |
+|---|---|---|---|
+| Đoàn viên | thêm/sửa/xóa/import, khóa tài khoản, cấp lại mật khẩu, điều chỉnh điểm | chỉ **xem** đoàn viên Chi đoàn mình | hồ sơ & thẻ của mình |
+| Chi đoàn, Báo cáo, Cài đặt hệ thống | toàn quyền | không có | không có |
+| Hoạt động | toàn trường + mọi Chi đoàn | tạo/sửa/hủy hoạt động của **Chi đoàn mình** | xem, đăng ký, quét QR |
+| Điểm danh | mọi hoạt động | hoạt động của Chi đoàn mình (QR, điểm danh hộ) | quét QR |
+| Bảng tin | đăng toàn trường / Chi đoàn bất kỳ | đăng cho Chi đoàn mình | xem, thích, bình luận |
+| Thi đua | ghi điểm thi đua trường | xem | xem |
+
 ## Quyết định thiết kế đáng lưu ý
 
 - **Phân quyền ở server**: mọi truy vấn đi qua `memberScope` / `activityScope` / `canManageDepartment`. Bí thư mở URL của Chi đoàn khác nhận 404.

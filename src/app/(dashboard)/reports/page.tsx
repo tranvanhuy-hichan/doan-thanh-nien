@@ -13,7 +13,7 @@ export const metadata = { title: "Báo cáo" };
 const PAGE_SIZE = 10;
 
 export default async function ReportsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const user = await requireRole(["ADMIN", "SECRETARY"]);
+  const user = await requireRole(["ADMIN"]);
   const sp = await searchParams;
   const month = str(sp.month);
   const page = pageParam(sp.page);

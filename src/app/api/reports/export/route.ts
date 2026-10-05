@@ -5,7 +5,7 @@ import { formatDateTime, formatHours } from "@/utils";
 
 export async function GET(req: Request) {
   const user = await getCurrentUser();
-  if (!user || user.mustChangePassword || user.role === "MEMBER") return new Response("Forbidden", { status: 403 });
+  if (!user || user.mustChangePassword || user.role !== "ADMIN") return new Response("Forbidden", { status: 403 });
   const month = new URL(req.url).searchParams.get("month") ?? undefined;
 
   const [acts, members] = await Promise.all([activityReport(user, month), memberReport(user)]);

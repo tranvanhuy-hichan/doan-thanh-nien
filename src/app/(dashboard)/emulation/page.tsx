@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
-import { canManageDepartment } from "@/lib/permissions";
 import { emulationRanking } from "@/lib/services/emulation";
 import { currentValue, resolvePeriod, PERIOD_LABEL, type PeriodType } from "@/lib/emulation-period";
 import { formatDate, formatDateShort, pageParam, str, toDateInput } from "@/utils";
@@ -42,7 +41,7 @@ export default async function EmulationPage({ searchParams }: { searchParams: Pr
         <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Chưa có Chi đoàn nào" /></div>
       ) : (
         <>
-        <RankingList items={ranking.map((r) => ({ ...r, mine: user.departmentId === r.id, canOpen: canManageDepartment(user, r.id) }))} />
+        <RankingList items={ranking.map((r) => ({ ...r, mine: user.departmentId === r.id, canOpen: user.role === "ADMIN" }))} />
         <div className="max-sm:hidden">
         <DataTable>
           <thead><tr><Th>Hạng</Th><Th>Chi đoàn</Th><Th className="text-right">Đoàn viên</Th><Th className="text-right">Lượt tham gia</Th><Th className="text-right">Điểm hoạt động (TB)</Th><Th className="text-right">Điểm thi đua trường</Th><Th className="min-w-44">Tổng điểm</Th></tr></thead>
@@ -50,7 +49,7 @@ export default async function EmulationPage({ searchParams }: { searchParams: Pr
             {ranking.map((r) => (
               <tr key={r.id} className={user.departmentId === r.id ? "bg-primary-light/50" : "hover:bg-slate-50"}>
                 <Td className="font-semibold tabular-nums">{r.rank}</Td>
-                <Td className="font-medium">{canManageDepartment(user, r.id) ? <Link href={`/departments/${r.id}`} className="text-primary hover:underline">{r.name}</Link> : r.name}</Td>
+                <Td className="font-medium">{user.role === "ADMIN" ? <Link href={`/departments/${r.id}`} className="text-primary hover:underline">{r.name}</Link> : r.name}</Td>
                 <Td className="text-right tabular-nums">{r.members}</Td>
                 <Td className="text-right tabular-nums">{r.attendances}</Td>
                 <Td className="text-right tabular-nums"><span title={`Tổng ${r.activityTotal} điểm / ${r.members} đoàn viên`}>{r.activityScore}</span></Td>

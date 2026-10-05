@@ -12,7 +12,7 @@ export const metadata = { title: "Chi đoàn" };
 const PAGE_SIZE = 10;
 
 export default async function DepartmentsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
-  const user = await requireRole(["ADMIN", "SECRETARY"]);
+  const user = await requireRole(["ADMIN"]);
   const isAdmin = user.role === "ADMIN";
   const page = pageParam((await searchParams).page);
   const where = isAdmin ? {} : { id: user.departmentId ?? "__none__" };

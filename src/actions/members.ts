@@ -79,11 +79,9 @@ export async function setMemberAccountStatusAction(id: string, status: "ACTIVE" 
 
 export async function resetMemberPasswordAction(id: string) {
   return run<{ password: string }>(async () => {
-    const admin = await requireRole(["ADMIN", "SECRETARY"]);
+    const admin = await requireRole(["ADMIN"]);
     const m = await db.member.findUnique({ where: { id } });
     if (!m) throw new UserError("Không tìm thấy đoàn viên");
-    // Bí thư chỉ được cấp lại mật khẩu cho đoàn viên của Chi đoàn mình.
-    if (admin.role === "SECRETARY" && m.departmentId !== admin.departmentId) throw new UserError("Bạn không có quyền với đoàn viên này");
     const password = generateTempPassword();
     await db.user.update({ where: { id: m.userId }, data: { passwordHash: await hashPassword(password), mustChangePassword: true } });
     await audit(admin.id, "account.reset_password", "User", m.userId, { code: m.code });

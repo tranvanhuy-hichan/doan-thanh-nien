@@ -13,7 +13,7 @@ export const metadata = { title: "Chi đoàn" };
 const PAGE_SIZE = 10;
 
 export default async function DepartmentDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ page?: string }> }) {
-  const user = await requireRole(["ADMIN", "SECRETARY"]);
+  const user = await requireRole(["ADMIN"]);
   const { id } = await params;
   const page = pageParam((await searchParams).page);
   if (!canManageDepartment(user, id)) notFound(); // bí thư Chi đoàn A mở URL Chi đoàn B -> 404

@@ -16,11 +16,23 @@ export function navFor(role: Role): NavItem[] {
       { href: "/achievements", label: "Thành tích", icon: Award },
     ];
   }
+  if (role === "SECRETARY") {
+    // Bí thư: chỉ phạm vi Chi đoàn của mình -> không có quản lý Chi đoàn / Báo cáo toàn trường.
+    return [
+      { href: "/dashboard", label: "Tổng quan", icon: LayoutDashboard },
+      { href: "/feed", label: "Bảng tin", icon: Newspaper },
+      { href: "/members", label: "Đoàn viên", icon: Users },
+      { href: "/activities", label: "Hoạt động", icon: CalendarDays },
+      { href: "/attendance", label: "Điểm danh", icon: CheckSquare },
+      { href: "/emulation", label: "Thi đua", icon: Trophy },
+      { href: "/achievements", label: "Thành tích", icon: Award },
+    ];
+  }
   return [
     { href: "/dashboard", label: "Tổng quan", icon: LayoutDashboard },
     { href: "/feed", label: "Bảng tin", icon: Newspaper },
     { href: "/members", label: "Đoàn viên", icon: Users },
-    { href: "/departments", label: role === "ADMIN" ? "Chi đoàn" : "Chi đoàn của tôi", icon: School },
+    { href: "/departments", label: "Chi đoàn", icon: School },
     { href: "/activities", label: "Hoạt động", icon: CalendarDays },
     { href: "/attendance", label: "Điểm danh", icon: CheckSquare },
     { href: "/emulation", label: "Thi đua", icon: Trophy },
