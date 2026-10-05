@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CompactList } from "@/components/ui/compact-list";
 import { Plus, Upload } from "lucide-react";
 import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
@@ -62,6 +63,13 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
       {members.length === 0 ? (
         <div className="rounded-lg border border-border bg-white"><EmptyState title="Không có đoàn viên nào" description="Thử đổi bộ lọc, hoặc thêm đoàn viên mới." /></div>
       ) : (
+        <>
+        <CompactList items={members.map((m) => ({
+          id: m.id, title: m.fullName, subtitle: `${m.code} · ${m.class.name}`, leading: <Avatar name={m.fullName} src={m.avatarUrl} size={28} />,
+          badge: <MemberStatusBadge status={m.status} locked={m.user.status === "LOCKED"} />, href: `/members/${m.id}`, hrefLabel: "Xem hồ sơ",
+          details: [["Mã đoàn viên", m.code], ["Lớp", m.class.name], ["Chi đoàn", m.department.name], ["Ngày sinh", formatDate(m.dateOfBirth)]],
+        }))} />
+        <div className="max-sm:hidden">
         <DataTable>
           <thead><tr><Th>Mã đoàn viên</Th><Th>Họ tên</Th><Th>Lớp</Th><Th>Chi đoàn</Th><Th>Ngày sinh</Th><Th>Trạng thái</Th></tr></thead>
           <tbody>
@@ -81,6 +89,8 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
             ))}
           </tbody>
         </DataTable>
+        </div>
+        </>
       )}
       <Pagination page={page} pageSize={PAGE_SIZE} total={total} basePath="/members" params={{ q, dept, cohort, status }} />
     </>

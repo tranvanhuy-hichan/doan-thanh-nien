@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CompactList } from "@/components/ui/compact-list";
 import { Plus } from "lucide-react";
 import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
@@ -57,6 +58,14 @@ export default async function ActivitiesPage({ searchParams }: { searchParams: P
       {activities.length === 0 ? (
         <div className="rounded-lg border border-border bg-white"><EmptyState title="Chưa có hoạt động nào" description={canCreate ? "Tạo hoạt động đầu tiên để bắt đầu điểm danh." : "Các hoạt động mới sẽ xuất hiện tại đây."} /></div>
       ) : (
+        <>
+        <CompactList items={activities.map((a) => ({
+          id: a.id, title: a.title, subtitle: `${formatDateTime(a.startAt)} · ${a.department?.name ?? "Toàn trường"}`,
+          badge: <ActivityStatusBadge status={activityStatus(a, now)} />, href: `/activities/${a.id}`,
+          details: [["Loại", a.category.name], ["Thời gian", formatDateTime(a.startAt)], ["Địa điểm", a.location], ["Tổ chức", a.department?.name ?? "Toàn trường"],
+            ["Đăng ký", `${a._count.registrations}${a.maxParticipants ? ` / ${a.maxParticipants}` : ""}`], ["Tham gia", a._count.attendances], ["Điểm", a.points]],
+        }))} />
+        <div className="max-sm:hidden">
         <DataTable>
           <thead><tr><Th>Hoạt động</Th><Th>Thời gian</Th><Th>Địa điểm</Th><Th>Tổ chức</Th><Th className="text-right">Đăng ký</Th><Th className="text-right">Tham gia</Th><Th>Trạng thái</Th></tr></thead>
           <tbody>
@@ -76,6 +85,8 @@ export default async function ActivitiesPage({ searchParams }: { searchParams: P
             ))}
           </tbody>
         </DataTable>
+        </div>
+        </>
       )}
       <Pagination page={page} pageSize={PAGE_SIZE} total={total} basePath="/activities" params={{ q, cat, status, month }} />
     </>

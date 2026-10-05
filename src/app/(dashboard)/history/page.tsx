@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CompactList } from "@/components/ui/compact-list";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
@@ -47,6 +48,12 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
       {rows.length === 0 ? (
         <div className="rounded-lg border border-border bg-white"><EmptyState title="Chưa có hoạt động nào" description="Lịch sử sẽ xuất hiện sau khi bạn đăng ký hoặc điểm danh hoạt động." /></div>
       ) : (
+        <>
+        <CompactList items={rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((r) => ({
+          id: r.id + r.key, title: r.title, subtitle: formatDate(r.checkedInAt ?? r.startAt), badge: <StatusBadge tone={r.tone}>{r.label}</StatusBadge>, value: r.points ? `+${r.points}` : undefined,
+          href: `/activities/${r.id}`, details: [["Loại", r.category], ["Thời gian", r.checkedInAt ? formatDateTime(r.checkedInAt) : formatDate(r.startAt)], ["Trạng thái", r.label], ["Điểm", r.points ? `+${r.points}` : "—"]],
+        }))} />
+        <div className="max-sm:hidden">
         <DataTable>
           <thead><tr><Th>Hoạt động</Th><Th>Loại</Th><Th>Thời gian</Th><Th>Trạng thái</Th><Th className="text-right">Điểm</Th></tr></thead>
           <tbody>{rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((r) => (
@@ -59,6 +66,8 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
             </tr>
           ))}</tbody>
         </DataTable>
+        </div>
+        </>
       )}
       <Pagination page={page} pageSize={PAGE_SIZE} total={rows.length} basePath="/history" params={{ month, cat, status }} />
     </>

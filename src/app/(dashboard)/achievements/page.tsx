@@ -1,3 +1,4 @@
+import { CompactList } from "@/components/ui/compact-list";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
 import { memberScope } from "@/lib/services/queries";
@@ -80,6 +81,11 @@ export default async function AchievementsPage() {
       <PageHeader title="Thành tích" description={isAdmin ? "Quản lý huy hiệu và đoàn viên tiêu biểu" : `Đoàn viên tiêu biểu Chi đoàn ${user.departmentName}`} actions={isAdmin && <BadgeFormButton categories={categories} />} />
       <Section title="Huy hiệu">
         {badges.length === 0 ? <div className="rounded-lg border border-border bg-white"><EmptyState title="Chưa có huy hiệu" description="Tạo huy hiệu để ghi nhận thành tích của đoàn viên." /></div> : (
+          <>
+          <CompactList items={badges.map((b) => ({ id: b.id, title: b.name, subtitle: b.description, leading: <BadgeIcon name={b.icon} className="size-5 text-primary" />, value: b._count.members,
+            details: [["Điều kiện", `${CRITERIA_LABEL[b.criteria]}${b.category ? ` (${b.category.name})` : ""} ≥ ${b.threshold}`], ["Đã đạt", b._count.members]],
+            actions: isAdmin ? <span className="flex"><BadgeFormButton badge={b} categories={categories} /><DeleteBadgeButton id={b.id} name={b.name} /></span> : undefined }))} />
+          <div className="max-sm:hidden">
           <DataTable>
             <thead><tr><Th>Huy hiệu</Th><Th>Điều kiện</Th><Th className="text-right">Đã đạt</Th>{isAdmin && <Th />}</tr></thead>
             <tbody>{badges.map((b) => (
@@ -91,6 +97,8 @@ export default async function AchievementsPage() {
               </tr>
             ))}</tbody>
           </DataTable>
+          </div>
+          </>
         )}
       </Section>
       <Section title="Đoàn viên tiêu biểu">

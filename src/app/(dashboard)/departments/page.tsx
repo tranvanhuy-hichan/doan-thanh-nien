@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CompactList } from "@/components/ui/compact-list";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/auth/session";
 import { participationRate } from "@/lib/services/queries";
@@ -34,6 +35,20 @@ export default async function DepartmentsPage({ searchParams }: { searchParams: 
       {departments.length === 0 ? (
         <div className="rounded-lg border border-border bg-white"><EmptyState title="Chưa có Chi đoàn nào" description="Tạo Chi đoàn đầu tiên để bắt đầu thêm đoàn viên." /></div>
       ) : (
+        <>
+        <CompactList items={departments.map((d, i) => ({
+          id: d.id, title: `Chi đoàn ${d.name}`, subtitle: d.secretary ? `Bí thư: ${d.secretary.fullName}` : "Chưa phân công bí thư", value: `${rates[i]}%`,
+          href: `/departments/${d.id}`, hrefLabel: "Xem Chi đoàn",
+          details: [["Bí thư", d.secretary?.fullName ?? "Chưa phân công"], ["Đoàn viên", d._count.members], ["Hoạt động", d._count.activities], ["Tỷ lệ tham gia", `${rates[i]}%`]],
+          actions: isAdmin ? (
+            <span className="flex items-center gap-1">
+              <SecretaryButton departmentId={d.id} current={d.secretary} available={freeSecretaries} />
+              <DepartmentFormButton dept={{ id: d.id, name: d.name, description: d.description }} />
+              <DeleteDepartmentButton id={d.id} name={d.name} />
+            </span>
+          ) : undefined,
+        }))} />
+        <div className="max-sm:hidden">
         <DataTable>
           <thead><tr><Th>Chi đoàn</Th><Th>Bí thư</Th><Th className="text-right">Đoàn viên</Th><Th className="text-right">Hoạt động</Th><Th className="text-right">Tỷ lệ tham gia</Th>{isAdmin && <Th />}</tr></thead>
           <tbody>
@@ -55,6 +70,8 @@ export default async function DepartmentsPage({ searchParams }: { searchParams: 
             ))}
           </tbody>
         </DataTable>
+        </div>
+        </>
       )}
       <Pagination page={page} pageSize={PAGE_SIZE} total={totalDepts} basePath="/departments" params={{}} />
     </>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CompactList } from "@/components/ui/compact-list";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/auth/session";
@@ -38,16 +39,26 @@ export default async function DepartmentDetailPage({ params, searchParams }: { p
       </div>
       <Section title="Hoạt động gần đây" className="mt-8">
         {activities.length === 0 ? <EmptyState title="Chưa có hoạt động" /> : (
+          <>
+          <CompactList items={activities.map((a) => ({ id: a.id, title: a.title, subtitle: formatDateShort(a.startAt), value: a._count.attendances, href: `/activities/${a.id}`,
+            details: [["Ngày", formatDateShort(a.startAt)], ["Tham gia", a._count.attendances]] }))} />
+          <div className="max-sm:hidden">
           <DataTable>
             <thead><tr><Th>Hoạt động</Th><Th>Ngày</Th><Th className="text-right">Tham gia</Th></tr></thead>
             <tbody>{activities.map((a) => (
               <tr key={a.id}><Td><Link href={`/activities/${a.id}`} className="font-medium hover:text-primary">{a.title}</Link></Td><Td>{formatDateShort(a.startAt)}</Td><Td className="text-right">{a._count.attendances}</Td></tr>
             ))}</tbody>
           </DataTable>
+          </div>
+          </>
         )}
       </Section>
       <Section title={`Đoàn viên (${dept._count.members})`}>
         {members.length === 0 ? <EmptyState title="Chi đoàn chưa có đoàn viên" /> : (
+          <>
+          <CompactList items={members.map((m) => ({ id: m.id, title: m.fullName, subtitle: `${m.code} · ${m.class.name}`, leading: <Avatar name={m.fullName} src={m.avatarUrl} size={28} />, value: m.totalPoints,
+            href: `/members/${m.id}`, hrefLabel: "Xem hồ sơ", details: [["Mã đoàn viên", m.code], ["Lớp", m.class.name], ["Điểm", m.totalPoints]] }))} />
+          <div className="max-sm:hidden">
           <DataTable>
             <thead><tr><Th>Mã</Th><Th>Họ tên</Th><Th>Lớp</Th><Th className="text-right">Điểm</Th></tr></thead>
             <tbody>{members.map((m) => (
@@ -58,6 +69,8 @@ export default async function DepartmentDetailPage({ params, searchParams }: { p
               </tr>
             ))}</tbody>
           </DataTable>
+          </div>
+          </>
         )}
         <Pagination page={page} pageSize={PAGE_SIZE} total={dept._count.members} basePath={`/departments/${id}`} params={{}} />
       </Section>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CompactList } from "@/components/ui/compact-list";
 import { Download } from "lucide-react";
 import { requireRole } from "@/lib/auth/session";
 import { activityReport } from "@/lib/services/reports";
@@ -32,6 +33,12 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
       </div>
       <Section title="Chi tiết theo hoạt động" className="mt-8">
         {rows.length === 0 ? <div className="rounded-lg border border-border bg-white"><EmptyState title="Không có hoạt động trong kỳ báo cáo" /></div> : (
+          <>
+          <CompactList items={rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((a) => ({
+            id: a.id, title: a.title, subtitle: `${formatDateTime(a.startAt)} · ${a.department?.name ?? "Toàn trường"}`, value: `${a.rate}%`, href: `/activities/${a.id}`,
+            details: [["Loại", a.category.name], ["Thời gian", formatDateTime(a.startAt)], ["Tổ chức", a.department?.name ?? "Toàn trường"], ["Đăng ký", a._count.registrations], ["Tham gia", a._count.attendances], ["Tỷ lệ", `${a.rate}%`]],
+          }))} />
+          <div className="max-sm:hidden">
           <DataTable>
             <thead><tr><Th>Hoạt động</Th><Th>Thời gian</Th><Th>Tổ chức</Th><Th className="text-right">Đăng ký</Th><Th className="text-right">Tham gia</Th><Th className="text-right">Tỷ lệ</Th></tr></thead>
             <tbody>{rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((a) => (
@@ -40,15 +47,23 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
                 <Td className="text-right tabular-nums">{a._count.registrations}</Td><Td className="text-right tabular-nums">{a._count.attendances}</Td><Td className="text-right tabular-nums">{a.rate}%</Td></tr>
             ))}</tbody>
           </DataTable>
+          </div>
+          </>
         )}
         <Pagination page={page} pageSize={PAGE_SIZE} total={rows.length} basePath="/reports" params={{ month }} />
       </Section>
       {user.role === "ADMIN" && ranking.length > 0 && (
         <Section title="Xếp hạng Chi đoàn (toàn thời gian)">
+          <>
+          <CompactList items={ranking.map((d, i) => ({ id: d.id, rank: i + 1, title: `Chi đoàn ${d.name}`, value: `${d.rate}%`,
+            details: [["Đoàn viên", d.members], ["Lượt tham gia", d.attended], ["Tỷ lệ tham gia", `${d.rate}%`]] }))} />
+          <div className="max-sm:hidden">
           <DataTable>
             <thead><tr><Th>#</Th><Th>Chi đoàn</Th><Th className="text-right">Đoàn viên</Th><Th className="text-right">Lượt tham gia</Th><Th className="text-right">Tỷ lệ</Th></tr></thead>
             <tbody>{ranking.map((d, i) => <tr key={d.id}><Td>{i + 1}</Td><Td className="font-medium">{d.name}</Td><Td className="text-right tabular-nums">{d.members}</Td><Td className="text-right tabular-nums">{d.attended}</Td><Td className="text-right tabular-nums">{d.rate}%</Td></tr>)}</tbody>
           </DataTable>
+          </div>
+          </>
         </Section>
       )}
     </>

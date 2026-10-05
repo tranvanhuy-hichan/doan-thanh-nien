@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CompactList } from "@/components/ui/compact-list";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
 import { activityScope, participationRate } from "@/lib/services/queries";
@@ -45,6 +46,10 @@ async function AdminDashboard() {
       </Section>
       <Section title="Chi đoàn có tỷ lệ tham gia cao">
         {ranking.length === 0 ? <EmptyState title="Chưa có Chi đoàn" /> : (
+          <>
+          <CompactList items={ranking.slice(0, 5).map((d, i) => ({ id: d.id, rank: i + 1, title: `Chi đoàn ${d.name}`, value: `${d.rate}%`, href: `/departments/${d.id}`, hrefLabel: "Xem Chi đoàn",
+            details: [["Đoàn viên", d.members], ["Lượt tham gia", d.attended], ["Tỷ lệ tham gia", `${d.rate}%`]] }))} />
+          <div className="max-sm:hidden">
           <DataTable>
             <thead><tr><Th>#</Th><Th>Chi đoàn</Th><Th className="text-right">Đoàn viên</Th><Th className="text-right">Lượt tham gia</Th><Th className="text-right">Tỷ lệ</Th></tr></thead>
             <tbody>{ranking.slice(0, 5).map((d, i) => (
@@ -52,6 +57,8 @@ async function AdminDashboard() {
                 <Td className="text-right tabular-nums">{d.members}</Td><Td className="text-right tabular-nums">{d.attended}</Td><Td className="text-right font-medium tabular-nums">{d.rate}%</Td></tr>
             ))}</tbody>
           </DataTable>
+          </div>
+          </>
         )}
       </Section>
     </>
@@ -61,6 +68,12 @@ async function AdminDashboard() {
 function RecentTable({ rows }: { rows: { id: string; title: string; startAt: Date; endAt: Date; cancelledAt: Date | null; department: { name: string } | null; _count: { attendances: number } }[] }) {
   if (!rows.length) return <EmptyState title="Chưa có hoạt động" />;
   return (
+    <>
+    <CompactList items={rows.map((a) => ({
+      id: a.id, title: a.title, subtitle: `${formatDateTime(a.startAt)} · ${a.department?.name ?? "Toàn trường"}`, badge: <ActivityStatusBadge status={activityStatus(a)} />, href: `/activities/${a.id}`,
+      details: [["Thời gian", formatDateTime(a.startAt)], ["Tổ chức", a.department?.name ?? "Toàn trường"], ["Tham gia", a._count.attendances]],
+    }))} />
+    <div className="max-sm:hidden">
     <DataTable>
       <thead><tr><Th>Hoạt động</Th><Th>Thời gian</Th><Th>Tổ chức</Th><Th className="text-right">Tham gia</Th><Th>Trạng thái</Th></tr></thead>
       <tbody>{rows.map((a) => (
@@ -68,6 +81,8 @@ function RecentTable({ rows }: { rows: { id: string; title: string; startAt: Dat
           <Td>{a.department?.name ?? "Toàn trường"}</Td><Td className="text-right tabular-nums">{a._count.attendances}</Td><Td><ActivityStatusBadge status={activityStatus(a)} /></Td></tr>
       ))}</tbody>
     </DataTable>
+    </div>
+    </>
   );
 }
 
