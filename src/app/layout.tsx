@@ -5,8 +5,8 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: { default: "Đoàn TNCS Hồ Chí Minh - THPT Sơn Hà", template: "%s · Đoàn THPT Sơn Hà" },
   description: "Hệ thống quản lý đoàn viên và hoạt động Đoàn - Trường THPT Sơn Hà",
-  applicationName: "Đoàn Sơn Hà",
-  appleWebApp: { capable: true, title: "Đoàn Sơn Hà", statusBarStyle: "default" },
+  applicationName: "Đoàn THPT Sơn Hà",
+  appleWebApp: { capable: true, title: "Đoàn THPT Sơn Hà", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = { themeColor: "#0b63b8", viewportFit: "cover", width: "device-width", initialScale: 1 };
