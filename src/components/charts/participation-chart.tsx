@@ -3,7 +3,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 
 export function ParticipationChart({ data }: { data: { month: string; rate: number; attended: number; activities: number }[] }) {
   return (
-    <div className="h-60 w-full">
+    <div className="h-64 w-full rounded-lg border border-border bg-white/85 p-3 pt-4">
       <ResponsiveContainer>
         <BarChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
           <CartesianGrid vertical={false} stroke="#e2e8f0" />
