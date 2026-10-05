@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
 import { canManageDepartment } from "@/lib/permissions";
 import { emulationRanking } from "@/lib/services/emulation";
-import { currentValue, periodOptions, resolvePeriod, PERIOD_LABEL, type PeriodType } from "@/lib/emulation-period";
+import { currentValue, resolvePeriod, PERIOD_LABEL, type PeriodType } from "@/lib/emulation-period";
 import { formatDate, formatDateShort, pageParam, str, toDateInput } from "@/utils";
 import { DataTable, EmptyState, PageHeader, Pagination, Section, Td, Th } from "@/components/ui/misc";
 import { RankingList } from "@/components/emulation/ranking-list";
@@ -36,7 +36,7 @@ export default async function EmulationPage({ searchParams }: { searchParams: Pr
     <>
       <PageHeader title="Thi đua Chi đoàn" description={period.label}
         actions={admin && <AddRecordButton departments={departments} today={toDateInput(new Date())} />} />
-      <PeriodFilter type={period.type} value={period.value} options={periodOptions()} />
+      <PeriodFilter type={period.type} value={period.value} />
 
       {ranking.length === 0 ? (
         <div className="rounded-lg border border-border bg-white"><EmptyState title="Chưa có Chi đoàn nào" /></div>
