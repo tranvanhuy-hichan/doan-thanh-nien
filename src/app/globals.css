@@ -72,3 +72,11 @@ body::before {
 @media (max-width: 639px) {
   .page-actions > button, .page-actions > a { height: 2rem; padding-inline: 0.625rem; font-size: 13px; }
 }
+
+/* Nội dung bài viết (RichText) */
+.prose-doan { font-size: 16px; line-height: 1.75; color: var(--color-foreground); }
+.prose-doan p { margin: 0 0 1rem; }
+.prose-doan h2 { margin: 1.75rem 0 0.75rem; font-size: 1.25rem; font-weight: 700; color: var(--color-primary-dark); }
+.prose-doan h3 { margin: 1.25rem 0 0.5rem; font-size: 1.05rem; font-weight: 600; }
+.prose-doan ul, .prose-doan ol { margin: 0 0 1rem; padding-left: 1.5rem; }
+.prose-doan li { margin-bottom: 0.25rem; }

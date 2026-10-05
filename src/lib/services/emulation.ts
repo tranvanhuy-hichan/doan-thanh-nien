@@ -1,6 +1,7 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
-import type { Period } from "@/lib/emulation-period";
+import { resolvePeriod, type Period, type PeriodType } from "@/lib/emulation-period";
 
 export type RankRow = {
   id: string; name: string; members: number; attendances: number;
@@ -44,3 +45,13 @@ export async function emulationRanking(period: Period): Promise<RankRow[]> {
   rows.forEach((r, i) => { r.rank = i > 0 && rows[i - 1].total === r.total ? rows[i - 1].rank : i + 1; });
   return rows;
 }
+
+/** Bản có cache 5 phút cho các trang công khai (nhiều người xem, dữ liệu ít đổi). */
+export const cachedRanking = unstable_cache(
+  async (type: PeriodType, value: string) => {
+    const period = resolvePeriod(type, value);
+    return period ? emulationRanking(period) : [];
+  },
+  ["emulation-ranking"],
+  { revalidate: 300 },
+);

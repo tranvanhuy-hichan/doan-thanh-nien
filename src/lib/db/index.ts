@@ -10,7 +10,7 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 function datasourceUrl() {
   const url = process.env.DATABASE_URL;
   if (!url || /[?&]connection_limit=/.test(url)) return url;
-  const limit = process.env.DB_CONNECTION_LIMIT ?? "3";
+  const limit = process.env.DB_CONNECTION_LIMIT ?? "2";
   return `${url}${url.includes("?") ? "&" : "?"}connection_limit=${limit}&pool_timeout=20`;
 }
 

@@ -31,7 +31,7 @@ export async function seedDemo() {
   await db.$transaction([
     db.auditLog.deleteMany(), db.notification.deleteMany(), db.memberBadge.deleteMany(), db.pointTransaction.deleteMany(),
     db.attendance.deleteMany(), db.activityRegistration.deleteMany(), db.activityImage.deleteMany(), db.activity.deleteMany(),
-    db.emulationRecord.deleteMany(), db.post.deleteMany(), db.badge.deleteMany(), db.member.deleteMany(), db.class.deleteMany(), db.department.deleteMany(), db.user.deleteMany(), db.activityCategory.deleteMany(),
+    db.article.deleteMany(), db.sitePage.deleteMany(), db.chapterReport.deleteMany(), db.emulationRecord.deleteMany(), db.post.deleteMany(), db.badge.deleteMany(), db.member.deleteMany(), db.class.deleteMany(), db.department.deleteMany(), db.user.deleteMany(), db.activityCategory.deleteMany(),
   ]);
 
   const passwordHash = await hashPassword(DEMO_PASSWORD);
@@ -158,6 +158,33 @@ export async function seedDemo() {
   const recs: [number, number, string, number][] = [[0, 5, "Nề nếp tuần tốt", 3], [1, 3, "Phong trào văn nghệ", 10], [2, 4, "Nề nếp tuần tốt", 3], [0, -2, "Đi học muộn nhiều", 12], [1, 6, "Giải nhất thi Rung chuông vàng", 38], [2, 2, "Vệ sinh lớp học sạch", 8]];
   for (const [d, points, reason, daysAgo] of recs) {
     await db.emulationRecord.create({ data: { departmentId: depts[d].id, points, reason: `${DEMO_TAG}${reason}`, recordedAt: new Date(now - daysAgo * DAY), createdById: admin.id } });
+  }
+
+  // Nội dung trang công khai (demo)
+  const day = (n: number) => new Date(now - n * DAY);
+  const articles: { kind: "NEWS" | "PLAN" | "EVENT" | "ANNOUNCEMENT"; title: string; summary: string; content: string; ago: number; eventAt?: Date; eventLocation?: string }[] = [
+    { kind: "NEWS", title: "Đoàn trường tổ chức Ngày Chủ nhật xanh hưởng ứng phong trào bảo vệ môi trường", summary: "Hàng trăm đoàn viên tham gia dọn vệ sinh khuôn viên trường và khu vực lân cận.", content: "## Hoạt động nổi bật\nSáng Chủ nhật, đoàn viên các Chi đoàn đã tham gia dọn dẹp sân trường, trồng thêm cây xanh và phân loại rác thải.\n\n- Số đoàn viên tham gia: hơn 100 em\n- Thời gian: 3 giờ\n\nHoạt động nhận được sự ủng hộ của thầy cô và phụ huynh.", ago: 2 },
+    { kind: "NEWS", title: "Chi đoàn 12A1 đạt giải Nhất cuộc thi Rung chuông vàng", summary: "Cuộc thi thu hút sự tham gia của các Chi đoàn khối 10, 11, 12.", content: "Cuộc thi Rung chuông vàng diễn ra sôi nổi tại hội trường với nhiều phần thi hấp dẫn.", ago: 8 },
+    { kind: "NEWS", title: "Hiến máu nhân đạo: lan tỏa nghĩa cử cao đẹp", summary: "Chương trình hiến máu tình nguyện thu hút đông đảo đoàn viên, giáo viên.", content: "Chương trình hiến máu nhân đạo là hoạt động thường niên của Đoàn trường.", ago: 20 },
+    { kind: "PLAN", title: "Kế hoạch công tác Đoàn năm học 2026–2027", summary: "Định hướng hoạt động của Đoàn trường trong năm học mới.", content: "## Mục tiêu\n1. Nâng cao chất lượng sinh hoạt Chi đoàn\n2. Đẩy mạnh phong trào tình nguyện\n3. Tổ chức các hoạt động văn hóa, thể thao\n\n## Nhiệm vụ trọng tâm\n- Xây dựng Chi đoàn vững mạnh\n- Tuyên truyền an toàn giao thông", ago: 30 },
+    { kind: "PLAN", title: "Kế hoạch tổ chức Hội thi Đoàn viên tài năng", summary: "Hội thi nhằm phát hiện và bồi dưỡng các đoàn viên có năng khiếu.", content: "Hội thi gồm các phần thi: văn nghệ, kiến thức, kỹ năng.", ago: 5 },
+    { kind: "EVENT", title: "Hội thi Đoàn viên tài năng", summary: "Sân chơi dành cho đoàn viên toàn trường.", content: "Mời toàn thể đoàn viên tham dự và cổ vũ.", ago: 3, eventAt: new Date(now + 14 * DAY), eventLocation: "Hội trường trường THPT Sơn Hà" },
+    { kind: "EVENT", title: "Tuyên truyền an toàn giao thông", summary: "Hoạt động tuyên truyền tại cổng trường.", content: "Đoàn viên tham gia hướng dẫn giao thông và phát tờ rơi.", ago: 1, eventAt: new Date(now + 6 * DAY), eventLocation: "Cổng trường" },
+    { kind: "ANNOUNCEMENT", title: "Thông báo lịch sinh hoạt Chi đoàn tháng 10", summary: "Các Chi đoàn sinh hoạt định kỳ vào tuần cuối tháng.", content: "Các Chi đoàn sinh hoạt theo lịch của Ban chấp hành Đoàn trường. Bí thư Chi đoàn gửi biên bản về cho BCH Đoàn trường.", ago: 1 },
+    { kind: "ANNOUNCEMENT", title: "Thông báo đăng ký tham gia Ngày Chủ nhật xanh", summary: "Đoàn viên đăng ký trên hệ thống quản lý Đoàn.", content: "Đoàn viên đăng nhập hệ thống, vào mục Hoạt động và đăng ký tham gia.", ago: 4 },
+  ];
+  for (const a of articles) {
+    await db.article.create({ data: { kind: a.kind, title: `${DEMO_TAG}${a.title}`, slug: `${a.kind.toLowerCase()}-demo-${Math.random().toString(36).slice(2, 8)}`, summary: a.summary, content: a.content.replaceAll("\\n", "\n"), eventAt: a.eventAt, eventLocation: a.eventLocation, published: true, publishedAt: day(a.ago), authorId: admin.id } });
+  }
+  const intro: Record<string, [string, string]> = {
+    "doan-truong": ["Đoàn trường", "## Giới thiệu chung\nĐoàn trường THPT Sơn Hà là tổ chức Đoàn cơ sở trực thuộc, tập hợp đoàn viên thanh niên của nhà trường.\n\n(Nội dung demo – hãy cập nhật trong mục Website công khai.)"],
+    "bch-doan-truong": ["Ban chấp hành Đoàn trường", "## Ban chấp hành\n(Nội dung demo – cập nhật danh sách Ban chấp hành Đoàn trường.)"],
+    "co-cau-to-chuc": ["Cơ cấu tổ chức", "## Cơ cấu\n- Ban chấp hành Đoàn trường\n- Các Chi đoàn khối 10, 11, 12\n\n(Nội dung demo.)"],
+    "noi-quy": ["Nội quy", "## Nội quy sinh hoạt\n1. Đoàn viên tham gia sinh hoạt đầy đủ\n2. Chấp hành điều lệ Đoàn\n3. Tích cực tham gia hoạt động phong trào\n\n(Nội dung demo.)"],
+  };
+  for (const [slug, [title, content]] of Object.entries(intro)) await db.sitePage.create({ data: { slug, title, content: content.replaceAll("\\n", "\n"), updatedById: admin.id } });
+  for (const d of depts) {
+    await db.chapterReport.create({ data: { departmentId: d.id, createdById: d.secretaryId, title: `${DEMO_TAG}Báo cáo hoạt động tháng 9 – Chi đoàn ${d.name}`, content: "## Kết quả\n- Sinh hoạt Chi đoàn đúng định kỳ\n- Tham gia đầy đủ các hoạt động của Đoàn trường\n\n## Phương hướng\nTiếp tục duy trì nề nếp và đẩy mạnh phong trào.".replaceAll("\\n", "\n"), createdAt: day(5) } });
   }
 
   await db.auditLog.create({ data: { userId: admin.id, action: "seed.demo", target: "System", metadata: { note: "Nạp dữ liệu demo" } } });

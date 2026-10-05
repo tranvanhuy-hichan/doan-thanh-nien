@@ -1,4 +1,4 @@
-import { Settings, Award, BarChart3, CalendarDays, CheckSquare, IdCard, LayoutDashboard, Newspaper, QrCode, Trophy, School, History, Users, type LucideIcon } from "lucide-react";
+import { FileText, Globe, Settings, Award, BarChart3, CalendarDays, CheckSquare, IdCard, LayoutDashboard, Newspaper, QrCode, Trophy, School, History, Users, type LucideIcon } from "lucide-react";
 import type { Role } from "@prisma/client";
 
 export type NavItem = { href: string; label: string; icon: LucideIcon };
@@ -26,6 +26,7 @@ export function navFor(role: Role): NavItem[] {
       { href: "/attendance", label: "Điểm danh", icon: CheckSquare },
       { href: "/emulation", label: "Thi đua", icon: Trophy },
       { href: "/achievements", label: "Thành tích", icon: Award },
+      { href: "/chapter-reports", label: "Báo cáo Chi đoàn", icon: FileText },
     ];
   }
   return [
@@ -38,6 +39,8 @@ export function navFor(role: Role): NavItem[] {
     { href: "/emulation", label: "Thi đua", icon: Trophy },
     { href: "/achievements", label: "Thành tích", icon: Award },
     { href: "/reports", label: "Báo cáo", icon: BarChart3 },
+    { href: "/chapter-reports", label: "Báo cáo Chi đoàn", icon: FileText },
+    { href: "/cms/articles", label: "Website công khai", icon: Globe },
   ];
 }
 
@@ -58,11 +61,11 @@ export const ROLE_LABEL: Record<Role, string> = { ADMIN: "Quản trị viên", S
 
 export const PAGE_TITLES: Record<string, string> = {
   dashboard: "Tổng quan", members: "Đoàn viên", departments: "Chi đoàn", activities: "Hoạt động", attendance: "Điểm danh",
-  feed: "Bảng tin", emulation: "Thi đua", achievements: "Thành tích", reports: "Báo cáo", settings: "Cài đặt", profile: "Hồ sơ & thẻ số", checkin: "Quét QR điểm danh",
+  feed: "Bảng tin", cms: "Website công khai", articles: "Bài viết", pages: "Trang giới thiệu", "chapter-reports": "Báo cáo Chi đoàn", emulation: "Thi đua", achievements: "Thành tích", reports: "Báo cáo", settings: "Cài đặt", profile: "Hồ sơ & thẻ số", checkin: "Quét QR điểm danh",
   history: "Lịch sử hoạt động", notifications: "Thông báo", new: "Tạo mới", edit: "Chỉnh sửa",
 };
 
 /** Tiêu đề riêng cho đường dẫn cụ thể (ưu tiên hơn PAGE_TITLES theo đoạn). */
 export const PATH_TITLES: Record<string, string> = {
-  "/feed/new": "Đăng bài", "/members/new": "Thêm đoàn viên", "/activities/new": "Tạo hoạt động",
+  "/feed/new": "Đăng bài", "/cms/articles/new": "Đăng bài", "/chapter-reports/new": "Đăng báo cáo", "/members/new": "Thêm đoàn viên", "/activities/new": "Tạo hoạt động",
 };

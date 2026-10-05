@@ -47,6 +47,13 @@ enum BadgeCriteria {
   CATEGORY_COUNT
 }
 
+enum ArticleKind {
+  NEWS // Tin tức
+  PLAN // Kế hoạch
+  EVENT // Sự kiện
+  ANNOUNCEMENT // Thông báo
+}
+
 enum NotificationType {
   ACTIVITY_CREATED
   ACTIVITY_REMINDER
@@ -83,6 +90,8 @@ model User {
   postComments      PostComment[]
   emulationRecords  EmulationRecord[]
   pushSubscriptions PushSubscription[]
+  articles          Article[]
+  chapterReports    ChapterReport[]
 
   @@index([role, status])
 }
@@ -101,6 +110,7 @@ model Department {
   activities       Activity[]
   posts            Post[]
   emulationRecords EmulationRecord[]
+  chapterReports   ChapterReport[]
 }
 
 model Class {
@@ -397,4 +407,54 @@ model PushSubscription {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+/// Bài viết trên trang công khai: tin tức, kế hoạch, sự kiện, thông báo (Admin quản lý).
+model Article {
+  id            String      @id @default(cuid())
+  kind          ArticleKind
+  title         String
+  slug          String      @unique
+  summary       String?
+  content       String
+  coverUrl      String?
+  coverPublicId String?
+  eventAt       DateTime? // dùng cho Sự kiện
+  eventLocation String?
+  published     Boolean     @default(true)
+  publishedAt   DateTime?
+  authorId      String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([kind, published, publishedAt])
+}
+
+/// Trang giới thiệu cố định (Đoàn trường, BCH, Cơ cấu tổ chức, Nội quy).
+model SitePage {
+  slug        String   @id
+  title       String
+  content     String
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+}
+
+/// Báo cáo của từng Chi đoàn (bí thư đăng, hiển thị công khai theo Khối/Lớp).
+model ChapterReport {
+  id            String   @id @default(cuid())
+  departmentId  String
+  title         String
+  content       String
+  imageUrl      String?
+  imagePublicId String?
+  createdById   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  createdBy  User?      @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([departmentId, createdAt])
 }

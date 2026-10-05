@@ -100,3 +100,25 @@ export const emulationSchema = z.object({
   reason: z.string().trim().min(3, "Nhập nội dung ghi nhận").max(200),
   recordedAt: z.coerce.date({ message: "Chọn ngày ghi nhận" }),
 });
+
+export const articleSchema = z.object({
+  kind: z.enum(["NEWS", "PLAN", "EVENT", "ANNOUNCEMENT"]),
+  title: z.string().trim().min(3, "Tiêu đề tối thiểu 3 ký tự").max(200),
+  summary: optionalText(500),
+  content: z.string().trim().min(1, "Nhập nội dung").max(50000),
+  coverUrl: optionalText(500),
+  coverPublicId: optionalText(300),
+  eventAt: optionalDate,
+  eventLocation: optionalText(200),
+  published: z.coerce.boolean().default(true),
+});
+
+export const sitePageSchema = z.object({ content: z.string().max(50000) });
+
+export const reportSchema = z.object({
+  departmentId: z.string().optional(), // bí thư: server tự gán Chi đoàn của mình
+  title: z.string().trim().min(3, "Tiêu đề tối thiểu 3 ký tự").max(200),
+  content: z.string().trim().min(1, "Nhập nội dung").max(50000),
+  imageUrl: optionalText(500),
+  imagePublicId: optionalText(300),
+});
