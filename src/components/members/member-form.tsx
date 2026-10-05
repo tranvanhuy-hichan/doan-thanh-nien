@@ -42,10 +42,10 @@ export function MemberForm({ id, departments, initial }: { id?: string; departme
 
   return (
     <>
-      <form onSubmit={onSubmit} className="max-w-2xl space-y-5" noValidate>
+      <form onSubmit={onSubmit} className="w-full space-y-5" noValidate>
         <Field label="Ảnh đại diện"><ImageUpload folder="members" shape="square" value={avatar} onChange={setAvatar} /></Field>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Họ và tên" required error={errors.fullName?.message} className="sm:col-span-2"><Input {...register("fullName")} /></Field>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Field label="Họ và tên" required error={errors.fullName?.message} className="sm:col-span-2 lg:col-span-3"><Input {...register("fullName")} /></Field>
           <Field label="Ngày sinh" error={errors.dateOfBirth?.message}><Input type="date" {...register("dateOfBirth")} /></Field>
           <Field label="Giới tính">
             <Select {...register("gender")}><option value="">—</option><option>Nam</option><option>Nữ</option><option>Khác</option></Select>

@@ -39,7 +39,7 @@ export function ArticleForm({ id, kind, initial, image }: {
   }
 
   return (
-    <div className="max-w-3xl space-y-4">
+    <div className="w-full space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Trạng thái">
           <Select value={v.published ? "1" : "0"} onChange={(e) => setV({ ...v, published: e.target.value === "1" })}><option value="1">Hiển thị công khai</option><option value="0">Bản nháp (ẩn)</option></Select>
@@ -68,7 +68,7 @@ export function SitePageForm({ slug, title, initial }: { slug: string; title: st
   const [content, setContent] = useState(initial);
   const [busy, setBusy] = useState(false);
   return (
-    <div className="max-w-3xl space-y-4">
+    <div className="w-full space-y-4">
       <Field label={`Nội dung trang “${title}”`} hint={FORMAT_HINT}><Textarea className="min-h-96" value={content} onChange={(e) => setContent(e.target.value)} /></Field>
       <div className="flex gap-2">
         <Button loading={busy} onClick={async () => {
@@ -92,7 +92,7 @@ export function ReportForm({ id, departments, fixedDepartment, initial, image }:
   const [errors, setErrors] = useState<Errors>({});
   const [busy, setBusy] = useState(false);
   return (
-    <div className="max-w-3xl space-y-4">
+    <div className="w-full space-y-4">
       <Field label="Chi đoàn" required error={errors.departmentId}>
         {fixedDepartment ? <Input value={fixedDepartment} disabled readOnly /> : (
           <Select value={v.departmentId} onChange={(e) => setV({ ...v, departmentId: e.target.value })}><option value="">Chọn Chi đoàn</option>{departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}</Select>

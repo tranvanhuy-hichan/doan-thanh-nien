@@ -19,7 +19,7 @@ export function SiteSettingsForm({ initial }: { initial: Record<string, string> 
   const [v, setV] = useState(initial);
   const [busy, setBusy] = useState(false);
   return (
-    <div className="max-w-2xl space-y-4">
+    <div className="w-full space-y-4">
       {FIELDS.map((f) => (
         <Field key={f.key} label={f.label}>
           {f.multiline ? <Textarea className="min-h-24" value={v[f.key] ?? ""} onChange={(e) => setV({ ...v, [f.key]: e.target.value })} /> : <Input value={v[f.key] ?? ""} onChange={(e) => setV({ ...v, [f.key]: e.target.value })} />}

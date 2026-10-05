@@ -55,7 +55,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
       </dl>
 
       <Section title="Mô tả" className="mt-6">
-        {a.description ? <p className="max-w-3xl whitespace-pre-line">{a.description}</p> : <p className="text-muted">Chưa có mô tả.</p>}
+        {a.description ? <p className="whitespace-pre-line">{a.description}</p> : <p className="text-muted">Chưa có mô tả.</p>}
       </Section>
 
       <Section title="Thông tin tham gia">

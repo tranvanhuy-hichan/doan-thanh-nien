@@ -49,10 +49,10 @@ export function ActivityForm({ id, categories, departments, lockedDepartment, in
   });
 
   return (
-    <form onSubmit={onSubmit} className="max-w-2xl space-y-5" noValidate>
+    <form onSubmit={onSubmit} className="w-full space-y-5" noValidate>
       <Field label="Ảnh bìa hoạt động"><ImageUpload folder="activities" value={img} onChange={setImg} /></Field>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Tên hoạt động" required error={errors.title} className="sm:col-span-2"><Input {...register("title")} /></Field>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Field label="Tên hoạt động" required error={errors.title} className="sm:col-span-2 lg:col-span-3"><Input {...register("title")} /></Field>
         <Field label="Loại hoạt động" required error={errors.categoryId}>
           <Select {...register("categoryId", { onChange: (e) => { if (!pointsLocked) { const c = categories.find((x) => x.id === e.target.value); if (c) setValue("points", String(c.defaultPoints)); } } })}>
             <option value="">Chọn loại</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -65,11 +65,11 @@ export function ActivityForm({ id, categories, departments, lockedDepartment, in
         </Field>
         <Field label="Bắt đầu" required error={errors.startAt}><Input type="datetime-local" {...register("startAt")} /></Field>
         <Field label="Kết thúc" required error={errors.endAt}><Input type="datetime-local" {...register("endAt")} /></Field>
-        <Field label="Địa điểm" required error={errors.location} className="sm:col-span-2"><Input {...register("location")} /></Field>
+        <Field label="Địa điểm" required error={errors.location} className="sm:col-span-2 lg:col-span-3"><Input {...register("location")} /></Field>
         <Field label="Số lượng tối đa" error={errors.maxParticipants} hint="Để trống nếu không giới hạn"><Input type="number" min={1} {...register("maxParticipants")} /></Field>
         <Field label="Điểm hoạt động" error={errors.points} hint={pointsLocked ? "Đã có người điểm danh nên không thể đổi" : "Tự động cộng khi điểm danh"}><Input type="number" min={0} disabled={pointsLocked} {...register("points")} /></Field>
         <Field label="Giờ tình nguyện" error={errors.volunteerHours}><Input type="number" min={0} step="0.5" disabled={pointsLocked} {...register("volunteerHours")} /></Field>
-        <Field label="Mô tả" error={errors.description} className="sm:col-span-2"><Textarea rows={5} {...register("description")} /></Field>
+        <Field label="Mô tả" error={errors.description} className="sm:col-span-2 lg:col-span-3"><Textarea rows={5} {...register("description")} /></Field>
       </div>
       <div className="flex gap-2">
         <Button type="submit" loading={isSubmitting}>{id ? "Lưu thay đổi" : "Tạo hoạt động"}</Button>
