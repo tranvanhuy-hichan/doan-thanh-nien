@@ -36,13 +36,13 @@ export function PageHeader({ title, description, actions, back }: {
           <ChevronLeft className="size-4" />{back.label ?? "Quay lại"}
         </Link>
       )}
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-xl font-semibold">{title}</h1>
-          {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
-        </div>
-        {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+      <div className="flex items-center justify-between gap-3 sm:items-start">
+        <h1 className="min-w-0 text-xl font-semibold">{title}</h1>
+        {actions && (
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 max-sm:[&>*]:h-8 max-sm:[&>*]:px-3 max-sm:[&>*]:text-[13px]">{actions}</div>
+        )}
       </div>
+      {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
     </div>
   );
 }
