@@ -35,7 +35,15 @@ export async function loginAction(input: unknown) {
     const key = throttleKey(username, ip);
     checkThrottle(key);
 
-    const user = await db.user.findUnique({ where: { username } });
+    // Lỗi cấu hình triển khai: báo rõ để quản trị khắc phục (không lộ giá trị bí mật).
+    if (!process.env.AUTH_SECRET || process.env.AUTH_SECRET.length < 32) {
+      console.error("[login] AUTH_SECRET chưa cấu hình hoặc quá ngắn");
+      throw new UserError("Máy chủ chưa cấu hình AUTH_SECRET (tối thiểu 32 ký tự). Liên hệ quản trị viên.");
+    }
+    const user = await db.user.findUnique({ where: { username } }).catch((e) => {
+      console.error("[login] Không truy vấn được database", e);
+      throw new UserError("Không kết nối được cơ sở dữ liệu. Kiểm tra biến DATABASE_URL trên máy chủ.");
+    });
     // So sánh hash cả khi không có user để giảm lộ thông tin qua thời gian phản hồi.
     const ok = await verifyPassword(password, user?.passwordHash ?? "$2b$11$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalidinv");
     if (!user || !ok) {
