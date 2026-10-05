@@ -86,7 +86,19 @@ async function main() {
       reports++;
     }
   }
-  console.log(`✓ Nội dung demo: +${created} bài viết, +${reports} báo cáo Chi đoàn, trang giới thiệu đã có nội dung (nếu trống).`);
+  // Dòng chữ chạy đầu trang
+  const marquee = [
+    { text: "Chào mừng các bạn đến với website Đoàn trường THPT Sơn Hà", link: null },
+    { text: "Đoàn viên đăng ký tham gia Ngày Chủ nhật xanh trên hệ thống quản lý Đoàn", link: "/thong-bao" },
+    { text: "Bí thư các Chi đoàn nộp báo cáo tháng trước ngày 25", link: "/bao-cao-chi-doan" },
+  ];
+  let marq = 0;
+  for (const [i, m] of marquee.entries()) {
+    if (await db.marqueeItem.findFirst({ where: { text: m.text } })) continue;
+    await db.marqueeItem.create({ data: { text: m.text, link: m.link, sortOrder: i } });
+    marq++;
+  }
+  console.log(`✓ Nội dung demo: +${created} bài viết, +${reports} báo cáo Chi đoàn, +${marq} dòng chữ chạy, trang giới thiệu đã có nội dung (nếu trống).`);
 }
 
 main().catch((e) => { console.error(e); process.exit(1); }).finally(() => db.$disconnect());
