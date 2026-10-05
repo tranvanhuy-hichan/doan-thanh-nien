@@ -6,6 +6,7 @@ import { emulationRanking } from "@/lib/services/emulation";
 import { currentValue, periodOptions, resolvePeriod, PERIOD_LABEL, type PeriodType } from "@/lib/emulation-period";
 import { formatDate, formatDateShort, pageParam, str, toDateInput } from "@/utils";
 import { DataTable, EmptyState, PageHeader, Pagination, Section, Td, Th } from "@/components/ui/misc";
+import { RankingList } from "@/components/emulation/ranking-list";
 import { PeriodFilter } from "@/components/emulation/period-filter";
 import { AddRecordButton, DeleteRecordButton } from "@/components/emulation/record-actions";
 
@@ -41,21 +42,7 @@ export default async function EmulationPage({ searchParams }: { searchParams: Pr
         <div className="rounded-lg border border-border bg-white"><EmptyState title="Chưa có Chi đoàn nào" /></div>
       ) : (
         <>
-        <ul className="divide-y divide-border rounded-lg border border-border bg-white sm:hidden">
-          {ranking.map((r) => (
-            <li key={r.id} className={`px-3 py-2.5 ${user.departmentId === r.id ? "bg-primary-light/50" : ""}`}>
-              <div className="flex items-center gap-3">
-                <span className={`flex size-7 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold ${r.rank <= 3 ? "bg-primary text-white" : "bg-slate-100 text-slate-600"}`}>{r.rank}</span>
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-medium">{canManageDepartment(user, r.id) ? <Link href={`/departments/${r.id}`} className="text-primary">{r.name}</Link> : r.name}</div>
-                  <div className="truncate text-xs text-muted">{r.members} đoàn viên · {r.attendances} lượt · HĐ {r.activityScore} + Trường {r.schoolScore}</div>
-                </div>
-                <span className="text-lg font-semibold tabular-nums">{r.total}</span>
-              </div>
-              <div className="mt-2 ml-10 h-1 overflow-hidden rounded-full bg-slate-100"><div className={`h-full ${r.total < 0 ? "bg-danger" : "bg-primary"}`} style={{ width: `${(Math.abs(r.total) / max) * 100}%` }} /></div>
-            </li>
-          ))}
-        </ul>
+        <RankingList items={ranking.map((r) => ({ ...r, mine: user.departmentId === r.id, canOpen: canManageDepartment(user, r.id) }))} />
         <div className="max-sm:hidden">
         <DataTable>
           <thead><tr><Th>Hạng</Th><Th>Chi đoàn</Th><Th className="text-right">Đoàn viên</Th><Th className="text-right">Lượt tham gia</Th><Th className="text-right">Điểm hoạt động (TB)</Th><Th className="text-right">Điểm thi đua trường</Th><Th className="min-w-44">Tổng điểm</Th></tr></thead>
