@@ -5,13 +5,15 @@ import { currentValue, resolvePeriod } from "@/lib/emulation-period";
 import { latestArticles, upcomingActivities, articleHref } from "@/lib/services/public";
 import { formatDate, formatDateTime, formatTime } from "@/utils";
 import { ArticleRow, Block, EmptyPublic } from "@/components/public/blocks";
+import { getSiteSettings } from "@/lib/services/site-settings";
 import { DoanLogo } from "@/components/layout/logo";
 
 export const revalidate = 60; // trang chủ cache 60 giây
 
 export default async function HomePage() {
   const period = resolvePeriod("month", currentValue("month"))!;
-  const [news, events, announcements, plans, upcoming, ranking] = await Promise.all([
+  const [settings, news, events, announcements, plans, upcoming, ranking] = await Promise.all([
+    getSiteSettings(),
     latestArticles("NEWS", 6), latestArticles("EVENT", 4), latestArticles("ANNOUNCEMENT", 6), latestArticles("PLAN", 4),
     upcomingActivities(5), emulationRanking(period),
   ]);
@@ -24,8 +26,8 @@ export default async function HomePage() {
         <span className="hidden size-28 shrink-0 items-center justify-center rounded-full bg-white sm:flex"><DoanLogo className="h-[5.5rem]" /></span>
         <div className="min-w-0">
           <p className="text-xs font-medium tracking-widest text-blue-200 uppercase">Đoàn TNCS Hồ Chí Minh</p>
-          <h1 className="mt-1 text-2xl font-bold uppercase sm:text-3xl">Đoàn trường THPT Sơn Hà</h1>
-          <p className="mt-2 max-w-xl text-sm text-blue-100">Cổng thông tin chính thức của Đoàn trường: tin tức, kế hoạch, sự kiện, lịch hoạt động và bảng thi đua các Chi đoàn.</p>
+          <h1 className="mt-1 text-2xl font-bold uppercase sm:text-3xl">{settings.heroTitle}</h1>
+          <p className="mt-2 max-w-xl text-sm text-blue-100">{settings.heroSubtitle}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Link href="/lich-hoat-dong" className="inline-flex h-9 items-center rounded-md bg-white px-4 text-sm font-medium text-primary-dark hover:bg-blue-50">Lịch hoạt động</Link>
             <Link href="/gioi-thieu/doan-truong" className="inline-flex h-9 items-center rounded-md border border-white/40 px-4 text-sm font-medium hover:bg-white/10">Giới thiệu</Link>
@@ -33,8 +35,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
+      <div className="grid gap-6 xl:grid-cols-3">
+        <div className="space-y-6 xl:col-span-2">
           <Block title="Tin tức" href="/tin-tuc">
             {news.length === 0 ? <EmptyPublic text="Chưa có tin tức." /> : (
               <>

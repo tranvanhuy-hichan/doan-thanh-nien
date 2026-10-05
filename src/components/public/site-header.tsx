@@ -47,7 +47,7 @@ const isActive = (pathname: string, href: string) => {
   return base === "/" ? pathname === "/" : pathname === base || pathname.startsWith(base + "/");
 };
 
-export function SiteHeader() {
+export function SiteHeader({ address }: { address: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(false), [pathname]);
@@ -61,7 +61,7 @@ export function SiteHeader() {
             <span className="min-w-0 leading-tight">
               <span className="block truncate text-[10px] font-medium tracking-wide text-muted uppercase sm:text-xs">Đoàn TNCS Hồ Chí Minh</span>
               <span className="block text-[15px] leading-tight font-bold text-primary-dark uppercase sm:text-xl">Đoàn trường THPT Sơn Hà</span>
-              <span className="hidden text-xs text-muted sm:block">Xã Sơn Hà, Tỉnh Quảng Ngãi</span>
+              <span className="hidden text-xs text-muted sm:block">{address}</span>
             </span>
           </Link>
           <Link href="/login" className="ml-auto inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md bg-primary px-3.5 text-sm font-medium text-white hover:bg-primary-dark">

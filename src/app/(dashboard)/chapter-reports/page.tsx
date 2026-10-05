@@ -6,6 +6,7 @@ import { formatDate, pageParam } from "@/utils";
 import { buttonClass } from "@/components/ui/button";
 import { CompactList } from "@/components/ui/compact-list";
 import { DataTable, EmptyState, PageHeader, Pagination, Td, Th } from "@/components/ui/misc";
+import { CmsTabs } from "@/components/cms/tabs";
 import { ReportRowActions } from "@/components/cms/row-actions";
 
 export const metadata = { title: "Báo cáo Chi đoàn" };
@@ -23,6 +24,7 @@ export default async function ChapterReportsPage({ searchParams }: { searchParam
     <>
       <PageHeader title="Báo cáo Chi đoàn" description={user.role === "SECRETARY" ? `Báo cáo của Chi đoàn ${user.departmentName} (hiển thị công khai)` : "Báo cáo của các Chi đoàn"}
         actions={<Link href="/chapter-reports/new" className={buttonClass()}><Plus className="size-4" />Đăng báo cáo</Link>} />
+      {user.role === "ADMIN" && <CmsTabs active="/chapter-reports" />}
       {items.length === 0 ? <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Chưa có báo cáo" description="Đăng báo cáo để hiển thị tại mục Báo cáo Chi đoàn trên trang công khai." /></div> : (
         <>
           <CompactList items={items.map((r) => ({

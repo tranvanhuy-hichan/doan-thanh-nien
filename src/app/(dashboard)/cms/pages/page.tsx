@@ -5,6 +5,7 @@ import { requireRole } from "@/lib/auth/session";
 import { SITE_PAGES } from "@/lib/services/public";
 import { formatDate } from "@/utils";
 import { buttonClass } from "@/components/ui/button";
+import { CmsTabs } from "@/components/cms/tabs";
 import { DataTable, PageHeader, Td, Th } from "@/components/ui/misc";
 
 export const metadata = { title: "Trang giới thiệu" };
@@ -16,6 +17,7 @@ export default async function CmsPagesPage() {
   return (
     <>
       <PageHeader title="Trang giới thiệu" description="Nội dung các trang trong mục Giới thiệu" />
+      <CmsTabs active="/cms/pages" />
       <DataTable>
         <thead><tr><Th>Trang</Th><Th>Cập nhật</Th><Th /></tr></thead>
         <tbody>{Object.entries(SITE_PAGES).map(([slug, title]) => (

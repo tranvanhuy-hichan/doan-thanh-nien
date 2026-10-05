@@ -31,7 +31,7 @@ export async function seedDemo() {
   await db.$transaction([
     db.auditLog.deleteMany(), db.notification.deleteMany(), db.memberBadge.deleteMany(), db.pointTransaction.deleteMany(),
     db.attendance.deleteMany(), db.activityRegistration.deleteMany(), db.activityImage.deleteMany(), db.activity.deleteMany(),
-    db.article.deleteMany(), db.sitePage.deleteMany(), db.chapterReport.deleteMany(), db.emulationRecord.deleteMany(), db.post.deleteMany(), db.badge.deleteMany(), db.member.deleteMany(), db.class.deleteMany(), db.department.deleteMany(), db.user.deleteMany(), db.activityCategory.deleteMany(),
+    db.article.deleteMany(), db.sitePage.deleteMany(), db.siteSetting.deleteMany(), db.chapterReport.deleteMany(), db.emulationRecord.deleteMany(), db.post.deleteMany(), db.badge.deleteMany(), db.member.deleteMany(), db.class.deleteMany(), db.department.deleteMany(), db.user.deleteMany(), db.activityCategory.deleteMany(),
   ]);
 
   const passwordHash = await hashPassword(DEMO_PASSWORD);

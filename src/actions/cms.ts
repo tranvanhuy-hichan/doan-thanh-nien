@@ -83,3 +83,17 @@ export async function saveSitePageAction(slug: string, input: unknown) {
     return { message: "Đã lưu trang" };
   });
 }
+
+export async function saveSiteSettingsAction(input: Record<string, string>) {
+  return run(async () => {
+    const admin = await requireRole(["ADMIN"]);
+    const { SETTING_FIELDS } = await import("@/lib/services/site-settings");
+    for (const f of SETTING_FIELDS) {
+      const value = String(input[f.key] ?? "").trim().slice(0, 1000);
+      await db.siteSetting.upsert({ where: { key: f.key }, update: { value }, create: { key: f.key, value } });
+    }
+    await audit(admin.id, "site.settings", "SiteSetting", null);
+    refreshPublic();
+    return { message: "Đã lưu thông tin website" };
+  });
+}

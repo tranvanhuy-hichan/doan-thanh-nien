@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { DoanLogo } from "@/components/layout/logo";
 
-export function SiteFooter() {
+export function SiteFooter({ address, phone, email }: { address: string; phone: string; email: string }) {
   return (
     <footer className="mt-12 bg-primary-dark text-blue-100">
       <div className="grid w-full gap-6 px-4 py-8 md:grid-cols-3 lg:px-8">
@@ -10,7 +10,9 @@ export function SiteFooter() {
           <div className="text-sm">
             <div className="font-semibold text-white uppercase">Đoàn trường THPT Sơn Hà</div>
             <div>Đoàn TNCS Hồ Chí Minh</div>
-            <div className="text-blue-200">Xã Sơn Hà, Tỉnh Quảng Ngãi</div>
+            <div className="text-blue-200">{address}</div>
+            {phone && <div className="text-blue-200">ĐT: {phone}</div>}
+            {email && <div className="text-blue-200">Email: {email}</div>}
           </div>
         </div>
         <ul className="grid grid-cols-2 gap-1 text-sm">

@@ -458,3 +458,9 @@ model ChapterReport {
 
   @@index([departmentId, createdAt])
 }
+
+/// Thông tin chung của website công khai (tiêu đề banner, địa chỉ, liên hệ...). Dạng key/value.
+model SiteSetting {
+  key   String @id
+  value String
+}

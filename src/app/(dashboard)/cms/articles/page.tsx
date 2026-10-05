@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import type { ArticleKind, Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/auth/session";
@@ -9,6 +9,7 @@ import { buttonClass } from "@/components/ui/button";
 import { CompactList } from "@/components/ui/compact-list";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { DataTable, EmptyState, PageHeader, Pagination, StatusBadge, Td, Th } from "@/components/ui/misc";
+import { CmsTabs } from "@/components/cms/tabs";
 import { ArticleRowActions } from "@/components/cms/row-actions";
 
 export const metadata = { title: "Quản lý bài viết" };
@@ -27,11 +28,8 @@ export default async function CmsArticlesPage({ searchParams }: { searchParams: 
   return (
     <>
       <PageHeader title="Website công khai" description="Quản lý tin tức, kế hoạch, sự kiện, thông báo"
-        actions={<>
-          <Link href="/" target="_blank" className={buttonClass("secondary")}><ExternalLink className="size-4" />Xem trang<span className="max-sm:hidden"> công khai</span></Link>
-          <Link href="/cms/pages" className={buttonClass("secondary")}>Trang giới thiệu</Link>
-          <Link href="/cms/articles/new" className={buttonClass()}><Plus className="size-4" />Đăng bài</Link>
-        </>} />
+        actions={<Link href="/cms/articles/new" className={buttonClass()}><Plus className="size-4" />Đăng bài</Link>} />
+      <CmsTabs active="/cms/articles" />
       <FilterBar fields={[
         { type: "search", name: "q", placeholder: "Tìm theo tiêu đề..." },
         { type: "select", name: "kind", label: "Loại bài", options: Object.entries(KIND_LABEL).map(([value, label]) => ({ value, label })) },
