@@ -1,4 +1,4 @@
-import { Award, BarChart3, CalendarDays, CheckSquare, IdCard, LayoutDashboard, Newspaper, QrCode, Trophy, School, History, Users, type LucideIcon } from "lucide-react";
+import { Settings, Award, BarChart3, CalendarDays, CheckSquare, IdCard, LayoutDashboard, Newspaper, QrCode, Trophy, School, History, Users, type LucideIcon } from "lucide-react";
 import type { Role } from "@prisma/client";
 
 export type NavItem = { href: string; label: string; icon: LucideIcon };
@@ -27,6 +27,19 @@ export function navFor(role: Role): NavItem[] {
     { href: "/achievements", label: "Thành tích", icon: Award },
     { href: "/reports", label: "Báo cáo", icon: BarChart3 },
   ];
+}
+
+/** Thanh điều hướng dưới (mobile): 4 mục dùng nhiều nhất theo vai trò, phần còn lại nằm trong nút "Thêm". */
+const PRIMARY_MOBILE: Record<Role, string[]> = {
+  ADMIN: ["/dashboard", "/members", "/activities", "/feed"],
+  SECRETARY: ["/dashboard", "/activities", "/attendance", "/feed"],
+  MEMBER: ["/dashboard", "/activities", "/checkin", "/feed"],
+};
+
+export function mobileNav(role: Role): { main: NavItem[]; more: NavItem[] } {
+  const all = [...navFor(role), { href: "/settings", label: "Cài đặt", icon: Settings }];
+  const keys = PRIMARY_MOBILE[role];
+  return { main: keys.map((k) => all.find((i) => i.href === k)!), more: all.filter((i) => !keys.includes(i.href)) };
 }
 
 export const ROLE_LABEL: Record<Role, string> = { ADMIN: "Quản trị viên", SECRETARY: "Bí thư Chi đoàn", MEMBER: "Đoàn viên" };

@@ -1,0 +1,21 @@
+import type { MetadataRoute } from "next";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "Đoàn TNCS Hồ Chí Minh - THPT Sơn Hà",
+    short_name: "Đoàn Sơn Hà",
+    description: "Quản lý đoàn viên và hoạt động Đoàn - Trường THPT Sơn Hà",
+    start_url: "/dashboard",
+    scope: "/",
+    display: "standalone",
+    orientation: "portrait",
+    background_color: "#ffffff",
+    theme_color: "#0b63b8",
+    lang: "vi",
+    icons: [
+      { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+    ],
+  };
+}

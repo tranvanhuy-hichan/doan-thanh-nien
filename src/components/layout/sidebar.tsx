@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, Settings, X } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
+import type { Role } from "@prisma/client";
 import { cn } from "@/utils";
-import type { NavItem } from "@/lib/nav";
+import { navFor, type NavItem } from "@/lib/nav";
 import { logoutAction } from "@/actions/auth";
 import { DoanLogo } from "./logo";
 
@@ -46,23 +47,11 @@ function SidebarBody({ items, labels, onNavigate }: { items: NavItem[]; labels: 
   );
 }
 
-export function Sidebar({ items, drawerOpen, onClose }: { items: NavItem[]; drawerOpen: boolean; onClose: () => void }) {
+export function Sidebar({ role }: { role: Role }) {
+  // Tablet: thu gọn còn icon. Desktop: đầy đủ. Mobile dùng BottomNav nên không có thanh bên.
   return (
-    <>
-      {/* Tablet: thu gọn còn icon. Desktop: đầy đủ. */}
-      <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-16 flex-col bg-primary-dark md:flex lg:w-60">
-        <SidebarBody items={items} labels="hidden lg:inline" />
-      </aside>
-      {/* Mobile: drawer */}
-      {drawerOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          <div className="absolute inset-0 bg-slate-900/40" onClick={onClose} />
-          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col bg-primary-dark shadow-xl">
-            <button onClick={onClose} className="absolute top-3 right-3 rounded p-1 text-blue-100 hover:bg-white/10" aria-label="Đóng menu"><X className="size-4" /></button>
-            <SidebarBody items={items} labels="inline" onNavigate={onClose} />
-          </aside>
-        </div>
-      )}
-    </>
+    <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-16 flex-col bg-primary-dark md:flex lg:w-60">
+      <SidebarBody items={navFor(role)} labels="hidden lg:inline" />
+    </aside>
   );
 }

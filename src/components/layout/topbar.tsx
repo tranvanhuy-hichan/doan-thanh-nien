@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { Bell, ChevronDown, ChevronRight, KeyRound, LogOut, Menu } from "lucide-react";
+import { Bell, ChevronDown, ChevronRight, KeyRound, LogOut } from "lucide-react";
 import { cn, relativeTime } from "@/utils";
 import { PAGE_TITLES } from "@/lib/nav";
 import { Avatar } from "@/components/ui/misc";
@@ -82,8 +82,8 @@ function Notifications({ items, unread }: { items: NotificationItem[]; unread: n
   );
 }
 
-export function Topbar({ user, roleLabel, notifications, unread, onMenu }: {
-  user: { fullName: string; avatarUrl: string | null }; roleLabel: string; notifications: NotificationItem[]; unread: number; onMenu: () => void;
+export function Topbar({ user, roleLabel, notifications, unread }: {
+  user: { fullName: string; avatarUrl: string | null }; roleLabel: string; notifications: NotificationItem[]; unread: number;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -91,7 +91,6 @@ export function Topbar({ user, roleLabel, notifications, unread, onMenu }: {
   return (
     <header className="no-print sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-border bg-white/90 px-4 backdrop-blur-sm lg:px-6">
       <div className="flex min-w-0 items-center gap-2">
-        <button onClick={onMenu} className="rounded-md p-1.5 hover:bg-slate-100 md:hidden" aria-label="Mở menu"><Menu className="size-5" /></button>
         <Breadcrumb />
       </div>
       <div className="flex items-center gap-1">
