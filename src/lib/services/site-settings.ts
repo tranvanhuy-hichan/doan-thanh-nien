@@ -17,3 +17,11 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   const map = new Map(rows.map((r) => [r.key, r.value]));
   return Object.fromEntries(SETTING_FIELDS.map((f) => [f.key, map.get(f.key) ?? f.default])) as SiteSettings;
 }
+
+export const DEFAULT_MARQUEE = "Chào mừng các bạn đến với website Đoàn trường THPT Sơn Hà";
+
+/** Các dòng chữ chạy đang bật, theo thứ tự; trống thì dùng câu chào mặc định. */
+export async function getMarquee(): Promise<{ id: string; text: string; link: string | null }[]> {
+  const items = await db.marqueeItem.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }], select: { id: true, text: true, link: true } });
+  return items.length ? items : [{ id: "default", text: DEFAULT_MARQUEE, link: null }];
+}

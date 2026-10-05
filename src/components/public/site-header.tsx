@@ -68,7 +68,7 @@ function SearchBox({ className }: { className?: string }) {
   );
 }
 
-export function SiteHeader({ address, bannerUrl }: { address: string; bannerUrl?: string }) {
+export function SiteHeader({ address, bannerUrl, marquee }: { address: string; bannerUrl?: string; marquee: { id: string; text: string; link: string | null }[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(false), [pathname]);
@@ -145,14 +145,28 @@ export function SiteHeader({ address, bannerUrl }: { address: string; bannerUrl?
         </nav>
       </div>
 
-      {/* Hàng ngày – chào mừng – tìm kiếm */}
+      {/* Hàng ngày – dòng chữ chạy – tìm kiếm */}
       <div className="border-b border-border bg-slate-100/90">
-        <div className="flex w-full items-center gap-3 px-4 py-2 text-sm lg:px-8">
+        <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 text-sm lg:flex-nowrap lg:px-8">
           <span className="text-xs font-semibold text-slate-600 sm:text-sm"><Today /></span>
-          <span className="hidden flex-1 text-center text-base font-extrabold tracking-wide text-primary uppercase md:block">Chào mừng các bạn đến với website Đoàn trường THPT Sơn Hà</span>
+          <Marquee items={marquee} className="order-last w-full lg:order-none lg:w-auto lg:flex-1" />
           <SearchBox className="ml-auto w-44 sm:w-64" />
         </div>
       </div>
     </header>
+  );
+}
+
+/** Chữ chạy ngang; rê chuột để dừng. Người dùng bật "giảm chuyển động" thì hiện đứng yên. */
+function Marquee({ items, className }: { items: { id: string; text: string; link: string | null }[]; className?: string }) {
+  const chars = items.reduce((n, i) => n + i.text.length + 6, 0);
+  const content = items.map((it, i) => {
+    const node = it.link ? <Link href={it.link} className="hover:underline">{it.text}</Link> : <span>{it.text}</span>;
+    return <span key={it.id} className="inline-flex items-center">{i > 0 && <span className="mx-6 text-[#e0a800]" aria-hidden>★</span>}{node}</span>;
+  });
+  return (
+    <div className={cn("marquee text-sm font-extrabold tracking-wide text-primary uppercase sm:text-base", className)} role="marquee" aria-label="Thông điệp">
+      <div className="marquee-track" style={{ animationDuration: `${Math.max(14, chars * 0.16)}s` }}>{content}</div>
+    </div>
   );
 }

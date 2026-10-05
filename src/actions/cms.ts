@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { run, UserError } from "@/lib/action";
 import { audit } from "@/lib/audit";
@@ -112,5 +113,59 @@ export async function saveSiteSettingsAction(input: Record<string, string>) {
     await audit(admin.id, "site.settings", "SiteSetting", null);
     refreshPublic();
     return { message: "Đã lưu thông tin website" };
+  });
+}
+
+// ---------- Dòng chữ chạy ----------
+
+const marqueeSchema = z.object({
+  text: z.string().trim().min(2, "Nhập nội dung (tối thiểu 2 ký tự)").max(300, "Tối đa 300 ký tự"),
+  link: z.preprocess((v) => (v === "" ? undefined : v), z.string().trim().max(300).refine((v) => v.startsWith("/") || /^https?:\/\//.test(v), "Liên kết phải bắt đầu bằng / hoặc https://").optional()),
+});
+
+export async function addMarqueeAction(input: unknown) {
+  return run(async () => {
+    const admin = await requireRole(["ADMIN"]);
+    const d = marqueeSchema.parse(input);
+    const last = await db.marqueeItem.aggregate({ _max: { sortOrder: true } });
+    await db.marqueeItem.create({ data: { text: d.text, link: d.link ?? null, sortOrder: (last._max.sortOrder ?? 0) + 1 } });
+    await audit(admin.id, "marquee.create", "MarqueeItem", null, { text: d.text });
+    refreshPublic(); revalidatePath("/cms/marquee");
+    return { message: "Đã thêm dòng chữ chạy" };
+  });
+}
+
+export async function toggleMarqueeAction(id: string, active: boolean) {
+  return run(async () => {
+    const admin = await requireRole(["ADMIN"]);
+    await db.marqueeItem.update({ where: { id }, data: { active } });
+    await audit(admin.id, active ? "marquee.enable" : "marquee.disable", "MarqueeItem", id);
+    refreshPublic(); revalidatePath("/cms/marquee");
+    return { message: active ? "Đã bật" : "Đã tắt" };
+  });
+}
+
+export async function deleteMarqueeAction(id: string) {
+  return run(async () => {
+    const admin = await requireRole(["ADMIN"]);
+    await db.marqueeItem.delete({ where: { id } });
+    await audit(admin.id, "marquee.delete", "MarqueeItem", id);
+    refreshPublic(); revalidatePath("/cms/marquee");
+    return { message: "Đã xóa" };
+  });
+}
+
+/** Đổi vị trí với dòng liền kề (hoán đổi sortOrder). */
+export async function moveMarqueeAction(id: string, dir: "up" | "down") {
+  return run(async () => {
+    await requireRole(["ADMIN"]);
+    const items = await db.marqueeItem.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] });
+    const i = items.findIndex((x) => x.id === id);
+    const j = dir === "up" ? i - 1 : i + 1;
+    if (i < 0 || j < 0 || j >= items.length) return;
+    const reordered = [...items];
+    [reordered[i], reordered[j]] = [reordered[j], reordered[i]];
+    await db.$transaction(reordered.map((x, idx) => db.marqueeItem.update({ where: { id: x.id }, data: { sortOrder: idx } })));
+    refreshPublic(); revalidatePath("/cms/marquee");
   });
 }

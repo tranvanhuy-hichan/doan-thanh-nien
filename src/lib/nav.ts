@@ -44,7 +44,7 @@ export function navFor(role: Role): NavItem[] {
       children: [
         { href: "/cms/tin-tuc", label: "Tin tức" }, { href: "/cms/ke-hoach", label: "Kế hoạch" }, { href: "/cms/su-kien", label: "Sự kiện" },
         { href: "/cms/thong-bao", label: "Thông báo" }, { href: "/cms/pages", label: "Trang giới thiệu" },
-        { href: "/chapter-reports", label: "Báo cáo Chi đoàn" }, { href: "/cms/settings", label: "Thông tin website" },
+        { href: "/chapter-reports", label: "Báo cáo Chi đoàn" }, { href: "/cms/marquee", label: "Dòng chữ chạy" }, { href: "/cms/settings", label: "Thông tin website" },
       ],
     },
   ];
@@ -67,7 +67,7 @@ export const ROLE_LABEL: Record<Role, string> = { ADMIN: "Quản trị viên", S
 
 export const PAGE_TITLES: Record<string, string> = {
   dashboard: "Tổng quan", members: "Đoàn viên", departments: "Chi đoàn", activities: "Hoạt động", attendance: "Điểm danh",
-  feed: "Bảng tin", cms: "Website công khai", "tin-tuc": "Tin tức", "ke-hoach": "Kế hoạch", "su-kien": "Sự kiện", "thong-bao": "Thông báo", pages: "Trang giới thiệu", "chapter-reports": "Báo cáo Chi đoàn", emulation: "Thi đua", achievements: "Thành tích", reports: "Báo cáo", settings: "Cài đặt", profile: "Hồ sơ & thẻ số", checkin: "Quét QR điểm danh",
+  feed: "Bảng tin", marquee: "Dòng chữ chạy", cms: "Website công khai", "tin-tuc": "Tin tức", "ke-hoach": "Kế hoạch", "su-kien": "Sự kiện", "thong-bao": "Thông báo", pages: "Trang giới thiệu", "chapter-reports": "Báo cáo Chi đoàn", emulation: "Thi đua", achievements: "Thành tích", reports: "Báo cáo", settings: "Cài đặt", profile: "Hồ sơ & thẻ số", checkin: "Quét QR điểm danh",
   history: "Lịch sử hoạt động", notifications: "Thông báo", new: "Tạo mới", edit: "Chỉnh sửa",
 };
 
