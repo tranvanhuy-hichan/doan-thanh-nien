@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Đoàn TNCS Hồ Chí Minh - THPT Sơn Hà",
-    short_name: "Đoàn THPT Sơn Hà",
+    short_name: "Đoàn trường THPT Sơn Hà",
     description: "Quản lý đoàn viên và hoạt động Đoàn - Trường THPT Sơn Hà",
     start_url: "/dashboard",
     scope: "/",
