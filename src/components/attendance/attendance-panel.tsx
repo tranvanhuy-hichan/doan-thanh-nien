@@ -73,11 +73,11 @@ export function AttendancePanel({ activityId, title, open, canOpen, roster, tota
             <div className="text-3xl font-semibold tabular-nums">{count} <span className="text-lg font-normal text-muted">/ {total} đã tham gia</span></div>
             <div className="mt-1"><StatusBadge tone={open ? "green" : "gray"}>{open ? "Đang mở điểm danh" : "Đã đóng"}</StatusBadge></div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant={open ? "secondary" : "primary"} loading={pending} disabled={!open && !canOpen} onClick={toggle}>{open ? "Đóng điểm danh" : "Mở điểm danh"}</Button>
-            {open && <Button variant="secondary" onClick={() => setBig(true)}><Maximize2 className="size-4" />Phóng to QR</Button>}
+          <div className="flex gap-1.5 sm:flex-wrap sm:gap-2 max-sm:[&>*]:h-8 max-sm:[&>*]:px-2.5 max-sm:[&>*]:text-[13px]">
+            <Button variant={open ? "secondary" : "primary"} loading={pending} disabled={!open && !canOpen} onClick={toggle}>{open ? "Đóng" : "Mở"}<span className="max-sm:hidden"> điểm danh</span></Button>
+            {open && <Button variant="secondary" onClick={() => setBig(true)}><Maximize2 className="size-4" />Phóng to<span className="max-sm:hidden"> QR</span></Button>}
             {open && (
-              <ConfirmButton size="md" trigger={<><RefreshCw className="size-4" />Tạo QR mới</>} title="Tạo mã QR mới?"
+              <ConfirmButton size="md" trigger={<><RefreshCw className="size-4" />QR mới</>} title="Tạo mã QR mới?"
                 description="Mọi mã QR cũ (kể cả ảnh chụp màn hình) sẽ lập tức vô hiệu." confirmLabel="Tạo mới"
                 onConfirm={async () => { reportResult(await rotateCheckinQrAction(activityId)); await refresh(true); }} />
             )}
