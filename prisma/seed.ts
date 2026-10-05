@@ -25,7 +25,7 @@ const NAMES = [
 const HOUR = 3600_000;
 const DAY = 24 * HOUR;
 
-async function main() {
+export async function seedDemo() {
   console.log("⚠ Đang nạp DỮ LIỆU DEMO – dữ liệu hiện có sẽ bị xóa.");
   // Xóa theo thứ tự phụ thuộc
   await db.$transaction([
@@ -165,4 +165,11 @@ async function main() {
   console.log(`  Mật khẩu chung: ${DEMO_PASSWORD}  |  admin, bithu.10a1, SH20260001 …`);
 }
 
-main().catch((e) => { console.error(e); process.exit(1); }).finally(() => db.$disconnect());
+// Chạy trực tiếp: `npm run db:seed`. Khi được import (bootstrap.ts) thì không tự chạy.
+if (process.argv[1]?.endsWith("seed.ts")) {
+  if (process.env.NODE_ENV === "production" && process.env.SEED_CONFIRM !== "yes") {
+    console.error("Từ chối: seed demo sẽ XÓA toàn bộ dữ liệu. Đặt SEED_CONFIRM=yes nếu bạn thật sự muốn.");
+    process.exit(1);
+  }
+  seedDemo().catch((e) => { console.error(e); process.exit(1); }).finally(() => db.$disconnect());
+}

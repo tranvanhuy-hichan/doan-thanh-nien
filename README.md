@@ -47,3 +47,12 @@ src/lib/qr            QR token ký HMAC, sống 90 giây
 - Quét QR bằng camera cần HTTPS (hoặc localhost). Có thể quét bằng camera điện thoại rồi mở liên kết, hoặc dán liên kết.
 - Thông báo “hoạt động sắp diễn ra” chưa có job nền; cần cron gọi một route nội bộ nếu muốn nhắc tự động.
 - Logo Đoàn là SVG đơn giản (`src/components/layout/logo.tsx`); thay bằng asset chính thức khi có.
+
+## Triển khai (Vercel)
+
+`vercel-build` tự chạy: `prisma generate` → `prisma db push` → `prisma/bootstrap.ts` → `next build`.
+`bootstrap.ts` an toàn khi chạy lặp lại: **chỉ hành động khi database chưa có người dùng nào**, không bao giờ xóa dữ liệu.
+
+- Mặc định: tạo 1 tài khoản admin (`ADMIN_USERNAME`, mặc định `admin`) với mật khẩu `ADMIN_INITIAL_PASSWORD` hoặc mật khẩu ngẫu nhiên in ra log build (xem ở tab Deployments → Build Logs). Bắt buộc đổi mật khẩu ở lần đăng nhập đầu.
+- Đặt `SEED_DEMO=true` ở lần deploy đầu để nạp dữ liệu demo như local (mật khẩu chung `Doan@2026`). Sau khi trình diễn xong nên xóa biến này và đổi/xóa tài khoản demo.
+- `npm run db:seed` (xóa sạch dữ liệu) bị chặn khi `NODE_ENV=production` trừ khi đặt `SEED_CONFIRM=yes`.
