@@ -8,7 +8,7 @@ import { cn } from "@/utils";
 import { mobileNav, type NavItem } from "@/lib/nav";
 import { logoutAction } from "@/actions/auth";
 
-const isActive = (pathname: string, href: string) => pathname === href || (href !== "/dashboard" && pathname.startsWith(href + "/"));
+const isActive = (pathname: string, it: NavItem) => { const h = it.match ?? it.href; return pathname === h || (h !== "/dashboard" && pathname.startsWith(h + "/")); };
 
 function Tab({ item, active }: { item: NavItem; active: boolean }) {
   return (
@@ -25,7 +25,7 @@ export function BottomNav({ role }: { role: Role }) {
   const { main, more } = mobileNav(role);
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(false), [pathname]);
-  const moreActive = more.some((i) => isActive(pathname, i.href));
+  const moreActive = more.some((i) => isActive(pathname, i));
 
   return (
     <>
@@ -36,7 +36,7 @@ export function BottomNav({ role }: { role: Role }) {
             <div className="mx-auto my-2 h-1 w-10 rounded-full bg-slate-200" />
             <div className="grid grid-cols-3 gap-2 px-4 pt-2">
               {more.map((it) => (
-                <Link key={it.href} href={it.href} className={cn("flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 text-center text-xs", isActive(pathname, it.href) ? "bg-primary-light font-semibold text-primary-dark" : "bg-slate-50 text-slate-700 active:bg-slate-100")}>
+                <Link key={it.href} href={it.href} className={cn("flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 text-center text-xs", isActive(pathname, it) ? "bg-primary-light font-semibold text-primary-dark" : "bg-slate-50 text-slate-700 active:bg-slate-100")}>
                   <it.icon className="size-6" />{it.label}
                 </Link>
               ))}
@@ -51,16 +51,16 @@ export function BottomNav({ role }: { role: Role }) {
       )}
       <nav className="no-print fixed inset-x-0 bottom-0 z-50 border-t border-border bg-white pb-[env(safe-area-inset-bottom)] md:hidden" aria-label="Điều hướng nhanh">
         <div className="flex items-end px-1">
-          <Tab item={main[0]} active={isActive(pathname, main[0].href)} />
-          <Tab item={main[1]} active={isActive(pathname, main[1].href)} />
+          <Tab item={main[0]} active={isActive(pathname, main[0])} />
+          <Tab item={main[1]} active={isActive(pathname, main[1])} />
           <div className="flex flex-1 justify-center">
             <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label="Thêm chức năng"
               className={cn("-mt-4 mb-1 flex size-14 flex-col items-center justify-center rounded-full border-4 border-white bg-primary text-white shadow-md transition-colors active:bg-primary-dark", (open || moreActive) && "bg-primary-dark")}>
               <Grip className="size-6" />
             </button>
           </div>
-          <Tab item={main[2]} active={isActive(pathname, main[2].href)} />
-          <Tab item={main[3]} active={isActive(pathname, main[3].href)} />
+          <Tab item={main[2]} active={isActive(pathname, main[2])} />
+          <Tab item={main[3]} active={isActive(pathname, main[3])} />
         </div>
       </nav>
     </>

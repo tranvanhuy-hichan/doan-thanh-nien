@@ -10,11 +10,11 @@ import { DoanLogo } from "./logo";
 
 function NavLinks({ items, labels, onNavigate }: { items: NavItem[]; labels: string; onNavigate?: () => void }) {
   const pathname = usePathname();
-  const active = (href: string) => pathname === href || (href !== "/dashboard" && pathname.startsWith(href + "/"));
+  const active = (it: NavItem) => { const h = it.match ?? it.href; return pathname === h || (h !== "/dashboard" && pathname.startsWith(h + "/")); };
   const link = (it: NavItem) => (
     <Link key={it.href} href={it.href} onClick={onNavigate} title={it.label}
       className={cn("flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-        active(it.href) ? "bg-white font-medium text-primary-dark" : "text-blue-50 hover:bg-white/10")}>
+        active(it) ? "bg-white font-medium text-primary-dark" : "text-blue-50 hover:bg-white/10")}>
       <it.icon className="size-[18px] shrink-0" />
       <span className={labels}>{it.label}</span>
     </Link>

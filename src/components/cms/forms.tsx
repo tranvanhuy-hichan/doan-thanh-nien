@@ -8,19 +8,20 @@ import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/form";
 import { ImageUpload, type UploadedImage } from "@/components/ui/image-upload";
 import { fromLocalInput } from "@/utils";
+import { KIND_ACTION, kindSlug } from "@/lib/services/kind";
 
 export const FORMAT_HINT = "Định dạng: “## Tiêu đề”, “- gạch đầu dòng”, “1. đánh số”, “**chữ đậm**”. Cách một dòng trống để tách đoạn.";
 
 type Errors = Record<string, string>;
 const toErrors = (f?: Record<string, string[]>): Errors => Object.fromEntries(Object.entries(f ?? {}).map(([k, m]) => [k, m[0]]));
 
-export function ArticleForm({ id, initial, image }: {
-  id?: string;
-  initial?: { kind: string; title: string; summary: string; content: string; eventAt: string; eventLocation: string; published: boolean };
+export function ArticleForm({ id, kind, initial, image }: {
+  id?: string; kind: "NEWS" | "PLAN" | "EVENT" | "ANNOUNCEMENT";
+  initial?: { title: string; summary: string; content: string; eventAt: string; eventLocation: string; published: boolean };
   image?: UploadedImage;
 }) {
   const router = useRouter();
-  const [v, setV] = useState(initial ?? { kind: "NEWS", title: "", summary: "", content: "", eventAt: "", eventLocation: "", published: true });
+  const [v, setV] = useState(initial ?? { title: "", summary: "", content: "", eventAt: "", eventLocation: "", published: true });
   const [img, setImg] = useState<UploadedImage>(image ?? null);
   const [errors, setErrors] = useState<Errors>({});
   const [busy, setBusy] = useState(false);
@@ -29,25 +30,22 @@ export function ArticleForm({ id, initial, image }: {
   async function submit() {
     setBusy(true); setErrors({});
     const res = await saveArticleAction(id ?? null, {
-      ...v, eventAt: v.eventAt ? fromLocalInput(v.eventAt).toISOString() : "", coverUrl: img?.imageUrl ?? "", coverPublicId: img?.publicId ?? "",
+      ...v, kind, eventAt: v.eventAt ? fromLocalInput(v.eventAt).toISOString() : "", coverUrl: img?.imageUrl ?? "", coverPublicId: img?.publicId ?? "",
     });
     setBusy(false);
     if (!res.ok) { toast.error(res.error); setErrors(toErrors(res.fieldErrors)); return; }
     toast.success(res.message);
-    router.push("/cms/articles"); router.refresh();
+    router.push(`/cms/${kindSlug(kind)}`); router.refresh();
   }
 
   return (
     <div className="max-w-3xl space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Loại bài" required>
-          <Select value={v.kind} onChange={set("kind")}><option value="NEWS">Tin tức</option><option value="PLAN">Kế hoạch</option><option value="EVENT">Sự kiện</option><option value="ANNOUNCEMENT">Thông báo</option></Select>
-        </Field>
         <Field label="Trạng thái">
           <Select value={v.published ? "1" : "0"} onChange={(e) => setV({ ...v, published: e.target.value === "1" })}><option value="1">Hiển thị công khai</option><option value="0">Bản nháp (ẩn)</option></Select>
         </Field>
         <Field label="Tiêu đề" required error={errors.title} className="sm:col-span-2"><Input value={v.title} onChange={set("title")} /></Field>
-        {v.kind === "EVENT" && (
+        {kind === "EVENT" && (
           <>
             <Field label="Thời gian diễn ra" required error={errors.eventAt}><Input type="datetime-local" value={v.eventAt} onChange={set("eventAt")} /></Field>
             <Field label="Địa điểm" error={errors.eventLocation}><Input value={v.eventLocation} onChange={set("eventLocation")} /></Field>
@@ -58,7 +56,7 @@ export function ArticleForm({ id, initial, image }: {
       </div>
       <Field label="Ảnh bìa"><ImageUpload folder="activities" value={img} onChange={setImg} /></Field>
       <div className="flex gap-2">
-        <Button loading={busy} onClick={submit}>{id ? "Lưu thay đổi" : "Đăng bài"}</Button>
+        <Button loading={busy} onClick={submit}>{id ? "Lưu thay đổi" : KIND_ACTION[kind]}</Button>
         <Button variant="secondary" onClick={() => router.back()}>Hủy</Button>
       </div>
     </div>

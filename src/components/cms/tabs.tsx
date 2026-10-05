@@ -3,7 +3,10 @@ import { ExternalLink } from "lucide-react";
 import { cn } from "@/utils";
 
 const TABS = [
-  { href: "/cms/articles", label: "Bài viết" },
+  { href: "/cms/tin-tuc", label: "Tin tức" },
+  { href: "/cms/ke-hoach", label: "Kế hoạch" },
+  { href: "/cms/su-kien", label: "Sự kiện" },
+  { href: "/cms/thong-bao", label: "Thông báo" },
   { href: "/cms/pages", label: "Trang giới thiệu" },
   { href: "/chapter-reports", label: "Báo cáo Chi đoàn" },
   { href: "/cms/settings", label: "Thông tin website" },

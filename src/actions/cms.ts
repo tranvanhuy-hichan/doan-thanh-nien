@@ -53,7 +53,7 @@ export async function setArticlePublishedAction(id: string, published: boolean) 
     await db.article.update({ where: { id }, data: { published, publishedAt: published ? cur.publishedAt ?? new Date() : cur.publishedAt } });
     await audit(admin.id, published ? "article.publish" : "article.unpublish", "Article", id);
     refreshPublic();
-    revalidatePath("/cms/articles");
+    revalidatePath("/cms", "layout");
     return { message: published ? "Đã hiển thị bài viết" : "Đã ẩn bài viết" };
   });
 }
@@ -67,7 +67,7 @@ export async function deleteArticleAction(id: string) {
     await deleteImage(cur.coverPublicId);
     await audit(admin.id, "article.delete", "Article", id, { title: cur.title });
     refreshPublic();
-    revalidatePath("/cms/articles");
+    revalidatePath("/cms", "layout");
     return { message: "Đã xóa bài viết" };
   });
 }

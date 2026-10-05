@@ -54,3 +54,7 @@ export async function departmentsByGrade() {
   }
   return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b, "vi", { numeric: true }));
 }
+
+/** Route quản lý /cms/<slug> <-> loại bài. Trùng slug với đường dẫn công khai (bỏ dấu "/"). */
+export const CMS_SLUG: Record<string, ArticleKind> = { "tin-tuc": "NEWS", "ke-hoach": "PLAN", "su-kien": "EVENT", "thong-bao": "ANNOUNCEMENT" };
+export { KIND_ACTION } from "./kind";

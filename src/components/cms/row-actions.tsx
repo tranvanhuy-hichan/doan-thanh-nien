@@ -8,14 +8,14 @@ import { buttonClass } from "@/components/ui/button";
 import { ConfirmButton } from "@/components/ui/modal";
 import { reportResult } from "@/components/ui/submit";
 
-export function ArticleRowActions({ id, published }: { id: string; published: boolean }) {
+export function ArticleRowActions({ id, published, base }: { id: string; published: boolean; base: string }) {
   const router = useRouter();
   return (
     <span className="inline-flex items-center gap-1">
       <ConfirmButton triggerVariant="ghost" triggerLabel={published ? "Ẩn bài" : "Hiển thị bài"} trigger={published ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
         title={published ? "Ẩn bài viết?" : "Hiển thị bài viết?"} description={published ? "Bài sẽ không còn hiện trên trang công khai." : "Bài sẽ hiện công khai ngay."} confirmLabel={published ? "Ẩn" : "Hiển thị"}
         onConfirm={async () => { reportResult(await setArticlePublishedAction(id, !published)); router.refresh(); }} />
-      <Link href={`/cms/articles/${id}/edit`} className={buttonClass("ghost", "sm")} aria-label="Sửa"><Pencil className="size-3.5" /></Link>
+      <Link href={`${base}/${id}/edit`} className={buttonClass("ghost", "sm")} aria-label="Sửa"><Pencil className="size-3.5" /></Link>
       <ConfirmButton triggerVariant="ghost" triggerClassName="text-danger" triggerLabel="Xóa" trigger={<Trash2 className="size-3.5" />} title="Xóa bài viết?" danger confirmLabel="Xóa"
         onConfirm={async () => { reportResult(await deleteArticleAction(id)); router.refresh(); }} />
     </span>
