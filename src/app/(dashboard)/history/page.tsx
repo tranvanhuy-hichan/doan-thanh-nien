@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
 import { categories } from "@/lib/services/queries";
-import { formatDate, formatDateTime, pageParam, str } from "@/utils";
+import { formatDate, formatDateTime, monthParamRange, pageParam, str } from "@/utils";
 import { DataTable, EmptyState, PageHeader, Pagination, StatusBadge, Td, Th, type Tone } from "@/components/ui/misc";
 import { FilterBar } from "@/components/ui/filter-bar";
 
@@ -17,6 +17,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
   const sp = await searchParams;
   const month = str(sp.month), cat = str(sp.cat), status = str(sp.status);
   const now = new Date();
+  const range = monthParamRange(month);
   const page = pageParam(sp.page);
 
   const [attendances, registrations, cats] = await Promise.all([
@@ -34,7 +35,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
       return { id: r.activityId, title: r.activity.title, category: r.activity.category.name, categoryId: r.activity.categoryId, startAt: r.activity.startAt,
         label: ended ? "Vắng mặt" : "Đã đăng ký", key: ended ? "ABSENT" : "REGISTERED", tone: (ended ? "red" : "blue") as Tone, points: 0 };
     }),
-  ].filter((r) => (!cat || r.categoryId === cat) && (!status || r.key === status) && (!month || formatMonth(r.startAt) === month))
+  ].filter((r) => (!cat || r.categoryId === cat) && (!status || r.key === status) && (!range || (r.startAt >= range.from && r.startAt < range.to)))
     .sort((a, b) => b.startAt.getTime() - a.startAt.getTime());
 
   return (
@@ -72,9 +73,4 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
       <Pagination page={page} pageSize={PAGE_SIZE} total={rows.length} basePath="/history" params={{ month, cat, status }} />
     </>
   );
-}
-
-function formatMonth(d: Date) {
-  const s = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Ho_Chi_Minh", year: "numeric", month: "2-digit" }).format(d);
-  return s.slice(0, 7);
 }

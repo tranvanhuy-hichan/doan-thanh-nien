@@ -4,17 +4,26 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { Search, X } from "lucide-react";
 import { Input, Select } from "./form";
 
-/** 24 tháng gần nhất + 3 tháng tới (và giá trị đang chọn nếu nằm ngoài khoảng này). */
-function monthOptions(current: string | null) {
+/** Lọc theo Tháng + Năm tách riêng. Chỉ chọn năm = cả năm; giá trị: `YYYY` hoặc `YYYY-MM`. */
+function MonthYearFilter({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [year, month] = value.split("-");
   const now = new Date();
-  const out: { value: string; label: string }[] = [];
-  for (let i = -3; i < 24; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const m = String(d.getMonth() + 1);
-    out.push({ value: `${d.getFullYear()}-${m.padStart(2, "0")}`, label: `Tháng ${m}/${d.getFullYear()}` });
-  }
-  if (current && /^\d{4}-\d{2}$/.test(current) && !out.some((o) => o.value === current)) out.push({ value: current, label: `Tháng ${+current.slice(5)}/${current.slice(0, 4)}` });
-  return out;
+  const years = Array.from({ length: 6 }, (_, i) => String(now.getFullYear() + 1 - i));
+  if (year && !years.includes(year)) years.push(year);
+  const compose = (y: string, m: string) => (!y && !m ? "" : `${y || now.getFullYear()}${m ? `-${m}` : ""}`);
+  const cls = "max-sm:min-w-[calc(50%-0.25rem)] max-sm:flex-1";
+  return (
+    <>
+      <Select aria-label="Tháng" value={month ?? ""} onChange={(e) => onChange(compose(year ?? "", e.target.value))} className={`w-auto min-w-28 ${cls}`}>
+        <option value="">Tháng</option>
+        {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")).map((m) => <option key={m} value={m}>Tháng {+m}</option>)}
+      </Select>
+      <Select aria-label="Năm" value={year ?? ""} onChange={(e) => onChange(compose(e.target.value, month ?? ""))} className={`w-auto min-w-28 ${cls}`}>
+        <option value="">Năm</option>
+        {years.map((y) => <option key={y} value={y}>{y}</option>)}
+      </Select>
+    </>
+  );
 }
 
 export type FilterField =
@@ -57,11 +66,7 @@ export function FilterBar({ fields }: { fields: FilterField[] }) {
             {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </Select>
         ) : (
-          <Select key={f.name} aria-label="Tháng" value={sp.get(f.name) ?? ""} onChange={(e) => update(f.name, e.target.value)}
-            className="w-auto min-w-36 max-sm:min-w-[calc(50%-0.25rem)] max-sm:flex-1">
-            <option value="">Tháng</option>
-            {monthOptions(sp.get(f.name)).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </Select>
+          <MonthYearFilter key={f.name} value={sp.get(f.name) ?? ""} onChange={(v) => update(f.name, v)} />
         ),
       )}
       {active && (

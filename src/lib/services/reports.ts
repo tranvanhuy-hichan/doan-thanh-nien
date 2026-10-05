@@ -2,12 +2,12 @@ import "server-only";
 import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
+import { monthParamRange } from "@/utils";
 import { activityScope, memberScope } from "./queries";
 
 export function monthRange(month?: string): Prisma.ActivityWhereInput {
-  if (!month || !/^\d{4}-\d{2}$/.test(month)) return {};
-  const [y, m] = month.split("-").map(Number);
-  return { startAt: { gte: new Date(Date.UTC(y, m - 1, 1) - 7 * 3600_000), lt: new Date(Date.UTC(y, m, 1) - 7 * 3600_000) } };
+  const r = monthParamRange(month);
+  return r ? { startAt: { gte: r.from, lt: r.to } } : {};
 }
 
 export async function activityReport(user: SessionUser, month?: string) {

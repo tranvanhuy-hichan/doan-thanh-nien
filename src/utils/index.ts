@@ -59,3 +59,13 @@ export function pageParam(v: string | string[] | undefined, fallback = 1) {
   return Number.isInteger(n) && n > 0 ? n : fallback;
 }
 export const str = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) || undefined;
+
+/** Khoảng thời gian (giờ VN) của tham số lọc `YYYY-MM` (một tháng) hoặc `YYYY` (cả năm). */
+export function monthParamRange(v?: string): { from: Date; to: Date } | null {
+  const VN = 7 * 3600_000;
+  const m = v?.match(/^(\d{4})-(\d{2})$/);
+  if (m && +m[2] >= 1 && +m[2] <= 12) return { from: new Date(Date.UTC(+m[1], +m[2] - 1, 1) - VN), to: new Date(Date.UTC(+m[1], +m[2], 1) - VN) };
+  const y = v?.match(/^(\d{4})$/);
+  if (y) return { from: new Date(Date.UTC(+y[1], 0, 1) - VN), to: new Date(Date.UTC(+y[1] + 1, 0, 1) - VN) };
+  return null;
+}

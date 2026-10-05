@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
 import { activityScope, categories } from "@/lib/services/queries";
 import { activityStatus } from "@/lib/services/activity-status";
-import { formatDateTime, pageParam, str } from "@/utils";
+import { formatDateTime, monthParamRange, pageParam, str } from "@/utils";
 import { buttonClass } from "@/components/ui/button";
 import { DataTable, EmptyState, PageHeader, Pagination, Td, Th } from "@/components/ui/misc";
 import { FilterBar } from "@/components/ui/filter-bar";
@@ -27,11 +27,8 @@ export default async function ActivitiesPage({ searchParams }: { searchParams: P
     : status === "ONGOING" ? { cancelledAt: null, startAt: { lte: now }, endAt: { gte: now } }
     : status === "ENDED" ? { cancelledAt: null, endAt: { lt: now } }
     : status === "CANCELLED" ? { cancelledAt: { not: null } } : {};
-  let monthWhere: Prisma.ActivityWhereInput = {};
-  if (month && /^\d{4}-\d{2}$/.test(month)) {
-    const [y, m] = month.split("-").map(Number);
-    monthWhere = { startAt: { gte: new Date(Date.UTC(y, m - 1, 1) - 7 * 3600_000), lt: new Date(Date.UTC(y, m, 1) - 7 * 3600_000) } };
-  }
+  const range = monthParamRange(month);
+  const monthWhere: Prisma.ActivityWhereInput = range ? { startAt: { gte: range.from, lt: range.to } } : {};
   const where: Prisma.ActivityWhereInput = {
     AND: [activityScope(user), statusWhere, monthWhere, q ? { title: { contains: q, mode: "insensitive" } } : {}, cat ? { categoryId: cat } : {}],
   };
