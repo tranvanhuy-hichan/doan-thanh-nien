@@ -23,11 +23,11 @@
 <b>Đoàn trường THPT Sơn Hà</b>
 <span>Đoàn TNCS Hồ Chí Minh</span>
 <i></i>
-<noscript><a href="/dashboard" style="color:#ffd400">Vào hệ thống</a></noscript>
+<noscript><a href="/" style="color:#ffd400">Vào trang chủ</a></noscript>
 <script>
-// Trang khởi động tĩnh (phục vụ tức thì từ CDN/bộ nhớ đệm): hiện màn hình xanh ngay, rồi chuyển vào hệ thống.
+// Trang khởi động tĩnh (phục vụ tức thì từ CDN/bộ nhớ đệm): hiện màn hình xanh ngay, rồi chuyển tới trang chủ công khai.
 // Trang này vẫn hiển thị cho tới khi trang đích trả về, nên không bị khoảng trống/đen giữa hai trang.
-requestAnimationFrame(function(){requestAnimationFrame(function(){location.replace("/dashboard")})});
+requestAnimationFrame(function(){requestAnimationFrame(function(){location.replace("/")})});
 </script>
 </body>
 </html>

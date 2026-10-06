@@ -1,5 +1,5 @@
 // Service worker: nhận thông báo đẩy và hiển thị trên thiết bị (cả khi đã đóng app).
-const SHELL = "doan-shell-v1";
+const SHELL = "doan-shell-v2";
 const SHELL_FILES = ["/start.html", "/logo-doan.webp"];
 
 // Lưu sẵn trang khởi động (nền xanh + huy hiệu) để mở app đã cài là hiện NGAY, không chờ mạng/máy chủ.
