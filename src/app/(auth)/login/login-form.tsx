@@ -8,8 +8,9 @@ import type { z } from "zod";
 import { loginSchema } from "@/lib/validation";
 import { loginAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/form";
+import { Field, Input, PasswordInput } from "@/components/ui/form";
 import { Alert } from "@/components/ui/misc";
+import { PasskeyLogin } from "@/components/auth/passkey-login";
 
 type Values = z.infer<typeof loginSchema>;
 
@@ -33,12 +34,13 @@ export function LoginForm({ next }: { next: string }) {
         <Input autoComplete="username" autoFocus {...register("username")} />
       </Field>
       <Field label="Mật khẩu" error={errors.password?.message}>
-        <Input type="password" autoComplete="current-password" {...register("password")} />
+        <PasswordInput aria-label="Mật khẩu" autoComplete="current-password" {...register("password")} />
       </Field>
       <Button type="submit" loading={isSubmitting} className="w-full">Đăng nhập</Button>
       <div className="text-center">
         <Link href="/forgot-password" className="text-[13px] text-primary hover:underline">Quên mật khẩu?</Link>
       </div>
+      <PasskeyLogin next={next} />
     </form>
   );
 }

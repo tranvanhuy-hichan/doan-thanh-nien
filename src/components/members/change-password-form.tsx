@@ -7,7 +7,7 @@ import type { z } from "zod";
 import { changePasswordSchema } from "@/lib/validation";
 import { changePasswordAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/form";
+import { Field, PasswordInput } from "@/components/ui/form";
 
 type Values = z.infer<typeof changePasswordSchema>;
 
@@ -26,13 +26,13 @@ export function ChangePasswordForm({ redirectTo }: { redirectTo?: string }) {
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       <Field label="Mật khẩu hiện tại" error={errors.currentPassword?.message}>
-        <Input type="password" autoComplete="current-password" {...register("currentPassword")} />
+        <PasswordInput aria-label="Mật khẩu hiện tại" autoComplete="current-password" {...register("currentPassword")} />
       </Field>
       <Field label="Mật khẩu mới" error={errors.newPassword?.message} hint="Tối thiểu 8 ký tự, gồm chữ và số">
-        <Input type="password" autoComplete="new-password" {...register("newPassword")} />
+        <PasswordInput aria-label="Mật khẩu mới" autoComplete="new-password" {...register("newPassword")} />
       </Field>
       <Field label="Nhập lại mật khẩu mới" error={errors.confirmPassword?.message}>
-        <Input type="password" autoComplete="new-password" {...register("confirmPassword")} />
+        <PasswordInput aria-label="Nhập lại mật khẩu mới" autoComplete="new-password" {...register("confirmPassword")} />
       </Field>
       <Button type="submit" loading={isSubmitting} className="w-full">Lưu mật khẩu</Button>
     </form>

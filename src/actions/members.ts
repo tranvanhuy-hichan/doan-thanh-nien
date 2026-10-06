@@ -83,7 +83,10 @@ export async function resetMemberPasswordAction(id: string) {
     const m = await db.member.findUnique({ where: { id } });
     if (!m) throw new UserError("Không tìm thấy đoàn viên");
     const password = generateTempPassword();
-    await db.user.update({ where: { id: m.userId }, data: { passwordHash: await hashPassword(password), mustChangePassword: true } });
+    await db.$transaction([
+      db.user.update({ where: { id: m.userId }, data: { passwordHash: await hashPassword(password), mustChangePassword: true } }),
+      db.passkey.deleteMany({ where: { userId: m.userId } }), // cấp lại mật khẩu = thu hồi các thiết bị đăng nhập nhanh
+    ]);
     await audit(admin.id, "account.reset_password", "User", m.userId, { code: m.code });
     return { data: { password }, message: "Đã cấp lại mật khẩu tạm thời" };
   });

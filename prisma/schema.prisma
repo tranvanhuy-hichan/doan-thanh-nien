@@ -100,6 +100,7 @@ model User {
   postComments      PostComment[]
   emulationRecords  EmulationRecord[]
   pushSubscriptions PushSubscription[]
+  passkeys          Passkey[]
   articles          Article[]
   chapterReports    ChapterReport[]
 
@@ -603,4 +604,21 @@ model WeeklyScheduleItem {
   schedule WeeklySchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
 
   @@index([scheduleId, date])
+}
+
+/// Khóa đăng nhập nhanh (vân tay / khuôn mặt / khóa bảo mật) theo chuẩn WebAuthn. Khóa công khai lưu ở đây, khóa riêng nằm trong thiết bị.
+model Passkey {
+  id           String    @id @default(cuid())
+  userId       String
+  credentialId String    @unique // base64url
+  publicKey    String // base64url
+  counter      Int       @default(0)
+  transports   String? // danh sách, cách nhau bằng dấu phẩy
+  deviceName   String?
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

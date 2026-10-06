@@ -117,3 +117,12 @@ src/lib/qr            QR token ký HMAC, sống 90 giây
 
 - Khoảnh khắc đầu tiên khi mở app (trước khi có bất kỳ mã nào của ta chạy) do **hệ điều hành** dựng: Android lấy nền/biểu tượng từ manifest **lúc cài**, iOS lấy ảnh khởi động khớp **đúng cỡ máy**. Nếu cài từ trước khi có cấu hình mới, hoặc cỡ máy không khớp, sẽ còn thấy màn hình đen/trắng cho tới khi cài lại.
 - Khoảng chờ tiếp theo là **chờ máy chủ trả trang** (đặc biệt khi máy chủ "ngủ" lâu chưa gọi). Để không còn màn hình trống, ứng dụng đã cài giờ mở bằng **trang khởi động tĩnh** `public/start.html` (`start_url` trong manifest): nền xanh + huy hiệu + vòng xoay, phục vụ tức thì và được **Service Worker lưu sẵn** (mở lại gần như không chờ mạng), rồi tự chuyển tới **trang chủ công khai** `/` (kể cả đã đăng nhập; người dùng bấm "Trang quản lý" để vào hệ thống). Trang này giữ nguyên trên màn hình cho tới khi trang đích trả về nên không bị khoảng trắng giữa hai trang.
+
+## Đăng nhập nhanh bằng vân tay / khuôn mặt (Passkey, WebAuthn)
+
+- Người dùng bật ở **Cài đặt → Đăng nhập nhanh → "Bật trên thiết bị này"** (sau khi đã đăng nhập bằng mật khẩu); mỗi tài khoản tối đa **5 thiết bị**, xem/xóa từng thiết bị ở cùng tab.
+- Ở trang đăng nhập có nút **"Đăng nhập bằng vân tay / khuôn mặt"** (chỉ hiện khi trình duyệt hỗ trợ). Thiết bị tự đề xuất khóa đã lưu, không cần gõ tên đăng nhập. Dữ liệu sinh trắc học không rời thiết bị; máy chủ chỉ lưu khóa công khai (bảng `Passkey`).
+- Cần **HTTPS** (hoặc `localhost`). Passkey **gắn với tên miền** đang dùng: đổi tên miền thì phải bật lại.
+- Tài khoản bị khóa thì không đăng nhập nhanh được; Admin **cấp lại mật khẩu tạm** cho đoàn viên sẽ **thu hồi mọi thiết bị đăng nhập nhanh** của tài khoản đó.
+- Thư viện: `@simplewebauthn/server` + `@simplewebauthn/browser`; "thử thách" (challenge) lưu trong cookie ký số 5 phút, dùng một lần.
+- Ô mật khẩu ở đăng nhập và đổi mật khẩu có nút con mắt để **xem/ẩn mật khẩu**.

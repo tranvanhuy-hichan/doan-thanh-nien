@@ -1,4 +1,5 @@
-import { forwardRef, useCallback, useLayoutEffect, useRef } from "react";
+import { forwardRef, useCallback, useLayoutEffect, useRef, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { cn } from "@/utils";
 
 const control = "w-full rounded-md border border-border bg-white/85 px-3 text-sm placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:bg-slate-50 disabled:text-muted";
@@ -26,6 +27,19 @@ export const WrapInput = forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttri
       onKeyDown={(e) => { if (e.key === "Enter") e.preventDefault(); onKeyDown?.(e); }}
       {...p}
     />
+  );
+});
+/** Ô nhập mật khẩu có nút con mắt để xem/ẩn mật khẩu. */
+export const PasswordInput = forwardRef<HTMLInputElement, Omit<React.InputHTMLAttributes<HTMLInputElement>, "type">>(function PasswordInput({ className, ...p }, ref) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="relative">
+      <input ref={ref} type={show ? "text" : "password"} className={cn(control, "h-9 pr-10", className)} {...p} />
+      <button type="button" onClick={() => setShow((v) => !v)} aria-label={show ? "Ẩn mật khẩu" : "Hiện mật khẩu"} aria-pressed={show} tabIndex={-1}
+        className="absolute inset-y-0 right-0 flex w-10 items-center justify-center rounded-r-md text-slate-500 hover:text-primary">
+        {show ? <EyeOff className="size-[18px]" /> : <Eye className="size-[18px]" />}
+      </button>
+    </div>
   );
 });
 export const Select = forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<HTMLSelectElement>>(function Select({ className, children, ...p }, ref) {

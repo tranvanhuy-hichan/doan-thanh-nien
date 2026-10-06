@@ -139,6 +139,12 @@ Ký hiệu: ✔ có, ✖ không, ◐ có điều kiện (ghi chú).
 - Phiên đăng nhập kéo dài **7 ngày** kể từ lúc đăng nhập, không tự gia hạn. Đăng xuất xóa cookie ngay.
 - Khóa tài khoản có hiệu lực **ngay**, vì mỗi lần mở trang hệ thống nạp lại người dùng từ database.
 
+### 4.1b Đăng nhập nhanh bằng vân tay / khuôn mặt (Passkey)
+- Sau khi đăng nhập bằng mật khẩu, người dùng vào **Cài đặt → Đăng nhập nhanh → "Bật trên thiết bị này"** để lưu một khóa đăng nhập vào điện thoại/máy tính. Mỗi tài khoản tối đa **5 thiết bị**; xem danh sách (tên thiết bị, ngày thêm, lần dùng gần nhất) và xóa từng thiết bị ở cùng tab.
+- Ở trang đăng nhập có nút **"Đăng nhập bằng vân tay / khuôn mặt"** (chỉ hiện khi trình duyệt hỗ trợ): thiết bị tự đề xuất khóa đã lưu, người dùng xác nhận bằng vân tay, khuôn mặt hoặc mã khóa màn hình, không cần nhớ mật khẩu hay gõ tên đăng nhập.
+- Chuẩn WebAuthn: dữ liệu sinh trắc học không rời khỏi thiết bị; máy chủ chỉ lưu khóa công khai. Cần HTTPS; khóa gắn với tên miền. Tài khoản bị khóa thì không đăng nhập nhanh được; khi Admin cấp lại mật khẩu tạm cho một đoàn viên, mọi thiết bị đăng nhập nhanh của tài khoản đó bị thu hồi.
+- Ô nhập mật khẩu ở trang đăng nhập và đổi mật khẩu có **nút con mắt** để xem hoặc ẩn mật khẩu.
+
 ### 4.2 Mật khẩu
 - Mật khẩu tạm thời do hệ thống sinh (10 ký tự ngẫu nhiên), hiển thị **một lần** khi tạo tài khoản hoặc cấp lại. Đoàn viên **bắt buộc đổi mật khẩu** ở lần đăng nhập đầu.
 - Mật khẩu mới: tối thiểu **8 ký tự**, tối đa 72, có ít nhất một chữ cái và một chữ số, khác mật khẩu hiện tại, phải nhập lại khớp.
@@ -513,6 +519,7 @@ Trang chia thành **tab** (chọn bằng địa chỉ `?tab=`), chỉ nạp dữ
 | Tài khoản | Mọi người | Ảnh đại diện (đổi được), họ tên (Admin sửa được), tên đăng nhập, mã đoàn viên, vai trò, Chi đoàn |
 | Thông báo | Mọi người | Bật thông báo đẩy, bật/tắt âm thanh |
 | Mật khẩu | Mọi người | Đổi mật khẩu |
+| Đăng nhập nhanh | Mọi người | Bật/xóa vân tay, khuôn mặt (passkey) trên từng thiết bị |
 | Năm học | Admin | Lịch năm học (mục 9.1) |
 | Loại hoạt động | Admin | Thêm/sửa/xóa loại và điểm mặc định |
 | Nhật ký | Admin | 30 thao tác gần nhất (thời gian, người thực hiện, hành động, đối tượng) |
