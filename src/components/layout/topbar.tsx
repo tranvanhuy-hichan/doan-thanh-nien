@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { ArrowLeft, Bell, ChevronDown, ChevronRight, KeyRound, LogOut } from "lucide-react";
+import { ArrowLeft, Bell, Globe, ChevronDown, ChevronRight, KeyRound, LogOut } from "lucide-react";
 import { cn, relativeTime } from "@/utils";
 import { PAGE_TITLES, PATH_TITLES } from "@/lib/nav";
 import { NotificationControls } from "@/components/notifications/controls";
@@ -103,6 +103,7 @@ export function Topbar({ user, roleLabel, notifications, unread }: {
         <Breadcrumb />
       </div>
       <div className="flex items-center gap-1">
+        <Link href="/" className="flex h-8 items-center gap-1.5 rounded-md px-2 text-[13px] font-medium text-primary hover:bg-primary-light" aria-label="Xem trang công khai" title="Xem trang công khai"><Globe className="size-4" /><span className="max-sm:hidden">Trang công khai</span></Link>
         <Notifications items={notifications} unread={unread} />
         <div ref={ref} className="relative">
           <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-2 rounded-md py-1 pr-2 pl-1.5 hover:bg-slate-100">

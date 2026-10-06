@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, ExternalLink, Home, LogIn, Mail, Menu, Phone, Search, X } from "lucide-react";
+import { ChevronDown, ExternalLink, Home, LayoutDashboard, LogIn, Mail, Menu, Phone, Search, X } from "lucide-react";
 import { cn } from "@/utils";
 import { DoanLogo } from "@/components/layout/logo";
 
@@ -56,6 +56,17 @@ const isActive = (pathname: string, href: string) => {
   return base === "/" ? pathname === "/" : pathname === base || pathname.startsWith(base + "/");
 };
 
+/** Đã đăng nhập chưa (hỏi nhẹ /api/me để trang công khai vẫn được cache). */
+function useLoggedIn() {
+  const [yes, setYes] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/me", { cache: "no-store" }).then((r) => r.json()).then((d) => alive && setYes(!!d.loggedIn)).catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  return yes;
+}
+
 const WEEKDAYS = ["Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"];
 function Today() {
   const [text, setText] = useState("");
@@ -85,6 +96,7 @@ export function SiteHeader({ bannerUrl, phone, email, facebook, youtube, marquee
   useEffect(() => {
     if (lastPath.current !== pathname) { lastPath.current = pathname; setOpen(false); }
   }, [pathname]);
+  const loggedIn = useLoggedIn();
   const main = MENU.filter((it) => !it.children); // Giới thiệu, Báo cáo Chi đoàn, Thi đua nằm ở thanh bên trái
 
   return (
@@ -115,8 +127,8 @@ export function SiteHeader({ bannerUrl, phone, email, facebook, youtube, marquee
             </div>
           </Link>
           <SearchBox className="mx-auto hidden w-full max-w-2xl lg:flex" />
-          <Link href="/login" className="ml-auto hidden h-10 shrink-0 items-center gap-1.5 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-dark lg:inline-flex lg:ml-0">
-            <LogIn className="size-4" />Đăng nhập
+          <Link href={loggedIn ? "/dashboard" : "/login"} className="ml-auto hidden h-10 shrink-0 items-center gap-1.5 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-dark lg:inline-flex lg:ml-0">
+            {loggedIn ? <><LayoutDashboard className="size-4" />Trang quản lý</> : <><LogIn className="size-4" />Đăng nhập</>}
           </Link>
         </div>
       </div>
@@ -152,8 +164,8 @@ export function SiteHeader({ bannerUrl, phone, email, facebook, youtube, marquee
                 </ul>
               </li>
             </ul>
-            <Link href="/login" aria-label="Đăng nhập" className="ml-auto my-1.5 mr-1 inline-flex h-9 shrink-0 lg:hidden items-center gap-1.5 rounded bg-[#ffd400] px-3 text-sm max-sm:w-10 max-sm:justify-center max-sm:px-0 sm:px-3.5 font-bold text-[#073a70] hover:bg-yellow-300">
-              <LogIn className="size-4" /><span className="max-sm:hidden">Đăng nhập</span>
+            <Link href={loggedIn ? "/dashboard" : "/login"} aria-label={loggedIn ? "Trang quản lý" : "Đăng nhập"} className="ml-auto my-1.5 mr-1 inline-flex h-9 shrink-0 lg:hidden items-center gap-1.5 rounded bg-[#ffd400] px-3 text-sm max-sm:w-10 max-sm:justify-center max-sm:px-0 sm:px-3.5 font-bold text-[#073a70] hover:bg-yellow-300">
+              {loggedIn ? <LayoutDashboard className="size-4" /> : <LogIn className="size-4" />}<span className="max-sm:hidden">{loggedIn ? "Trang quản lý" : "Đăng nhập"}</span>
             </Link>
           </div>
           {open && (
@@ -181,7 +193,7 @@ export function SiteHeader({ bannerUrl, phone, email, facebook, youtube, marquee
 
       {/* Banner full chiều ngang (chỉ trang chủ) */}
       {pathname === "/" && (
-        <div className="relative h-28 w-full overflow-hidden bg-primary-dark sm:h-40 lg:h-52">
+        <div className={cn("relative h-28 w-full overflow-hidden bg-primary-dark sm:h-40 lg:h-52", !bannerUrl && "max-sm:hidden")}>
           {bannerUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={bannerUrl} alt="Banner Đoàn trường THPT Sơn Hà" className="size-full object-cover object-center" />
