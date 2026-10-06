@@ -101,3 +101,8 @@ src/lib/qr            QR token ký HMAC, sống 90 giây
 
 - **Hàng chờ duyệt** (`/approvals`, Admin): gom bài nháp bí thư gửi lên (bấm **Duyệt & đăng** là hiển thị công khai), góp ý chưa xem và báo cáo Chi đoàn mới trong 7 ngày. Menu có huy hiệu số việc đang chờ (bài nháp + góp ý mới).
 - **Lịch công tác tuần** (`/schedule`, Admin): chọn Năm học → Tuần (theo lịch năm học), thêm công việc theo từng ngày (thời gian, nội dung, phụ trách, địa điểm), **Sao chép tuần trước**, **Công bố** (tùy chọn gửi thông báo cho mọi người dùng). Lịch đã công bố hiện ở trang công khai `/lich-cong-tac` (mặc định tuần hiện tại, có nút tuần trước/sau và **In lịch**); Admin xem được bản nháp để xem trước.
+
+## Dọn dữ liệu cũ
+
+- Mỗi ngày (`/api/cron/cleanup`, dùng chung `CRON_SECRET`) hệ thống xóa: thông báo **đã đọc** quá 90 ngày, thông báo chưa đọc quá 120 ngày và **nhật ký hệ thống** quá 120 ngày. Điểm danh, điểm, huy hiệu, báo cáo, bài viết được giữ lâu dài. Chỉnh số ngày trong `RETENTION` ở `src/lib/services/cleanup.ts`.
+- Admin theo dõi dung lượng database và các bảng lớn nhất, hoặc bấm **Dọn ngay**, ở **Cài đặt → Dữ liệu**.
