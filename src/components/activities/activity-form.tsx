@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { saveActivityAction } from "@/actions/activities";
 import { Button } from "@/components/ui/button";
-import { Field, Input, Select, Textarea } from "@/components/ui/form";
+import { Field, Input, Select, Textarea, WrapInput } from "@/components/ui/form";
 import { ImageUpload, type UploadedImage } from "@/components/ui/image-upload";
 import { fromLocalInput } from "@/utils";
 
@@ -52,7 +52,7 @@ export function ActivityForm({ id, categories, departments, lockedDepartment, in
     <form onSubmit={onSubmit} className="w-full space-y-5" noValidate>
       <Field label="Ảnh bìa hoạt động"><ImageUpload folder="activities" value={img} onChange={setImg} /></Field>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Field label="Tên hoạt động" required error={errors.title} className="sm:col-span-2 lg:col-span-3"><Input {...register("title")} /></Field>
+        <Field label="Tên hoạt động" required error={errors.title} className="sm:col-span-2 lg:col-span-3"><WrapInput {...register("title")} /></Field>
         <Field label="Loại hoạt động" required error={errors.categoryId}>
           <Select {...register("categoryId", { onChange: (e) => { if (!pointsLocked) { const c = categories.find((x) => x.id === e.target.value); if (c) setValue("points", String(c.defaultPoints)); } } })}>
             <option value="">Chọn loại</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}

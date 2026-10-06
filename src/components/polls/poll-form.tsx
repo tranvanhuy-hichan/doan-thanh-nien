@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Plus, X } from "lucide-react";
 import { createPollAction } from "@/actions/polls";
 import { Button } from "@/components/ui/button";
-import { Field, Input, Textarea } from "@/components/ui/form";
+import { Field, Input, Textarea, WrapInput } from "@/components/ui/form";
 import { fromLocalInput } from "@/utils";
 
 export function PollForm() {
@@ -15,7 +15,7 @@ export function PollForm() {
   const [busy, setBusy] = useState(false);
   return (
     <div className="w-full max-w-2xl space-y-4">
-      <Field label="Câu hỏi" required><Input value={v.question} maxLength={200} placeholder="Ví dụ: Chủ đề hoạt động tháng sau?" onChange={(e) => setV({ ...v, question: e.target.value })} /></Field>
+      <Field label="Câu hỏi" required><WrapInput value={v.question} maxLength={200} placeholder="Ví dụ: Chủ đề hoạt động tháng sau?" onChange={(e) => setV({ ...v, question: e.target.value })} /></Field>
       <Field label="Mô tả"><Textarea className="min-h-16" maxLength={500} value={v.description} onChange={(e) => setV({ ...v, description: e.target.value })} /></Field>
       <Field label="Các lựa chọn" required>
         <div className="space-y-2">

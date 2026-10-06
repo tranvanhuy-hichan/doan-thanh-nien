@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
 import { emulationRanking } from "@/lib/services/emulation";
 import { currentValue, resolvePeriod, PERIOD_LABEL, type PeriodType } from "@/lib/emulation-period";
+import { loadCalendars } from "@/lib/services/school-calendar";
 import { formatDate, formatDateShort, pageParam, str, toDateInput } from "@/utils";
 import { DataTable, EmptyState, PageHeader, Pagination, Section, Td, Th } from "@/components/ui/misc";
 import { RankingList } from "@/components/emulation/ranking-list";
@@ -17,7 +18,8 @@ export default async function EmulationPage({ searchParams }: { searchParams: Pr
   const sp = await searchParams;
   const rawType = str(sp.type);
   const type: PeriodType = rawType && rawType in PERIOD_LABEL ? (rawType as PeriodType) : "month";
-  const period = resolvePeriod(type, str(sp.value) ?? "") ?? resolvePeriod(type, currentValue(type))!;
+  const calendars = await loadCalendars();
+  const period = resolvePeriod(type, str(sp.value) ?? "", calendars) ?? resolvePeriod(type, currentValue(type, new Date(), calendars), calendars)!;
   const page = pageParam(sp.page);
   const admin = user.role === "ADMIN";
 
@@ -35,7 +37,7 @@ export default async function EmulationPage({ searchParams }: { searchParams: Pr
     <>
       <PageHeader title="Thi đua Chi đoàn" description={period.label}
         actions={admin && <AddRecordButton departments={departments} today={toDateInput(new Date())} />} />
-      <PeriodFilter type={period.type} value={period.value} />
+      <PeriodFilter type={period.type} value={period.value} calendars={calendars} />
 
       {ranking.length === 0 ? (
         <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Chưa có Chi đoàn nào" /></div>
@@ -68,7 +70,7 @@ export default async function EmulationPage({ searchParams }: { searchParams: Pr
         </>
       )}
       <p className="mt-2 text-xs text-muted">
-        Tổng điểm = Điểm thi đua trường (Đoàn trường ghi nhận) + Điểm hoạt động Đoàn bình quân mỗi đoàn viên (tổng điểm điểm danh của đoàn viên trong kỳ ÷ số đoàn viên). Năm học tính từ 1/9; Học kỳ 1: 9–12, Học kỳ 2: 1–8.
+        Tổng điểm = Điểm thi đua trường (Đoàn trường ghi nhận) + Điểm hoạt động Đoàn bình quân mỗi đoàn viên (tổng điểm điểm danh của đoàn viên trong kỳ ÷ số đoàn viên). Tuần, học kỳ và năm học tính theo lịch năm học của trường (Tuần 1 bắt đầu từ ngày Admin đặt trong Cài đặt → Năm học).
       </p>
 
       <Section title={admin ? "Điểm thi đua trường đã ghi nhận" : "Điểm thi đua trường của Chi đoàn bạn"} className="mt-8">

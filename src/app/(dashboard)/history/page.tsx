@@ -4,7 +4,9 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
 import { categories } from "@/lib/services/queries";
-import { formatDate, formatDateTime, monthParamRange, pageParam, str } from "@/utils";
+import { formatDate, formatDateTime, pageParam, str } from "@/utils";
+import { rangeFromParams } from "@/lib/school-calendar";
+import { loadCalendars } from "@/lib/services/school-calendar";
 import { DataTable, EmptyState, PageHeader, Pagination, StatusBadge, Td, Th, type Tone } from "@/components/ui/misc";
 import { FilterBar } from "@/components/ui/filter-bar";
 
@@ -15,9 +17,10 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
   const user = await requireUser();
   if (!user.memberId) redirect("/dashboard");
   const sp = await searchParams;
-  const month = str(sp.month), cat = str(sp.cat), status = str(sp.status);
+  const nh = str(sp.nh), tuan = str(sp.tuan), cat = str(sp.cat), status = str(sp.status);
+  const calendars = await loadCalendars();
   const now = new Date();
-  const range = monthParamRange(month);
+  const range = rangeFromParams(calendars, nh, tuan);
   const page = pageParam(sp.page);
 
   const [attendances, registrations, cats] = await Promise.all([
@@ -42,7 +45,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
     <>
       <PageHeader title="Lịch sử hoạt động" />
       <FilterBar fields={[
-        { type: "month", name: "month" },
+        { type: "schoolweek", name: "nh", calendars },
         { type: "select", name: "cat", label: "Loại hoạt động", options: cats.map((c) => ({ value: c.id, label: c.name })) },
         { type: "select", name: "status", label: "Trạng thái", options: [{ value: "ATTENDED", label: "Tham gia" }, { value: "REGISTERED", label: "Đã đăng ký" }, { value: "ABSENT", label: "Vắng mặt" }] },
       ]} />
@@ -70,7 +73,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
         </div>
         </>
       )}
-      <Pagination page={page} pageSize={PAGE_SIZE} total={rows.length} basePath="/history" params={{ month, cat, status }} />
+      <Pagination page={page} pageSize={PAGE_SIZE} total={rows.length} basePath="/history" params={{ nh, tuan, cat, status }} />
     </>
   );
 }

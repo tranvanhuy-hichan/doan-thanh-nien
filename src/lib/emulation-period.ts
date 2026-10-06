@@ -1,13 +1,13 @@
 // Tính khoảng thời gian thi đua theo giờ Việt Nam (UTC+7). Dùng được ở cả server và client.
+// Tuần / học kỳ / năm học tính theo LỊCH NĂM HỌC (Tuần 1 bắt đầu từ ngày Admin đặt, xem school-calendar.ts); tháng theo lịch dương.
+import { currentWeek, defaultCalendar, semesterRange, weekLabel, weekRange, yearLabel, yearRange, schoolYearOf, type SchoolCalendar } from "./school-calendar";
 export type PeriodType = "week" | "month" | "semester" | "year";
 export const PERIOD_LABEL: Record<PeriodType, string> = { week: "Tuần", month: "Tháng", semester: "Học kỳ", year: "Năm học" };
 
 const VN = 7 * 3600_000;
-const DAY = 86400_000;
 /** 00:00 giờ VN của ngày (y, m0, d) dưới dạng instant. */
 const vnMidnight = (y: number, m0: number, d: number) => new Date(Date.UTC(y, m0, d) - VN);
 const pad = (n: number) => String(n).padStart(2, "0");
-const fmt = (d: Date) => { const v = new Date(d.getTime() + VN); return `${pad(v.getUTCDate())}/${pad(v.getUTCMonth() + 1)}`; };
 
 /** Năm bắt đầu của năm học chứa thời điểm `d` (năm học: 1/9 – 31/8). */
 export function schoolYearStart(d: Date) {
@@ -15,36 +15,20 @@ export function schoolYearStart(d: Date) {
   return v.getUTCMonth() >= 8 ? v.getUTCFullYear() : v.getUTCFullYear() - 1;
 }
 
-function isoWeekParts(d: Date) {
-  const v = new Date(d.getTime() + VN);
-  const t = new Date(Date.UTC(v.getUTCFullYear(), v.getUTCMonth(), v.getUTCDate()));
-  const dow = t.getUTCDay() || 7;
-  t.setUTCDate(t.getUTCDate() + 4 - dow);
-  const year = t.getUTCFullYear();
-  const week = Math.ceil(((t.getTime() - Date.UTC(year, 0, 1)) / DAY + 1) / 7);
-  return { year, week };
-}
-export const weekValue = (d: Date) => { const { year, week } = isoWeekParts(d); return `${year}-W${pad(week)}`; };
 export const monthValue = (d: Date) => { const v = new Date(d.getTime() + VN); return `${v.getUTCFullYear()}-${pad(v.getUTCMonth() + 1)}`; };
-export const semesterValue = (d: Date) => {
-  const v = new Date(d.getTime() + VN);
-  return `${schoolYearStart(d)}-${v.getUTCMonth() >= 8 ? 1 : 2}`; // HK1: 9–12, HK2: 1–8
-};
-
 export type Period = { type: PeriodType; value: string; from: Date; to: Date; label: string };
 
-/** `to` là cận trên loại trừ. Trả null nếu giá trị không hợp lệ. */
-export function resolvePeriod(type: PeriodType, value: string): Period | null {
+const calOf = (cals: SchoolCalendar[] | undefined, y: number) => cals?.find((c) => c.startYear === y) ?? defaultCalendar(y);
+
+/** `to` là cận trên loại trừ. Trả null nếu giá trị không hợp lệ.
+ *  Giá trị: tuần `2026-T03` (Tuần 3 năm học 2026–2027), tháng `2026-10`, học kỳ `2026-1`, năm học `2026`. */
+export function resolvePeriod(type: PeriodType, value: string, cals?: SchoolCalendar[]): Period | null {
   if (type === "week") {
-    const m = value.match(/^(\d{4})-W(\d{2})$/);
+    const m = value.match(/^(\d{4})-T(\d{1,2})$/);
     if (!m) return null;
-    const y = +m[1], w = +m[2];
-    const jan4 = new Date(Date.UTC(y, 0, 4));
-    const mondayUtc = jan4.getTime() - ((jan4.getUTCDay() || 7) - 1) * DAY + (w - 1) * 7 * DAY;
-    const mon = new Date(mondayUtc);
-    const from = vnMidnight(mon.getUTCFullYear(), mon.getUTCMonth(), mon.getUTCDate());
-    const to = new Date(from.getTime() + 7 * DAY);
-    return { type, value, from, to, label: `Tuần ${w} (${fmt(from)} – ${fmt(new Date(to.getTime() - DAY))}/${new Date(to.getTime() - DAY + VN).getUTCFullYear()})` };
+    const c = calOf(cals, +m[1]);
+    const r = weekRange(c, +m[2]);
+    return r ? { type, value, ...r, label: `${weekLabel(c, +m[2])} · Năm học ${yearLabel(+m[1])}` } : null;
   }
   if (type === "month") {
     const m = value.match(/^(\d{4})-(\d{2})$/);
@@ -55,38 +39,20 @@ export function resolvePeriod(type: PeriodType, value: string): Period | null {
     const m = value.match(/^(\d{4})-([12])$/);
     if (!m) return null;
     const y = +m[1];
-    return m[2] === "1"
-      ? { type, value, from: vnMidnight(y, 8, 1), to: vnMidnight(y + 1, 0, 1), label: `Học kỳ 1 · Năm học ${y}–${y + 1}` }
-      : { type, value, from: vnMidnight(y + 1, 0, 1), to: vnMidnight(y + 1, 8, 1), label: `Học kỳ 2 · Năm học ${y}–${y + 1}` };
+    const r = semesterRange(calOf(cals, y), m[2] === "1" ? 1 : 2);
+    return { type, value, ...r, label: `Học kỳ ${m[2]} · Năm học ${yearLabel(y)}` };
   }
   const m = value.match(/^(\d{4})$/);
   if (!m) return null;
   const y = +m[1];
-  return { type, value, from: vnMidnight(y, 8, 1), to: vnMidnight(y + 1, 8, 1), label: `Năm học ${y}–${y + 1}` };
+  return { type, value, ...yearRange(calOf(cals, y)), label: `Năm học ${yearLabel(y)}` };
 }
 
-export function currentValue(type: PeriodType, now = new Date()) {
-  return type === "week" ? weekValue(now) : type === "month" ? monthValue(now) : type === "semester" ? semesterValue(now) : String(schoolYearStart(now));
-}
-
-/** Danh sách lựa chọn gần đây để người dùng chọn kỳ thi đua. */
-export function periodOptions(now = new Date()): Record<PeriodType, { value: string; label: string }[]> {
-  const out = { week: [], month: [], semester: [], year: [] } as Record<PeriodType, { value: string; label: string }[]>;
-  for (let i = 0; i < 12; i++) {
-    const d = new Date(now.getTime() - i * 7 * DAY);
-    const v = weekValue(d);
-    if (!out.week.some((o) => o.value === v)) out.week.push({ value: v, label: resolvePeriod("week", v)!.label });
-  }
-  const v = new Date(now.getTime() + VN);
-  for (let i = 0; i < 12; i++) {
-    const d = new Date(Date.UTC(v.getUTCFullYear(), v.getUTCMonth() - i, 15));
-    const mv = `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}`;
-    out.month.push({ value: mv, label: resolvePeriod("month", mv)!.label });
-  }
-  const sy = schoolYearStart(now);
-  for (let y = sy; y > sy - 4; y--) {
-    out.year.push({ value: String(y), label: resolvePeriod("year", String(y))!.label });
-    out.semester.push({ value: `${y}-2`, label: resolvePeriod("semester", `${y}-2`)!.label }, { value: `${y}-1`, label: resolvePeriod("semester", `${y}-1`)!.label });
-  }
-  return out;
+export function currentValue(type: PeriodType, now = new Date(), cals?: SchoolCalendar[]) {
+  const y = schoolYearOf(now);
+  const c = calOf(cals, y);
+  if (type === "week") return `${y}-T${String(currentWeek(c, now) ?? 1).padStart(2, "0")}`; // ngoài thời gian học: Tuần 1
+  if (type === "month") return monthValue(now);
+  if (type === "semester") return `${y}-${now < semesterRange(c, 2).from ? 1 : 2}`;
+  return String(y);
 }

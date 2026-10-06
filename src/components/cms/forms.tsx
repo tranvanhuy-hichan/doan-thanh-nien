@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { saveArticleAction, saveSitePageAction } from "@/actions/cms";
 import { saveReportAction } from "@/actions/chapter-reports";
 import { Button } from "@/components/ui/button";
-import { Field, Input, Select, Textarea } from "@/components/ui/form";
+import { Field, Input, Select, Textarea, WrapInput } from "@/components/ui/form";
 import { ImageUpload, type UploadedImage } from "@/components/ui/image-upload";
 import { FileUpload, type AttachmentValue } from "@/components/ui/file-upload";
 import { fromLocalInput } from "@/utils";
@@ -47,7 +47,7 @@ export function ArticleForm({ id, kind, initial, image, files, draftOnly }: {
         {!draftOnly && <Field label="Trạng thái">
           <Select value={v.published ? "1" : "0"} onChange={(e) => setV({ ...v, published: e.target.value === "1" })}><option value="1">Hiển thị công khai</option><option value="0">Bản nháp (ẩn)</option></Select>
         </Field>}
-        <Field label="Tiêu đề" required error={errors.title} className="sm:col-span-2"><Input value={v.title} onChange={set("title")} /></Field>
+        <Field label="Tiêu đề" required error={errors.title} className="sm:col-span-2"><WrapInput value={v.title} onChange={set("title")} /></Field>
         {kind === "EVENT" && (
           <>
             <Field label="Thời gian diễn ra" required error={errors.eventAt}><Input type="datetime-local" value={v.eventAt} onChange={set("eventAt")} /></Field>
@@ -102,7 +102,7 @@ export function ReportForm({ id, departments, fixedDepartment, initial, image }:
           <Select value={v.departmentId} onChange={(e) => setV({ ...v, departmentId: e.target.value })}><option value="">Chọn Chi đoàn</option>{departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}</Select>
         )}
       </Field>
-      <Field label="Tiêu đề báo cáo" required error={errors.title}><Input value={v.title} onChange={(e) => setV({ ...v, title: e.target.value })} placeholder="Ví dụ: Báo cáo hoạt động tháng 10" /></Field>
+      <Field label="Tiêu đề báo cáo" required error={errors.title}><WrapInput value={v.title} onChange={(e) => setV({ ...v, title: e.target.value })} placeholder="Ví dụ: Báo cáo hoạt động tháng 10" /></Field>
       <Field label="Nội dung" required error={errors.content} hint={FORMAT_HINT}><Textarea className="min-h-72" value={v.content} onChange={(e) => setV({ ...v, content: e.target.value })} /></Field>
       <Field label="Ảnh minh họa"><ImageUpload folder="activities" value={img} onChange={setImg} /></Field>
       <div className="flex gap-2">

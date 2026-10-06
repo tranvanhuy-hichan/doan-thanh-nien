@@ -1,14 +1,17 @@
 import ExcelJS from "exceljs";
 import { getCurrentUser } from "@/lib/auth/session";
 import { activityReport, memberReport } from "@/lib/services/reports";
+import { rangeFromParams } from "@/lib/school-calendar";
+import { loadCalendars } from "@/lib/services/school-calendar";
 import { formatDateTime, formatHours } from "@/utils";
 
 export async function GET(req: Request) {
   const user = await getCurrentUser();
   if (!user || user.mustChangePassword || user.role !== "ADMIN") return new Response("Forbidden", { status: 403 });
-  const month = new URL(req.url).searchParams.get("month") ?? undefined;
+  const q = new URL(req.url).searchParams;
+  const range = rangeFromParams(await loadCalendars(), q.get("nh"), q.get("tuan"));
 
-  const [acts, members] = await Promise.all([activityReport(user, month), memberReport(user)]);
+  const [acts, members] = await Promise.all([activityReport(user, range), memberReport(user)]);
   const wb = new ExcelJS.Workbook();
   const ws1 = wb.addWorksheet("Hoạt động");
   ws1.columns = [
@@ -28,7 +31,7 @@ export async function GET(req: Request) {
   return new Response(buf as ArrayBuffer, {
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "Content-Disposition": `attachment; filename="bao-cao-doan${month ? "-" + month : ""}.xlsx"`,
+      "Content-Disposition": `attachment; filename="bao-cao-doan${q.get("nh") ? "-" + q.get("nh") + (q.get("tuan") ? "-" + q.get("tuan") : "") : ""}.xlsx"`,
     },
   });
 }

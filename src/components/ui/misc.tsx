@@ -27,16 +27,24 @@ export function Avatar({ name, src, size = 32 }: { name: string; src?: string | 
   );
 }
 
-export function PageHeader({ title, description, actions }: {
+export function PageHeader({ title, description, actions, stackActions }: {
   title: string; description?: string; actions?: React.ReactNode;
+  /** Tiêu đề dài (trang chi tiết): trên mobile nút thao tác luôn xuống hàng riêng thay vì ép tiêu đề hẹp. */
+  stackActions?: boolean;
 }) {
   return (
     <div className="mb-5">
-      <div className="flex items-center justify-between gap-x-3 gap-y-2 sm:items-start">
-        <h1 className="min-w-0 text-xl font-semibold">{title}</h1>
-        {actions && <div className="page-actions flex max-w-full shrink-0 flex-wrap items-center justify-end gap-1.5 sm:gap-2">{actions}</div>}
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:items-start">
+        {stackActions ? (
+          // Trang chi tiết: tiêu đề + mô tả đi liền nhau, nút thao tác xuống hàng riêng (mobile)
+          <div className="min-w-[10rem] flex-1 max-sm:basis-full">
+            <h1 className="text-xl font-semibold">{title}</h1>
+            {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
+          </div>
+        ) : <h1 className="min-w-[10rem] flex-1 text-xl font-semibold">{title}</h1>}
+        {actions && <div className="page-actions ml-auto flex max-w-full shrink-0 flex-wrap items-center justify-end gap-1.5 sm:gap-2">{actions}</div>}
       </div>
-      {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
+      {description && !stackActions && <p className="mt-0.5 text-sm text-muted">{description}</p>}
     </div>
   );
 }

@@ -6,7 +6,9 @@ import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
 import { activityScope, categories } from "@/lib/services/queries";
 import { activityStatus } from "@/lib/services/activity-status";
-import { formatDateTime, monthParamRange, pageParam, str } from "@/utils";
+import { formatDateTime, pageParam, str } from "@/utils";
+import { rangeFromParams } from "@/lib/school-calendar";
+import { loadCalendars } from "@/lib/services/school-calendar";
 import { buttonClass } from "@/components/ui/button";
 import { DataTable, EmptyState, PageHeader, Pagination, Td, Th } from "@/components/ui/misc";
 import { FilterBar } from "@/components/ui/filter-bar";
@@ -18,7 +20,8 @@ const PAGE_SIZE = 12;
 export default async function ActivitiesPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const user = await requireUser();
   const sp = await searchParams;
-  const q = str(sp.q), cat = str(sp.cat), status = str(sp.status), month = str(sp.month);
+  const q = str(sp.q), cat = str(sp.cat), status = str(sp.status), nh = str(sp.nh), tuan = str(sp.tuan);
+  const calendars = await loadCalendars();
   const page = pageParam(sp.page);
   const now = new Date();
 
@@ -27,7 +30,7 @@ export default async function ActivitiesPage({ searchParams }: { searchParams: P
     : status === "ONGOING" ? { cancelledAt: null, startAt: { lte: now }, endAt: { gte: now } }
     : status === "ENDED" ? { cancelledAt: null, endAt: { lt: now } }
     : status === "CANCELLED" ? { cancelledAt: { not: null } } : {};
-  const range = monthParamRange(month);
+  const range = rangeFromParams(calendars, nh, tuan);
   const monthWhere: Prisma.ActivityWhereInput = range ? { startAt: { gte: range.from, lt: range.to } } : {};
   const where: Prisma.ActivityWhereInput = {
     AND: [activityScope(user), statusWhere, monthWhere, q ? { title: { contains: q, mode: "insensitive" } } : {}, cat ? { categoryId: cat } : {}],
@@ -50,7 +53,7 @@ export default async function ActivitiesPage({ searchParams }: { searchParams: P
         { type: "select", name: "cat", label: "Loại hoạt động", options: cats.map((c) => ({ value: c.id, label: c.name })) },
         { type: "select", name: "status", label: "Trạng thái", options: [
           { value: "UPCOMING", label: "Sắp diễn ra" }, { value: "ONGOING", label: "Đang diễn ra" }, { value: "ENDED", label: "Đã kết thúc" }, { value: "CANCELLED", label: "Đã hủy" }] },
-        { type: "month", name: "month" },
+        { type: "schoolweek", name: "nh", calendars },
       ]} />
       {activities.length === 0 ? (
         <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Chưa có hoạt động nào" description={canCreate ? "Tạo hoạt động đầu tiên để bắt đầu điểm danh." : "Các hoạt động mới sẽ xuất hiện tại đây."} /></div>
@@ -85,7 +88,7 @@ export default async function ActivitiesPage({ searchParams }: { searchParams: P
         </div>
         </>
       )}
-      <Pagination page={page} pageSize={PAGE_SIZE} total={total} basePath="/activities" params={{ q, cat, status, month }} />
+      <Pagination page={page} pageSize={PAGE_SIZE} total={total} basePath="/activities" params={{ q, cat, status, nh, tuan }} />
     </>
   );
 }

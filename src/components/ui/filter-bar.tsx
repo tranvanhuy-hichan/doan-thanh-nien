@@ -3,6 +3,34 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Search, X } from "lucide-react";
 import { Input, Select } from "./form";
+import { currentWeek, schoolYearOf, weekLabel, yearLabel, type SchoolCalendar } from "@/lib/school-calendar";
+
+/** Lọc theo NĂM HỌC rồi TUẦN (hoặc học kỳ / cả năm học). Tuần hiện thị kèm ngày tháng, ví dụ "Tuần 1 (05/09 – 11/09)". */
+function SchoolWeekFilter({ calendars, nh, tuan, onChange }: { calendars: SchoolCalendar[]; nh: string; tuan: string; onChange: (nh: string, tuan: string) => void }) {
+  const cur = schoolYearOf();
+  const cal = calendars.find((c) => String(c.startYear) === nh);
+  const nowWeek = cal ? currentWeek(cal) : null;
+  const cls = "max-sm:min-w-[calc(50%-0.25rem)] max-sm:flex-1";
+  const week = (n: number) => <option key={n} value={String(n)}>{weekLabel(cal!, n)}{n === nowWeek ? " · hiện tại" : ""}</option>;
+  return (
+    <>
+      <Select aria-label="Năm học" value={nh} onChange={(e) => onChange(e.target.value, tuan)} className={`w-auto min-w-36 ${cls}`}>
+        {calendars.map((c) => <option key={c.startYear} value={c.startYear}>Năm học {yearLabel(c.startYear)}{c.startYear === cur ? " (hiện tại)" : ""}</option>)}
+      </Select>
+      <Select aria-label="Tuần" value={tuan} onChange={(e) => onChange(nh, e.target.value)} className={`w-auto min-w-52 ${cls}`}>
+        <option value="">Cả năm học</option>
+        {cal && (
+          <>
+            <option value="hk1">Học kỳ 1 (Tuần 1–{cal.sem1Weeks})</option>
+            <option value="hk2">Học kỳ 2 (Tuần {cal.sem1Weeks + 1}–{cal.totalWeeks})</option>
+            <optgroup label="Học kỳ 1">{Array.from({ length: cal.sem1Weeks }, (_, i) => week(i + 1))}</optgroup>
+            <optgroup label="Học kỳ 2">{Array.from({ length: cal.totalWeeks - cal.sem1Weeks }, (_, i) => week(cal.sem1Weeks + i + 1))}</optgroup>
+          </>
+        )}
+      </Select>
+    </>
+  );
+}
 
 /** Lọc theo Tháng + Năm tách riêng. Chỉ chọn năm = cả năm; giá trị: `YYYY` hoặc `YYYY-MM`. */
 function MonthYearFilter({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -29,7 +57,9 @@ function MonthYearFilter({ value, onChange }: { value: string; onChange: (v: str
 export type FilterField =
   | { type: "search"; name: string; placeholder: string }
   | { type: "select"; name: string; label: string; options: { value: string; label: string }[] }
-  | { type: "month"; name: string };
+  | { type: "month"; name: string }
+  /** Lọc theo năm học + tuần/học kỳ (URL: ?nh=2026&tuan=3|hk1|hk2). `name` luôn là "nh". */
+  | { type: "schoolweek"; name: "nh"; calendars: SchoolCalendar[] };
 
 /** Bộ lọc đồng bộ với URL (search params) -> render phía server, có thể chia sẻ link. */
 export function FilterBar({ fields }: { fields: FilterField[] }) {
@@ -65,6 +95,15 @@ export function FilterBar({ fields }: { fields: FilterField[] }) {
             <option value="">{f.label}</option>
             {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </Select>
+        ) : f.type === "schoolweek" ? (
+          <SchoolWeekFilter key="schoolweek" calendars={f.calendars} nh={sp.get("nh") || String(schoolYearOf())} tuan={sp.get("tuan") ?? ""}
+            onChange={(nh, tuan) => {
+              const next = new URLSearchParams(sp.toString());
+              if (nh) next.set("nh", nh); else next.delete("nh");
+              if (nh && tuan) next.set("tuan", tuan); else next.delete("tuan");
+              next.delete("page");
+              start(() => router.replace(`${pathname}?${next}`));
+            }} />
         ) : (
           <MonthYearFilter key={f.name} value={sp.get(f.name) ?? ""} onChange={(v) => update(f.name, v)} />
         ),

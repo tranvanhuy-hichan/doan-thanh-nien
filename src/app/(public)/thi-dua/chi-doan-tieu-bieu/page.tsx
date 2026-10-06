@@ -1,13 +1,15 @@
 import { Trophy } from "lucide-react";
 import { cachedRanking } from "@/lib/services/emulation";
 import { currentValue, resolvePeriod } from "@/lib/emulation-period";
+import { loadCalendars } from "@/lib/services/school-calendar";
 import { PageTitle } from "@/components/public/blocks";
 
 export const metadata = { title: "Chi đoàn tiêu biểu" };
 export const revalidate = 300;
 
 export default async function ExemplaryPage() {
-  const periods = [resolvePeriod("semester", currentValue("semester"))!, resolvePeriod("year", currentValue("year"))!];
+  const cals = await loadCalendars();
+  const periods = [resolvePeriod("semester", currentValue("semester", new Date(), cals), cals)!, resolvePeriod("year", currentValue("year", new Date(), cals), cals)!];
   const results = await Promise.all(periods.map(async (p) => ({ period: p, ranking: await cachedRanking(p.type, p.value) })));
   return (
     <>

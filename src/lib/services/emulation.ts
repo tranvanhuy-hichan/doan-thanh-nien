@@ -49,7 +49,8 @@ export async function emulationRanking(period: Period): Promise<RankRow[]> {
 /** Bản có cache 5 phút cho các trang công khai (nhiều người xem, dữ liệu ít đổi). */
 export const cachedRanking = unstable_cache(
   async (type: PeriodType, value: string) => {
-    const period = resolvePeriod(type, value);
+    const { loadCalendars } = await import("@/lib/services/school-calendar");
+    const period = resolvePeriod(type, value, await loadCalendars());
     return period ? emulationRanking(period) : [];
   },
   ["emulation-ranking"],

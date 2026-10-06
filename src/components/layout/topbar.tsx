@@ -35,7 +35,7 @@ function Breadcrumb() {
       {crumbs.map((c, i) => {
         const last = i === crumbs.length - 1;
         return (
-          <span key={c.href} className={cn("min-w-0 items-center gap-1 sm:gap-1.5", last ? "flex" : "flex shrink-0 text-muted", i < crumbs.length - 2 && "max-sm:hidden")}>
+          <span key={c.href} className={cn("min-w-0 items-center gap-1 sm:gap-1.5", last ? "flex" : "flex shrink-0 text-muted", i < crumbs.length - 1 && "max-sm:hidden")}>
             {last ? <span className="truncate font-semibold">{c.label}</span> : <><Link href={c.href} className="hover:text-primary">{c.label}</Link><ChevronRight className="size-3.5" /></>}
           </span>
         );

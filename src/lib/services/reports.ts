@@ -2,17 +2,13 @@ import "server-only";
 import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
-import { monthParamRange } from "@/utils";
 import { activityScope, memberScope } from "./queries";
 
-export function monthRange(month?: string): Prisma.ActivityWhereInput {
-  const r = monthParamRange(month);
-  return r ? { startAt: { gte: r.from, lt: r.to } } : {};
-}
+export type TimeRange = { from: Date; to: Date } | null;
 
-export async function activityReport(user: SessionUser, month?: string) {
+export async function activityReport(user: SessionUser, range?: TimeRange) {
   const activities = await db.activity.findMany({
-    where: { AND: [activityScope(user), { cancelledAt: null, startAt: { lte: new Date() } }, monthRange(month)] },
+    where: { AND: [activityScope(user), { cancelledAt: null, startAt: { lte: new Date() } }, range ? { startAt: { gte: range.from, lt: range.to } } : {}] },
     orderBy: { startAt: "desc" }, take: 500,
     include: { category: true, department: true, _count: { select: { registrations: { where: { status: "REGISTERED" } }, attendances: user.role === "SECRETARY" ? { where: { member: { departmentId: user.departmentId! } } } : true } } },
   });

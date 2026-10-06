@@ -1,4 +1,5 @@
 import { currentValue, resolvePeriod, PERIOD_LABEL, type PeriodType } from "@/lib/emulation-period";
+import { loadCalendars } from "@/lib/services/school-calendar";
 import { cachedRanking } from "@/lib/services/emulation";
 import { str } from "@/utils";
 import { PageTitle } from "@/components/public/blocks";
@@ -12,13 +13,14 @@ export default async function PublicEmulationPage({ searchParams }: { searchPara
   const sp = await searchParams;
   const raw = str(sp.type);
   const type: PeriodType = raw && raw in PERIOD_LABEL ? (raw as PeriodType) : "month";
-  const period = resolvePeriod(type, str(sp.value) ?? "") ?? resolvePeriod(type, currentValue(type))!;
+  const calendars = await loadCalendars();
+  const period = resolvePeriod(type, str(sp.value) ?? "", calendars) ?? resolvePeriod(type, currentValue(type, new Date(), calendars), calendars)!;
   const ranking = await cachedRanking(period.type, period.value);
   const max = Math.max(1, ...ranking.map((r) => Math.abs(r.total)));
   return (
     <>
       <PageTitle title="Bảng thi đua Chi đoàn" description={period.label} />
-      <PeriodFilter type={period.type} value={period.value} />
+      <PeriodFilter type={period.type} value={period.value} calendars={calendars} />
       {ranking.length === 0 ? <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Chưa có dữ liệu thi đua" /></div> : (
         <>
           <RankingList items={ranking.map((r) => ({ ...r, mine: false, canOpen: false }))} />

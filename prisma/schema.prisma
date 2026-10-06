@@ -107,14 +107,14 @@ model User {
 }
 
 model Department {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String // tên hiện tại, tự đổi theo năm học: 10A1 -> 11A1 -> 12A1
   description String?
   startYear   Int? // năm vào lớp 10 (khóa): 2026 => niên khóa 2026–2029
   graduatedAt DateTime? // đã ra trường (tài khoản bị khóa, không còn trong thi đua)
-  secretaryId String?  @unique
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  secretaryId String?   @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   secretary        User?             @relation(fields: [secretaryId], references: [id], onDelete: SetNull)
   classes          Class[]
@@ -564,4 +564,12 @@ model PollVote {
 
   @@unique([pollId, userId, optionId])
   @@index([pollId, userId])
+}
+
+/// Lịch năm học: ngày bắt đầu Tuần 1 và số tuần. Lịch giáo dục tính theo tuần (Tuần 1 bắt đầu từ `week1Start`).
+model SchoolYear {
+  startYear  Int    @id // năm bắt đầu của năm học (2026 = năm học 2026–2027)
+  week1Start String // yyyy-MM-dd (giờ VN): ngày bắt đầu Tuần 1
+  sem1Weeks  Int    @default(18) // số tuần học kỳ 1
+  totalWeeks Int    @default(35) // tổng số tuần (HK1 + HK2)
 }

@@ -89,3 +89,10 @@ src/lib/qr            QR token ký HMAC, sống 90 giây
 - Bầu bí thư mới → chọn đoàn viên khác; bí thư cũ tự trở lại là đoàn viên thường. **Gỡ chức bí thư** cũng chỉ bỏ vai trò, tài khoản vẫn là đoàn viên.
 - Khi tạo Chi đoàn, Admin có thể dán danh sách họ tên (mỗi dòng một người): hệ thống tự tạo lớp, hồ sơ đoàn viên và tài khoản (tên đăng nhập = mã đoàn viên, mật khẩu tạm thời hiện một lần, tải được CSV). Có thể nhập thêm bằng file Excel ở mục Đoàn viên.
 - Tài khoản bí thư tạo trước đây (như `bithu.10a1`) đã được tự bổ sung hồ sơ đoàn viên.
+
+## Lịch năm học theo tuần & bộ lọc
+
+- Giáo dục tính thời gian theo **tuần**: Admin đặt **ngày bắt đầu Tuần 1**, số tuần học kỳ 1 và tổng số tuần ở **Cài đặt → Năm học** (mặc định Tuần 1 = 05/09, HK1 18 tuần, cả năm 35 tuần). Năm chưa đặt dùng mặc định.
+- Bộ lọc thời gian dùng chung (hoạt động, lịch sử, báo cáo + xuất Excel, lịch hoạt động công khai): chọn **Năm học** rồi **Tuần** (hiện kèm ngày tháng, ví dụ "Tuần 1 (05/09 – 11/09)"), hoặc **Học kỳ 1/2**, hoặc cả năm học. URL: `?nh=2026&tuan=3|hk1|hk2`.
+- Thi đua: kỳ **Tuần / Học kỳ / Năm học** theo lịch này (tuần có dạng `2026-T03`); kỳ **Tháng** vẫn theo lịch dương.
+- Trang công khai **Lịch hoạt động** hiển thị theo tuần (mặc định tuần hiện tại, có nút tuần trước/sau).

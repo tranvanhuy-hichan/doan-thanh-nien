@@ -3,6 +3,8 @@ import { CompactList } from "@/components/ui/compact-list";
 import { Download } from "lucide-react";
 import { requireRole } from "@/lib/auth/session";
 import { activityReport } from "@/lib/services/reports";
+import { rangeFromParams } from "@/lib/school-calendar";
+import { loadCalendars } from "@/lib/services/school-calendar";
 import { departmentRanking } from "@/lib/services/stats";
 import { formatDateTime, pageParam, str } from "@/utils";
 import { buttonClass } from "@/components/ui/button";
@@ -15,17 +17,19 @@ const PAGE_SIZE = 10;
 export default async function ReportsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const user = await requireRole(["ADMIN"]);
   const sp = await searchParams;
-  const month = str(sp.month);
+  const nh = str(sp.nh), tuan = str(sp.tuan);
+  const calendars = await loadCalendars();
+  const range = rangeFromParams(calendars, nh, tuan);
   const page = pageParam(sp.page);
-  const [rows, ranking] = await Promise.all([activityReport(user, month), user.role === "ADMIN" ? departmentRanking() : Promise.resolve([])]);
+  const [rows, ranking] = await Promise.all([activityReport(user, range), user.role === "ADMIN" ? departmentRanking() : Promise.resolve([])]);
   const attended = rows.reduce((s, r) => s + r._count.attendances, 0);
   const expected = rows.reduce((s, r) => s + r.expected, 0);
   const rate = expected ? Math.min(100, Math.round((attended / expected) * 100)) : 0;
   return (
     <>
       <PageHeader title="Báo cáo" description={user.role === "SECRETARY" ? `Chi đoàn ${user.departmentName}` : "Toàn trường"}
-        actions={<a href={`/api/reports/export${month ? `?month=${month}` : ""}`} className={buttonClass("secondary")}><Download className="size-4" />Xuất Excel</a>} />
-      <FilterBar fields={[{ type: "month", name: "month" }]} />
+        actions={<a href={`/api/reports/export${nh ? `?nh=${nh}${tuan ? `&tuan=${tuan}` : ""}` : ""}`} className={buttonClass("secondary")}><Download className="size-4" />Xuất Excel</a>} />
+      <FilterBar fields={[{ type: "schoolweek", name: "nh", calendars }]} />
       <div className="grid grid-cols-3 gap-6 sm:max-w-xl">
         <Stat label="Hoạt động đã diễn ra" value={rows.length} />
         <Stat label="Lượt tham gia" value={attended} />
@@ -50,7 +54,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
           </div>
           </>
         )}
-        <Pagination page={page} pageSize={PAGE_SIZE} total={rows.length} basePath="/reports" params={{ month }} />
+        <Pagination page={page} pageSize={PAGE_SIZE} total={rows.length} basePath="/reports" params={{ nh, tuan }} />
       </Section>
       {user.role === "ADMIN" && ranking.length > 0 && (
         <Section title="Xếp hạng Chi đoàn (toàn thời gian)">

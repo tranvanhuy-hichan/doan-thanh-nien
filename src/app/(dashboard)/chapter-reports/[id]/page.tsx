@@ -18,7 +18,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ i
   if (!r || !canManageDepartment(user, r.departmentId)) notFound();
   return (
     <>
-      <PageHeader title={r.title} description={`Chi đoàn ${r.department.name} · ${formatDate(r.createdAt)}`}
+      <PageHeader title={r.title} stackActions description={`Chi đoàn ${r.department.name} · ${formatDate(r.createdAt)}`}
         actions={<>
           <Link href={`/bao-cao-chi-doan/bao-cao/${r.id}`} target="_blank" className={buttonClass("secondary")}><ExternalLink className="size-4" /><span className="max-sm:hidden">Xem công khai</span></Link>
           <ReportRowActions id={r.id} backToList />

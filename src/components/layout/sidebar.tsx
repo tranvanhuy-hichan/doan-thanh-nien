@@ -13,7 +13,8 @@ function NavGroup({ item, labels }: { item: NavItem; labels: string }) {
   const pathname = usePathname();
   const children = item.children ?? [];
   const inside = children.some((c) => pathname === c.href || pathname.startsWith(c.href + "/")) || pathname.startsWith((item.match ?? item.href) + "/");
-  const [open, setOpen] = useState(inside);
+  // Nhóm menu luôn mở sẵn (vẫn có thể thu gọn thủ công, và tự mở lại khi vào một mục bên trong).
+  const [open, setOpen] = useState(true);
   useEffect(() => { if (inside) setOpen(true); }, [inside]);
   return (
     <div>
@@ -55,7 +56,7 @@ function SidebarBody({ items, labels, onNavigate }: { items: NavItem[]; labels: 
   return (
     <>
       <div className="flex items-center gap-3 border-b border-white/15 px-4 py-4">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white"><DoanLogo className="h-8" /></span>
+        <DoanLogo className="h-10 shrink-0 drop-shadow" />
         <div className={cn("min-w-0 leading-tight", labels)}>
           <div className="text-[13px] font-semibold text-white">Trường THPT Sơn Hà</div>
           <div className="text-xs text-blue-100">Đoàn TNCS Hồ Chí Minh</div>

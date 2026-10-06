@@ -7,7 +7,9 @@ import { Tabs } from "@/components/ui/tabs";
 import { Avatar } from "@/components/ui/misc";
 import { AvatarEditor } from "@/components/members/avatar-editor";
 import { NameForm } from "@/components/members/name-form";
-import { Bell, History, KeyRound, ListChecks, UserRound } from "lucide-react";
+import { Bell, CalendarRange, History, KeyRound, ListChecks, UserRound } from "lucide-react";
+import { loadCalendars } from "@/lib/services/school-calendar";
+import { SchoolYearManager } from "@/components/settings/school-year-manager";
 import { NotificationControls } from "@/components/notifications/controls";
 import { ChangePasswordForm } from "@/components/members/change-password-form";
 import { CategoryFormButton, DeleteCategoryButton } from "@/components/members/category-manager";
@@ -21,13 +23,15 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     { key: "account", label: "Tài khoản", icon: <UserRound className="size-4" /> },
     { key: "notifications", label: "Thông báo", icon: <Bell className="size-4" /> },
     { key: "password", label: "Mật khẩu", icon: <KeyRound className="size-4" /> },
-    ...(admin ? [{ key: "categories", label: "Loại hoạt động", icon: <ListChecks className="size-4" /> }, { key: "logs", label: "Nhật ký", icon: <History className="size-4" /> }] : []),
+    ...(admin ? [{ key: "schoolyear", label: "Năm học", icon: <CalendarRange className="size-4" /> }, { key: "categories", label: "Loại hoạt động", icon: <ListChecks className="size-4" /> }, { key: "logs", label: "Nhật ký", icon: <History className="size-4" /> }] : []),
   ];
   const requested = (await searchParams).tab;
   const tab = tabs.some((t) => t.key === requested) ? requested! : "account";
 
   // Chỉ nạp dữ liệu của tab đang mở.
   const categories = admin && tab === "categories" ? await db.activityCategory.findMany({ orderBy: { name: "asc" }, include: { _count: { select: { activities: true } } } }) : [];
+  const customYears = admin && tab === "schoolyear" ? new Set((await db.schoolYear.findMany({ select: { startYear: true } })).map((r) => r.startYear)) : new Set<number>();
+  const calendars = admin && tab === "schoolyear" ? await loadCalendars() : [];
   const logs = admin && tab === "logs" ? await db.auditLog.findMany({ orderBy: { createdAt: "desc" }, take: 30, include: { user: { select: { fullName: true, username: true } } } }) : [];
 
   return (
@@ -58,6 +62,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       {tab === "notifications" && <div className="max-w-sm"><NotificationControls /></div>}
 
       {tab === "password" && <div className="max-w-sm"><ChangePasswordForm /></div>}
+
+      {tab === "schoolyear" && <SchoolYearManager rows={calendars.map((c) => ({ ...c, custom: customYears.has(c.startYear) }))} />}
 
       {tab === "categories" && (
         <>
