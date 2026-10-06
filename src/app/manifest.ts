@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Đoàn trường THPT Sơn Hà",
     short_name: "Đoàn trường THPT Sơn Hà",
     description: "Quản lý đoàn viên và hoạt động Đoàn - Trường THPT Sơn Hà",
-    start_url: "/dashboard",
+    start_url: "/start.html", // trang khởi động tĩnh (nền xanh) rồi chuyển vào /dashboard
     scope: "/",
     display: "standalone",
     orientation: "portrait",

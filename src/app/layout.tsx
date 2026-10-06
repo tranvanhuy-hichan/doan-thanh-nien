@@ -30,14 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="vi">
       <head><style dangerouslySetInnerHTML={{ __html: SPLASH_CSS }} /></head>
       <body className="font-sans antialiased">
-        {/* Màn hình chờ khi mở app đã cài (chỉ hiện ở chế độ standalone) */}
-        <div id="app-splash" aria-hidden="true">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-doan.webp" alt="" width={102} height={112} />
-          <b>Đoàn trường THPT Sơn Hà</b>
-          <span>Đoàn TNCS Hồ Chí Minh</span>
-          <i />
-        </div>
+        {/* Màn hình chờ khi mở app đã cài (chỉ hiện ở chế độ standalone); do React quản lý nên gỡ an toàn */}
         <AppSplash />
         {children}
         <Toaster position="top-right" richColors closeButton toastOptions={{ style: { fontSize: "14px" } }} />

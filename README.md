@@ -112,3 +112,8 @@ src/lib/qr            QR token ký HMAC, sống 90 giây
 - **Android (Chrome):** màn hình khởi động do hệ điều hành dựng từ `manifest` (nền `#0b63b8`, biểu tượng nền xanh, tên ứng dụng). Cần **gỡ rồi cài lại** ứng dụng để Android cập nhật.
 - **iOS (Safari):** dùng 14 ảnh khởi động ở `public/splash/` (nền xanh + huy hiệu + tên), khai báo trong `src/app/layout.tsx`. Tạo lại bằng `node scripts/gen-splash.mjs`. iOS chỉ dùng ảnh khi thiết bị khớp đúng kích thước đã khai báo, và cũng cần **gỡ rồi thêm lại** vào màn hình chính.
 - **Trong lúc trang tải:** có một lớp phủ nền xanh + huy hiệu + tên hiển thị ngay từ khung hình đầu và mờ dần khi ứng dụng sẵn sàng (tối đa 6 giây). Chỉ hiện khi mở từ biểu tượng đã cài (chế độ standalone), trình duyệt thường không thấy.
+
+### Vì sao vẫn có thể thấy màn hình đen lúc đầu, và cách đã xử lý
+
+- Khoảnh khắc đầu tiên khi mở app (trước khi có bất kỳ mã nào của ta chạy) do **hệ điều hành** dựng: Android lấy nền/biểu tượng từ manifest **lúc cài**, iOS lấy ảnh khởi động khớp **đúng cỡ máy**. Nếu cài từ trước khi có cấu hình mới, hoặc cỡ máy không khớp, sẽ còn thấy màn hình đen/trắng cho tới khi cài lại.
+- Khoảng chờ tiếp theo là **chờ máy chủ trả trang** (đặc biệt khi máy chủ "ngủ" lâu chưa gọi). Để không còn màn hình trống, ứng dụng đã cài giờ mở bằng **trang khởi động tĩnh** `public/start.html` (`start_url` trong manifest): nền xanh + huy hiệu + vòng xoay, phục vụ tức thì và được **Service Worker lưu sẵn** (mở lại gần như không chờ mạng), rồi tự chuyển vào `/dashboard`. Trang này giữ nguyên trên màn hình cho tới khi trang đích trả về nên không bị khoảng trắng giữa hai trang.

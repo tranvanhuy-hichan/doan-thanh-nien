@@ -1,6 +1,25 @@
 // Service worker: nhận thông báo đẩy và hiển thị trên thiết bị (cả khi đã đóng app).
-self.addEventListener("install", () => self.skipWaiting());
-self.addEventListener("activate", (e) => e.waitUntil(self.clients.claim()));
+const SHELL = "doan-shell-v1";
+const SHELL_FILES = ["/start.html", "/logo-doan.webp"];
+
+// Lưu sẵn trang khởi động (nền xanh + huy hiệu) để mở app đã cài là hiện NGAY, không chờ mạng/máy chủ.
+self.addEventListener("install", (e) => e.waitUntil(caches.open(SHELL).then((c) => c.addAll(SHELL_FILES)).catch(() => {}).then(() => self.skipWaiting())));
+self.addEventListener("activate", (e) => e.waitUntil((async () => {
+  for (const k of await caches.keys()) if (k.startsWith("doan-shell-") && k !== SHELL) await caches.delete(k);
+  await self.clients.claim();
+})()));
+
+// Chỉ xử lý trang khởi động và logo: phục vụ từ bộ nhớ đệm ngay, đồng thời làm mới nền (stale-while-revalidate).
+self.addEventListener("fetch", (event) => {
+  const url = new URL(event.request.url);
+  if (event.request.method !== "GET" || url.origin !== location.origin || !SHELL_FILES.includes(url.pathname)) return;
+  event.respondWith((async () => {
+    const cache = await caches.open(SHELL);
+    const cached = await cache.match(url.pathname);
+    const fresh = fetch(event.request).then((r) => { if (r.ok) cache.put(url.pathname, r.clone()); return r; }).catch(() => cached);
+    return cached || fresh;
+  })());
+});
 
 self.addEventListener("push", (event) => {
   let data = {};
