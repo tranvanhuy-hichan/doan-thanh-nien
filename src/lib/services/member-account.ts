@@ -55,3 +55,12 @@ export async function createMemberWithAccount(
   const member = await client.member.create({ data: { ...data, code, userId: user.id } });
   return { user, member, tempPassword };
 }
+
+/** Bí thư là một đoàn viên giữ chức vụ: bảo đảm tài khoản bí thư (cũ) cũng có hồ sơ đoàn viên trong Chi đoàn. */
+export async function ensureMemberProfile(client: Client, user: { id: string; fullName: string }, dept: { id: string; name: string }) {
+  const existing = await client.member.findUnique({ where: { userId: user.id } });
+  if (existing) return existing;
+  const cls = await findOrCreateClass(client, dept.id, dept.name);
+  const [code] = await nextMemberCodes(client, new Date().getFullYear(), 1);
+  return client.member.create({ data: { code, userId: user.id, fullName: user.fullName, departmentId: dept.id, classId: cls.id } });
+}

@@ -11,7 +11,7 @@ export default async function EditReportPage({ params }: { params: Promise<{ id:
   const user = await requireRole(["ADMIN", "SECRETARY"]);
   const r = await db.chapterReport.findUnique({ where: { id: (await params).id }, include: { department: { select: { name: true } } } });
   if (!r || !canManageDepartment(user, r.departmentId)) notFound(); // bí thư không sửa được báo cáo của Chi đoàn khác
-  const departments = user.role === "ADMIN" ? await db.department.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }) : [];
+  const departments = user.role === "ADMIN" ? await db.department.findMany({ where: { graduatedAt: null }, orderBy: { name: "asc" }, select: { id: true, name: true } }) : [];
   return (
     <>
       <PageHeader title="Sửa báo cáo" />

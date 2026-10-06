@@ -86,7 +86,7 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     mustChangePassword: user.mustChangePassword,
     memberId: user.member?.id ?? null,
     memberCode: user.member?.code ?? null,
-    avatarUrl: user.member?.avatarUrl ?? null,
+    avatarUrl: user.member?.avatarUrl ?? user.avatarUrl ?? null,
     departmentId: user.secretaryOf?.id ?? user.member?.departmentId ?? null,
     departmentName: user.secretaryOf?.name ?? user.member?.department.name ?? null,
   };

@@ -36,14 +36,14 @@ export type MemberInput = z.infer<typeof memberSchema>;
 export const departmentSchema = z.object({
   name: z.string().trim().min(1, "Nhập tên Chi đoàn").max(50),
   description: optionalText(500),
+  startYear: z.number().int().min(2000, "Năm không hợp lệ").max(2100, "Năm không hợp lệ").optional(),
+  members: z.string().max(20000).optional(), // danh sách họ tên đoàn viên (mỗi dòng một người) để tự tạo tài khoản
 });
 
+/** Bí thư là một đoàn viên của Chi đoàn được gán thêm chức vụ. */
 export const secretarySchema = z.object({
   departmentId: z.string().min(1),
-  mode: z.enum(["existing", "new"]),
-  userId: z.string().optional(),
-  username: z.string().trim().min(3, "Tên đăng nhập tối thiểu 3 ký tự").max(40).regex(/^[a-zA-Z0-9._-]+$/, "Chỉ gồm chữ, số, . _ -").optional(),
-  fullName: z.string().trim().min(2).max(100).optional(),
+  memberId: z.string().min(1, "Chọn đoàn viên làm bí thư"),
 });
 
 export const activitySchema = z

@@ -7,9 +7,10 @@
  *   admin | bithu.10a1, bithu.11a1, bithu.12a1 | SH20260001 … SH20260030
  */
 import { PrismaClient } from "@prisma/client";
+import { schoolYearStart, startYearFor } from "../src/lib/school-year";
 import { hashPassword } from "../src/lib/auth/password";
 import { evaluateBadges } from "../src/lib/services/badges";
-import { createMemberWithAccount, findOrCreateClass, nextMemberCodes } from "../src/lib/services/member-account";
+import { createMemberWithAccount, ensureMemberProfile, findOrCreateClass, nextMemberCodes } from "../src/lib/services/member-account";
 
 const db = new PrismaClient();
 const DEMO_PASSWORD = "Doan@2026";
@@ -52,7 +53,7 @@ export async function seedDemo() {
     const sec = await db.user.create({
       data: { username: `bithu.${d.name.toLowerCase()}`, fullName: d.sec, role: "SECRETARY", passwordHash, mustChangePassword: false },
     });
-    const dept = await db.department.create({ data: { name: d.name, secretaryId: sec.id } });
+    const dept = await db.department.create({ data: { name: d.name, startYear: startYearFor(Number(d.name.slice(0, 2)), schoolYearStart()), secretaryId: sec.id } });
     depts.push({ id: dept.id, name: d.name, secretaryId: sec.id });
   }
 
@@ -73,6 +74,12 @@ export async function seedDemo() {
     );
     await db.user.update({ where: { id: member.userId }, data: { mustChangePassword: false } });
     members.push({ id: member.id, userId: member.userId, departmentId: dept.id });
+  }
+
+  // Bí thư cũng là đoàn viên (cùng một tài khoản): tạo hồ sơ đoàn viên cho tài khoản bí thư
+  for (const d of depts) {
+    const u = await db.user.findUniqueOrThrow({ where: { id: d.secretaryId } });
+    await ensureMemberProfile(db, u, d);
   }
 
   // Huy hiệu mẫu

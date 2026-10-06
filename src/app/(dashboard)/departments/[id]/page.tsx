@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { requireRole } from "@/lib/auth/session";
 import { canManageDepartment } from "@/lib/permissions";
 import { participationRate } from "@/lib/services/queries";
+import { cohortLabel } from "@/lib/school-year";
 import { formatDateShort, pageParam } from "@/utils";
 import { DeleteDepartmentButton, DepartmentFormButton, SecretaryButton } from "@/components/members/department-actions";
 import { Avatar, DataTable, EmptyState, PageHeader, Pagination, Section, Stat, Td, Th } from "@/components/ui/misc";
@@ -23,19 +24,19 @@ export default async function DepartmentDetailPage({ params, searchParams }: { p
     include: { secretary: { select: { id: true, fullName: true, username: true } }, _count: { select: { members: true, activities: true } } },
   });
   if (!dept) notFound();
-  const [rate, points, members, activities, freeSecretaries] = await Promise.all([
+  const [rate, points, members, activities, candidateRows] = await Promise.all([
     participationRate(id),
     db.member.aggregate({ where: { departmentId: id }, _sum: { totalPoints: true } }),
     db.member.findMany({ where: { departmentId: id }, orderBy: [{ totalPoints: "desc" }, { fullName: "asc" }], skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE, include: { class: true } }),
     db.activity.findMany({ where: { departmentId: id }, orderBy: { startAt: "desc" }, take: 5, include: { _count: { select: { attendances: true } } } }),
-    db.user.findMany({ where: { role: "SECRETARY", secretaryOf: null }, select: { id: true, fullName: true, username: true }, orderBy: { fullName: "asc" } }),
+    db.member.findMany({ where: { departmentId: id, status: "ACTIVE" }, orderBy: { fullName: "asc" }, select: { id: true, userId: true, fullName: true, code: true } }),
   ]);
   return (
     <>
-      <PageHeader title={`Chi đoàn ${dept.name}`} description={`Bí thư: ${dept.secretary?.fullName ?? "chưa phân công"}`}
-        actions={<>
-          <SecretaryButton departmentId={dept.id} current={dept.secretary} available={freeSecretaries} />
-          <DepartmentFormButton dept={{ id: dept.id, name: dept.name, description: dept.description }} />
+      <PageHeader title={`Chi đoàn ${dept.name}`} description={`${dept.startYear ? `Niên khóa ${cohortLabel(dept.startYear)} · ` : ""}${dept.graduatedAt ? "Đã ra trường" : `Bí thư: ${dept.secretary?.fullName ?? "chưa phân công"}`}`}
+        actions={dept.graduatedAt ? undefined : <>
+          <SecretaryButton departmentId={dept.id} current={dept.secretary} candidates={candidateRows.map((m) => ({ id: m.id, userId: m.userId, label: `${m.fullName} (${m.code})` }))} />
+          <DepartmentFormButton dept={{ id: dept.id, name: dept.name, description: dept.description, startYear: dept.startYear }} />
           <DeleteDepartmentButton id={dept.id} name={dept.name} />
         </>} />
       <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">

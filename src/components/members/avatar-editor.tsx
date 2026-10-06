@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { updateOwnAvatarAction } from "@/actions/members";
 import { Button } from "@/components/ui/button";
 
-export function AvatarEditor() {
+export function AvatarEditor({ label = "Đổi ảnh thẻ" }: { label?: string }) {
   const ref = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const router = useRouter();
@@ -28,7 +28,7 @@ export function AvatarEditor() {
   return (
     <>
       <input ref={ref} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => pick(e.target.files?.[0])} />
-      <Button variant="secondary" size="sm" loading={busy} onClick={() => ref.current?.click()}>Đổi ảnh thẻ</Button>
+      <Button variant="secondary" size="sm" loading={busy} onClick={() => ref.current?.click()}>{label}</Button>
     </>
   );
 }

@@ -12,7 +12,7 @@ export default async function EditMemberPage({ params }: { params: Promise<{ id:
   const { id } = await params;
   const [m, departments] = await Promise.all([
     db.member.findUnique({ where: { id }, include: { class: true } }),
-    db.department.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    db.department.findMany({ where: { graduatedAt: null }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
   ]);
   if (!m) notFound();
   return (

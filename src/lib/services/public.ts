@@ -56,7 +56,7 @@ export function upcomingActivities(take: number) {
 
 /** Chi đoàn nhóm theo khối (lấy số đầu của tên: 10A1 -> khối 10). */
 export async function departmentsByGrade() {
-  const depts = await db.department.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, _count: { select: { chapterReports: true } } } });
+  const depts = await db.department.findMany({ where: { graduatedAt: null }, orderBy: { name: "asc" }, select: { id: true, name: true, _count: { select: { chapterReports: true } } } });
   const groups = new Map<string, typeof depts>();
   for (const d of depts) {
     const g = d.name.match(/^\d+/)?.[0] ?? "Khác";

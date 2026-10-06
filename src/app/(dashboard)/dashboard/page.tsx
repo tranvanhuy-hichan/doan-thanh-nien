@@ -17,14 +17,14 @@ export const metadata = { title: "Tổng quan" };
 export default async function DashboardPage() {
   const user = await requireUser();
   if (user.role === "ADMIN") return <AdminDashboard />;
-  if (user.role === "SECRETARY") return <SecretaryDashboard departmentId={user.departmentId} name={user.departmentName} />;
+  if (user.role === "SECRETARY") return <SecretaryDashboard departmentId={user.departmentId} name={user.departmentName} memberId={user.memberId} />;
   return <MemberDashboard user={user} />;
 }
 
 async function AdminDashboard() {
   const [members, departments, activities, monthly, ranking, recent] = await Promise.all([
     db.member.count({ where: { status: "ACTIVE" } }),
-    db.department.count(),
+    db.department.count({ where: { graduatedAt: null } }),
     db.activity.count({ where: { cancelledAt: null } }),
     monthlyParticipation(),
     departmentRanking(),
@@ -86,7 +86,7 @@ function RecentTable({ rows }: { rows: { id: string; title: string; startAt: Dat
   );
 }
 
-async function SecretaryDashboard({ departmentId, name }: { departmentId: string | null; name: string | null }) {
+async function SecretaryDashboard({ departmentId, name, memberId }: { departmentId: string | null; name: string | null; memberId: string | null }) {
   if (!departmentId) {
     return <><PageHeader title="Tổng quan" /><EmptyState title="Bạn chưa được phân công Chi đoàn" description="Liên hệ quản trị viên để được phân công." /></>;
   }
@@ -105,7 +105,7 @@ async function SecretaryDashboard({ departmentId, name }: { departmentId: string
   ]);
   return (
     <>
-      <PageHeader title={`Chi đoàn ${name}`} />
+      <PageHeader title={`Chi đoàn ${name}`} actions={memberId ? <Link href="/checkin" className={buttonClass("secondary")}>Quét QR điểm danh</Link> : undefined} />
       <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
         <Stat label="Đoàn viên" value={members} />
         <Stat label="Hoạt động" value={activityCount} />

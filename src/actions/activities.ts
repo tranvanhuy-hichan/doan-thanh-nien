@@ -120,7 +120,7 @@ export async function deleteActivityAction(id: string) {
 
 export async function registerActivityAction(activityId: string, register: boolean) {
   return run(async () => {
-    const user = await requireRole(["MEMBER"]);
+    const user = await requireRole(["MEMBER", "SECRETARY"]);
     if (!user.memberId) throw new UserError("Tài khoản chưa gắn hồ sơ đoàn viên");
     await db.$transaction(async (tx) => {
       const a = await tx.activity.findUnique({ where: { id: activityId } });
@@ -194,7 +194,7 @@ export type CheckinSuccess = { activityTitle: string; fullName: string; classNam
 
 export async function checkInAction(token: string) {
   return run<CheckinSuccess>(async () => {
-    const user = await requireRole(["MEMBER"]);
+    const user = await requireRole(["MEMBER", "SECRETARY"]);
     if (!user.memberId) throw new UserError("Tài khoản chưa gắn hồ sơ đoàn viên");
     const parsed = await verifyCheckinToken(token);
     if (!parsed) throw new UserError("Mã QR không hợp lệ hoặc đã hết hạn, hãy quét lại mã đang hiển thị");

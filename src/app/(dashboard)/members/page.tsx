@@ -36,7 +36,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
       include: { class: true, department: true, user: { select: { status: true } } },
     }),
     db.member.count({ where }),
-    user.role === "ADMIN" ? db.department.findMany({ orderBy: { name: "asc" } }) : Promise.resolve([]),
+    user.role === "ADMIN" ? db.department.findMany({ where: { graduatedAt: null }, orderBy: { name: "asc" } }) : Promise.resolve([]),
     db.member.findMany({ where: memberScope(user), distinct: ["cohort"], select: { cohort: true }, orderBy: { cohort: "desc" } }),
   ]);
 

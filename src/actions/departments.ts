@@ -7,19 +7,51 @@ import { audit } from "@/lib/audit";
 import { requireRole } from "@/lib/auth/session";
 import { generateTempPassword, hashPassword } from "@/lib/auth/password";
 import { departmentSchema, secretarySchema } from "@/lib/validation";
+import { parseClassName, schoolYearStart, startYearFor } from "@/lib/school-year";
+import { syncSchoolYear } from "@/lib/services/rollover";
+import { createMemberWithAccount, findOrCreateClass, nextMemberCodes } from "@/lib/services/member-account";
+import type { Credential } from "@/actions/members";
 
 export async function saveDepartmentAction(id: string | null, input: unknown) {
-  return run(async () => {
+  return run<{ created?: Credential[] }>(async () => {
     const admin = await requireRole(["ADMIN"]);
-    const data = departmentSchema.parse(input);
-    const dup = await db.department.findFirst({ where: { name: data.name, ...(id ? { NOT: { id } } : {}) } });
-    if (dup) throw new UserError("Tên Chi đoàn đã tồn tại");
-    const dept = id
-      ? await db.department.update({ where: { id }, data })
-      : await db.department.create({ data });
-    await audit(admin.id, id ? "department.update" : "department.create", "Department", dept.id, { name: dept.name });
+    const { startYear: given, members: memberText, ...data } = departmentSchema.parse(input);
+    const current = id ? await db.department.findUnique({ where: { id }, select: { startYear: true, graduatedAt: true } }) : null;
+    if (current?.graduatedAt) throw new UserError("Chi đoàn đã ra trường, không thể chỉnh sửa");
+    // Khóa (năm vào lớp 10): nhập tay, hoặc giữ khóa cũ, hoặc suy ra từ tên khối (10A1 -> năm học hiện tại).
+    const p = parseClassName(data.name);
+    const startYear = given ?? current?.startYear ?? (p ? startYearFor(p.grade, schoolYearStart()) : null);
+    const dup = await db.department.findFirst({ where: { name: data.name, startYear, ...(id ? { NOT: { id } } : {}) } });
+    if (dup) throw new UserError("Chi đoàn này (cùng tên, cùng khóa) đã tồn tại");
+
+    if (id) {
+      const dept = await db.department.update({ where: { id }, data: { ...data, startYear } });
+      await audit(admin.id, "department.update", "Department", dept.id, { name: dept.name });
+      revalidatePath("/departments");
+      return { message: "Đã cập nhật Chi đoàn" };
+    }
+
+    // Tạo mới: nếu có danh sách họ tên thì tự tạo lớp + đoàn viên + tài khoản (mật khẩu tạm hiển thị một lần).
+    const names = [...new Set((memberText ?? "").split(/\r?\n/).map((l) => l.trim().replace(/\s+/g, " ")).filter(Boolean))];
+    if (names.some((n) => n.length < 2 || n.length > 100)) throw new UserError("Mỗi dòng là một họ tên (2–100 ký tự)");
+    if (names.length > 100) throw new UserError("Mỗi lần tạo tối đa 100 đoàn viên, có thể nhập thêm bằng file Excel ở mục Đoàn viên");
+    const hashed = await Promise.all(names.map(async () => { const password = generateTempPassword(); return { password, passwordHash: await hashPassword(password) }; }));
+    const created: Credential[] = [];
+    const dept = await db.$transaction(async (tx) => {
+      const d = await tx.department.create({ data: { ...data, startYear } });
+      if (names.length) {
+        const cls = await findOrCreateClass(tx, d.id, d.name);
+        const codes = await nextMemberCodes(tx, new Date().getFullYear(), names.length);
+        for (let i = 0; i < names.length; i++) {
+          await createMemberWithAccount(tx, { fullName: names[i], departmentId: d.id, classId: cls.id, cohort: startYear }, codes[i], hashed[i]);
+          created.push({ code: codes[i], fullName: names[i], className: cls.name, department: d.name, password: hashed[i].password });
+        }
+      }
+      await audit(admin.id, "department.create", "Department", d.id, { name: d.name, members: names.length }, tx);
+      return d;
+    }, { timeout: 60_000, maxWait: 10_000 });
     revalidatePath("/departments");
-    return { message: id ? "Đã cập nhật Chi đoàn" : "Đã tạo Chi đoàn" };
+    return { data: { created }, message: created.length ? `Đã tạo Chi đoàn ${dept.name} và ${created.length} tài khoản đoàn viên` : "Đã tạo Chi đoàn" };
   });
 }
 
@@ -36,45 +68,52 @@ export async function deleteDepartmentAction(id: string) {
   });
 }
 
-/** Phân công bí thư: chọn tài khoản bí thư có sẵn hoặc tạo mới (trả về mật khẩu tạm thời một lần). */
+/**
+ * Phân công bí thư: chọn một đoàn viên của Chi đoàn, tài khoản đó được gán thêm vai trò bí thư
+ * (vẫn là tài khoản đoàn viên, giữ quyền đoàn viên). Bí thư cũ trở lại là đoàn viên thường.
+ */
 export async function assignSecretaryAction(input: unknown) {
-  return run<{ username?: string; tempPassword?: string }>(async () => {
+  return run(async () => {
     const admin = await requireRole(["ADMIN"]);
     const data = secretarySchema.parse(input);
     const dept = await db.department.findUnique({ where: { id: data.departmentId } });
-    if (!dept) throw new UserError("Không tìm thấy Chi đoàn");
-
-    let userId: string;
-    let created: { username: string; tempPassword: string } | undefined;
-    if (data.mode === "existing") {
-      if (!data.userId) throw new UserError("Chọn bí thư");
-      const u = await db.user.findFirst({ where: { id: data.userId, role: "SECRETARY" }, include: { secretaryOf: true } });
-      if (!u) throw new UserError("Không tìm thấy tài khoản bí thư");
-      if (u.secretaryOf && u.secretaryOf.id !== dept.id) throw new UserError(`Bí thư này đang phụ trách Chi đoàn ${u.secretaryOf.name}`);
-      userId = u.id;
-    } else {
-      if (!data.username || !data.fullName) throw new UserError("Nhập tên đăng nhập và họ tên bí thư");
-      if (await db.user.findUnique({ where: { username: data.username } })) throw new UserError("Tên đăng nhập đã tồn tại");
-      const tempPassword = generateTempPassword();
-      const u = await db.user.create({
-        data: { username: data.username, fullName: data.fullName, role: "SECRETARY", passwordHash: await hashPassword(tempPassword), mustChangePassword: true },
-      });
-      userId = u.id;
-      created = { username: u.username, tempPassword };
-    }
-    await db.department.update({ where: { id: dept.id }, data: { secretaryId: userId } });
-    await audit(admin.id, "department.assign_secretary", "Department", dept.id, { secretaryId: userId });
+    if (!dept || dept.graduatedAt) throw new UserError("Không tìm thấy Chi đoàn");
+    const member = await db.member.findFirst({ where: { id: data.memberId, departmentId: dept.id, status: "ACTIVE" }, include: { user: true } });
+    if (!member) throw new UserError("Đoàn viên này không thuộc Chi đoàn hoặc không còn sinh hoạt");
+    if (member.user.status !== "ACTIVE") throw new UserError("Tài khoản của đoàn viên này đang bị khóa");
+    if (member.user.role === "ADMIN") throw new UserError("Không thể gán bí thư cho tài khoản quản trị");
+    await db.$transaction([
+      ...(dept.secretaryId && dept.secretaryId !== member.userId ? [db.user.updateMany({ where: { id: dept.secretaryId, member: { isNot: null } }, data: { role: "MEMBER" } })] : []),
+      db.user.update({ where: { id: member.userId }, data: { role: "SECRETARY" } }),
+      db.department.update({ where: { id: dept.id }, data: { secretaryId: member.userId } }),
+    ]);
+    await audit(admin.id, "department.assign_secretary", "Department", dept.id, { secretaryId: member.userId, memberId: member.id });
     revalidatePath("/departments");
-    return { data: created, message: "Đã phân công bí thư" };
+    return { message: `${member.fullName} đã được bầu làm bí thư` };
   });
 }
 
 export async function removeSecretaryAction(departmentId: string) {
   return run(async () => {
     const admin = await requireRole(["ADMIN"]);
-    await db.department.update({ where: { id: departmentId }, data: { secretaryId: null } });
+    const dept = await db.department.findUnique({ where: { id: departmentId } });
+    if (!dept) throw new UserError("Không tìm thấy Chi đoàn");
+    await db.$transaction([
+      ...(dept.secretaryId ? [db.user.updateMany({ where: { id: dept.secretaryId, member: { isNot: null } }, data: { role: "MEMBER" } })] : []),
+      db.department.update({ where: { id: departmentId }, data: { secretaryId: null } }),
+    ]);
     await audit(admin.id, "department.remove_secretary", "Department", departmentId);
     revalidatePath("/departments");
-    return { message: "Đã gỡ bí thư" };
+    return { message: "Đã gỡ chức bí thư (vẫn là đoàn viên)" };
+  });
+}
+
+/** Chuyển năm học thủ công (cron cũng tự chạy mỗi ngày): đổi tên khối, cho khóa lớp 12 ra trường. */
+export async function syncSchoolYearAction() {
+  return run(async () => {
+    const admin = await requireRole(["ADMIN"]);
+    const r = await syncSchoolYear(admin.id);
+    revalidatePath("/", "layout");
+    return { message: r.renamed || r.graduated ? `Năm học ${r.schoolYear}–${r.schoolYear + 1}: đổi tên ${r.renamed} Chi đoàn, ${r.graduated} Chi đoàn ra trường` : `Năm học ${r.schoolYear}–${r.schoolYear + 1}: không có thay đổi` };
   });
 }

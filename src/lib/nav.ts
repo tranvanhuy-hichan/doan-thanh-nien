@@ -29,6 +29,10 @@ export function navFor(role: Role): NavItem[] {
       { href: "/achievements", label: "Thành tích", icon: Award },
       { href: "/polls", label: "Bình chọn", icon: Vote },
       { href: "/chapter-reports", label: "Báo cáo Chi đoàn", icon: FileText },
+      // Bí thư cũng là đoàn viên: có hồ sơ, quét QR, lịch sử như đoàn viên
+      { href: "/profile", label: "Hồ sơ & thẻ số", icon: IdCard },
+      { href: "/checkin", label: "Quét QR", icon: QrCode },
+      { href: "/history", label: "Lịch sử", icon: History },
       {
         href: "/cms/tin-tuc", label: "Bài viết website", icon: Globe, match: "/cms",
         children: [{ href: "/cms/tin-tuc", label: "Tin tức" }, { href: "/cms/ke-hoach", label: "Kế hoạch" }, { href: "/cms/su-kien", label: "Sự kiện" }, { href: "/cms/thong-bao", label: "Thông báo" }],
@@ -60,7 +64,7 @@ export function navFor(role: Role): NavItem[] {
 
 /** Thanh điều hướng dưới (mobile): 4 mục dùng nhiều nhất theo vai trò, phần còn lại nằm trong nút "Thêm". */
 const PRIMARY_MOBILE: Record<Role, string[]> = {
-  ADMIN: ["/dashboard", "/members", "/activities", "/feed"],
+  ADMIN: ["/dashboard", "/departments", "/activities", "/feed"],
   SECRETARY: ["/dashboard", "/activities", "/attendance", "/feed"],
   MEMBER: ["/dashboard", "/activities", "/checkin", "/feed"],
 };

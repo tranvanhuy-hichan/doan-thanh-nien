@@ -121,16 +121,21 @@ export async function adjustPointsAction(input: unknown) {
   });
 }
 
-/** Đoàn viên tự cập nhật ảnh đại diện. */
+/** Tự cập nhật ảnh đại diện: đoàn viên (kể cả bí thư) lưu vào hồ sơ đoàn viên (hiện cả trên thẻ số); tài khoản không có hồ sơ (Admin) lưu ở tài khoản. */
 export async function updateOwnAvatarAction(input: { avatarUrl: string; avatarPublicId: string }) {
   return run(async () => {
     const user = await requireUser();
-    if (!user.memberId) throw new UserError("Chỉ đoàn viên mới có ảnh đại diện");
     if (!isOwnPublicId(input.avatarPublicId, "members") || !input.avatarUrl.startsWith("https://res.cloudinary.com/")) throw new UserError("Ảnh không hợp lệ");
-    const m = await db.member.findUniqueOrThrow({ where: { id: user.memberId } });
-    await db.member.update({ where: { id: m.id }, data: { avatarUrl: input.avatarUrl, avatarPublicId: input.avatarPublicId } });
-    await deleteImage(m.avatarPublicId);
-    revalidatePath("/profile");
+    if (user.memberId) {
+      const m = await db.member.findUniqueOrThrow({ where: { id: user.memberId } });
+      await db.member.update({ where: { id: m.id }, data: { avatarUrl: input.avatarUrl, avatarPublicId: input.avatarPublicId } });
+      await deleteImage(m.avatarPublicId);
+    } else {
+      const u = await db.user.findUniqueOrThrow({ where: { id: user.id } });
+      await db.user.update({ where: { id: user.id }, data: { avatarUrl: input.avatarUrl, avatarPublicId: input.avatarPublicId } });
+      await deleteImage(u.avatarPublicId);
+    }
+    revalidatePath("/", "layout");
     return { message: "Đã cập nhật ảnh" };
   });
 }

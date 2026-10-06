@@ -16,7 +16,7 @@ export default async function EditActivityPage({ params }: { params: Promise<{ i
   if (!a || !canManageActivity(user, a) || a.cancelledAt) notFound();
   const [cats, departments] = await Promise.all([
     categories(),
-    user.role === "ADMIN" ? db.department.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }) : Promise.resolve([]),
+    user.role === "ADMIN" ? db.department.findMany({ where: { graduatedAt: null }, orderBy: { name: "asc" }, select: { id: true, name: true } }) : Promise.resolve([]),
   ]);
   return (
     <>

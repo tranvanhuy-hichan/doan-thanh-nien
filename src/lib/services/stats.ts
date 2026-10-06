@@ -37,7 +37,7 @@ export async function monthlyParticipation(departmentId?: string, months = 6) {
 /** Xếp hạng Chi đoàn theo tỷ lệ tham gia (các hoạt động đã diễn ra). 4 truy vấn song song, kết quả gộp sẵn ở DB. */
 export async function departmentRanking() {
   const [departments, activities, attended] = await Promise.all([
-    db.department.findMany({ select: { id: true, name: true, _count: { select: { members: { where: { status: "ACTIVE" } } } } } }),
+    db.department.findMany({ where: { graduatedAt: null }, select: { id: true, name: true, _count: { select: { members: { where: { status: "ACTIVE" } } } } } }),
     db.activity.groupBy({ by: ["departmentId"], where: { cancelledAt: null, startAt: { lte: new Date() } }, _count: true }),
     db.$queryRaw<{ departmentId: string; count: number }[]>`
       SELECT m."departmentId" AS "departmentId", COUNT(*)::int AS count

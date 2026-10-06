@@ -82,6 +82,8 @@ model User {
   role               Role
   status             AccountStatus @default(ACTIVE)
   mustChangePassword Boolean       @default(true)
+  avatarUrl          String? // ảnh đại diện của tài khoản không có hồ sơ đoàn viên (vd Admin)
+  avatarPublicId     String?
   lastLoginAt        DateTime?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
@@ -106,8 +108,10 @@ model User {
 
 model Department {
   id          String   @id @default(cuid())
-  name        String   @unique
+  name        String // tên hiện tại, tự đổi theo năm học: 10A1 -> 11A1 -> 12A1
   description String?
+  startYear   Int? // năm vào lớp 10 (khóa): 2026 => niên khóa 2026–2029
+  graduatedAt DateTime? // đã ra trường (tài khoản bị khóa, không còn trong thi đua)
   secretaryId String?  @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -119,6 +123,9 @@ model Department {
   posts            Post[]
   emulationRecords EmulationRecord[]
   chapterReports   ChapterReport[]
+
+  @@unique([name, startYear])
+  @@index([graduatedAt])
 }
 
 model Class {

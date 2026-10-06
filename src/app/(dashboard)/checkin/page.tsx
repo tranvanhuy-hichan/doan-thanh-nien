@@ -12,11 +12,11 @@ export const metadata = { title: "Quét QR điểm danh" };
 export default async function CheckinPage({ searchParams }: { searchParams: Promise<{ t?: string }> }) {
   const user = await requireUser();
   const { t } = await searchParams;
-  if (user.role !== "MEMBER") {
+  if (!user.memberId) {
     return (
       <>
         <PageHeader title="Quét QR điểm danh" />
-        <Alert tone="amber">Chỉ tài khoản đoàn viên mới điểm danh bằng QR. Bí thư mở QR tại trang điểm danh của hoạt động.</Alert>
+        <Alert tone="amber">Chỉ tài khoản đoàn viên (kể cả bí thư) mới điểm danh bằng QR. Quản trị viên mở QR tại trang điểm danh của hoạt động.</Alert>
       </>
     );
   }

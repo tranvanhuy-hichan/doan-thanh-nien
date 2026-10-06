@@ -16,7 +16,7 @@ export type RankRow = {
 export async function emulationRanking(period: Period): Promise<RankRow[]> {
   const { from, to } = period;
   const [departments, points, attendance, school] = await Promise.all([
-    db.department.findMany({ select: { id: true, name: true, _count: { select: { members: { where: { status: "ACTIVE" } } } } } }),
+    db.department.findMany({ where: { graduatedAt: null }, select: { id: true, name: true, _count: { select: { members: { where: { status: "ACTIVE" } } } } } }),
     db.$queryRaw<{ departmentId: string; sum: number }[]>`
       SELECT m."departmentId" AS "departmentId", COALESCE(SUM(p.points), 0)::int AS sum
       FROM "PointTransaction" p JOIN "Member" m ON m.id = p."memberId"

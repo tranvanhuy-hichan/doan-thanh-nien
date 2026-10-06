@@ -27,7 +27,7 @@ export default async function EmulationPage({ searchParams }: { searchParams: Pr
     emulationRanking(period),
     db.emulationRecord.findMany({ where: recWhere, orderBy: { recordedAt: "desc" }, skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE, include: { department: { select: { name: true } }, createdBy: { select: { fullName: true } } } }),
     db.emulationRecord.count({ where: recWhere }),
-    admin ? db.department.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }) : Promise.resolve([]),
+    admin ? db.department.findMany({ where: { graduatedAt: null }, orderBy: { name: "asc" }, select: { id: true, name: true } }) : Promise.resolve([]),
   ]);
   const max = Math.max(1, ...ranking.map((r) => Math.abs(r.total)));
 

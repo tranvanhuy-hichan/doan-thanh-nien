@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { run, UserError } from "@/lib/action";
@@ -40,7 +41,8 @@ export async function loginAction(input: unknown) {
       console.error("[login] AUTH_SECRET chưa cấu hình hoặc quá ngắn");
       throw new UserError("Máy chủ chưa cấu hình AUTH_SECRET (tối thiểu 32 ký tự). Liên hệ quản trị viên.");
     }
-    const user = await db.user.findUnique({ where: { username } }).catch((e) => {
+    // Đăng nhập bằng tên đăng nhập hoặc mã đoàn viên (bí thư cũ có tên đăng nhập riêng nhưng vẫn có mã đoàn viên).
+    const user = await db.user.findFirst({ where: { OR: [{ username }, { member: { is: { code: username.toUpperCase() } } }] } }).catch((e) => {
       console.error("[login] Không truy vấn được database", e);
       throw new UserError("Không kết nối được cơ sở dữ liệu. Kiểm tra biến DATABASE_URL trên máy chủ.");
     });
@@ -79,5 +81,19 @@ export async function changePasswordAction(input: unknown) {
     });
     await audit(user.id, "auth.change_password", "User", user.id);
     return { message: "Đã đổi mật khẩu" };
+  });
+}
+
+/** Quản trị viên tự đổi họ tên hiển thị (đoàn viên/bí thư do Admin quản lý hồ sơ). */
+export async function updateOwnNameAction(input: { fullName: string }) {
+  return run(async () => {
+    const user = await requireUser();
+    if (user.role !== "ADMIN") throw new UserError("Chỉ quản trị viên được tự đổi họ tên");
+    const fullName = input.fullName.trim().replace(/\s+/g, " ");
+    if (fullName.length < 2 || fullName.length > 100) throw new UserError("Họ tên từ 2 đến 100 ký tự");
+    await db.user.update({ where: { id: user.id }, data: { fullName } });
+    await audit(user.id, "account.rename", "User", user.id);
+    revalidatePath("/", "layout");
+    return { message: "Đã cập nhật họ tên" };
   });
 }

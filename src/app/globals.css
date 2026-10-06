@@ -90,3 +90,6 @@ body::before {
   .marquee { white-space: normal; }
   .marquee-track { animation: none; padding-left: 0; }
 }
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

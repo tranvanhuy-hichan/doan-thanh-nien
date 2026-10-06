@@ -75,3 +75,17 @@ src/lib/qr            QR token ký HMAC, sống 90 giây
 - **Góp ý ẩn danh**: trang công khai `/gop-y` (không đăng nhập, không lưu danh tính, có ô bẫy bot và giới hạn 30 góp ý/giờ). Admin xem/xử lý ở mục **Góp ý**.
 - **Bình chọn**: Admin tạo ở mục **Bình chọn**; mọi tài khoản đăng nhập bỏ phiếu (đổi được lựa chọn khi chưa kết thúc), kết quả hiện dạng thanh phần trăm.
 - **Đếm ngược**: Admin đặt tên + thời điểm tại **Website công khai → Thông tin website**; hiện đầu trang chủ cho tới khi hết giờ.
+
+## Niên khóa & chuyển năm học
+
+- Mỗi Chi đoàn lưu **năm vào lớp 10** (`startYear`, ví dụ 2026 → niên khóa 2026–2029) và đi cùng học sinh suốt 3 năm; tài khoản, điểm, huy hiệu, lịch sử được giữ nguyên.
+- Năm học bắt đầu **01/09** (giờ VN). Tên khối tự đổi theo năm học (10A1 → 11A1 → 12A1), kể cả tên lớp bên trong Chi đoàn. Việc này chạy tự động mỗi ngày qua `/api/cron/rollover` (idempotent) và Admin có nút **Cập nhật năm học** ở trang Chi đoàn.
+- Quá lớp 12: Chi đoàn chuyển sang **Đã ra trường** (tab riêng ở trang Chi đoàn), đoàn viên chuyển trạng thái "Đã ra trường", tài khoản đoàn viên và bí thư bị khóa; dữ liệu vẫn giữ để tra cứu. Chi đoàn đã ra trường không còn xuất hiện ở danh sách chọn, thi đua và trang công khai.
+- Tạo Chi đoàn mới: nhập tên (vd 10A1); ô "Năm vào lớp 10" để trống thì tự tính theo năm học hiện tại. Tạo trước ngày 01/09 cho khóa sắp vào thì nhập năm của khóa đó.
+
+## Bí thư = đoàn viên giữ chức vụ
+
+- Bí thư **không phải tài khoản riêng**: đó là tài khoản của một đoàn viên trong Chi đoàn, được Admin gán thêm vai trò bí thư (nút **Chọn bí thư** ở trang Chi đoàn). Tài khoản vẫn có hồ sơ, thẻ số, quét QR, lịch sử như đoàn viên, cộng thêm quyền quản lý Chi đoàn của mình.
+- Bầu bí thư mới → chọn đoàn viên khác; bí thư cũ tự trở lại là đoàn viên thường. **Gỡ chức bí thư** cũng chỉ bỏ vai trò, tài khoản vẫn là đoàn viên.
+- Khi tạo Chi đoàn, Admin có thể dán danh sách họ tên (mỗi dòng một người): hệ thống tự tạo lớp, hồ sơ đoàn viên và tài khoản (tên đăng nhập = mã đoàn viên, mật khẩu tạm thời hiện một lần, tải được CSV). Có thể nhập thêm bằng file Excel ở mục Đoàn viên.
+- Tài khoản bí thư tạo trước đây (như `bithu.10a1`) đã được tự bổ sung hồ sơ đoàn viên.

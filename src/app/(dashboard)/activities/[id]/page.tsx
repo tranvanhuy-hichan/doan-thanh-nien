@@ -63,7 +63,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
           <div className="flex items-center gap-2 text-lg font-semibold"><Users className="size-5 text-muted" />
             {a._count.registrations}{a.maxParticipants ? ` / ${a.maxParticipants}` : ""} <span className="text-sm font-normal text-muted">người đăng ký · {a._count.attendances} đã điểm danh</span>
           </div>
-          {user.role === "MEMBER" && !myAtt && (status === "UPCOMING" || status === "ONGOING") && (
+          {user.memberId && !myAtt && (status === "UPCOMING" || status === "ONGOING") && (
             <RegisterButton activityId={a.id} registered={registered} disabled={!registered && full} reason={full ? "Hoạt động đã đủ số lượng" : undefined} />
           )}
         </div>
@@ -78,6 +78,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
           ) : <p className="text-sm text-muted">{status === "CANCELLED" ? "Hoạt động đã bị hủy." : "Điểm danh chưa mở. Bí thư sẽ mở khi hoạt động bắt đầu."}</p>
         ) : manage ? (
           <div className="flex flex-wrap items-center gap-3">
+            {myAtt && <Alert tone="green">Bạn đã điểm danh lúc {formatDateTime(myAtt.checkedInAt)}.</Alert>}
             <AttendanceLink id={a.id} label={a.checkinOpen ? "Quản lý điểm danh (đang mở)" : "Mở điểm danh"} />
             {!canOpenCheckin(a) && !a.checkinOpen && <span className="text-sm text-muted">Chỉ mở được từ 60 phút trước giờ bắt đầu.</span>}
           </div>
