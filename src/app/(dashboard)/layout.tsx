@@ -1,6 +1,6 @@
 import { getSessionUserId, requireUser } from "@/lib/auth/session";
 import { db } from "@/lib/db";
-import { ROLE_LABEL } from "@/lib/nav";
+import { roleLabelOf } from "@/lib/nav";
 import { AppShell } from "@/components/layout/app-shell";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -27,7 +27,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <AppShell
       role={user.role}
       user={{ fullName: user.fullName, avatarUrl: user.avatarUrl }}
-      roleLabel={ROLE_LABEL[user.role]}
+      roleLabel={roleLabelOf(user)}
       unread={unread}
       pushKey={process.env.VAPID_PUBLIC_KEY ?? null}
       badges={pending ? { "/approvals": pending } : undefined}

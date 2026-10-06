@@ -1,13 +1,14 @@
 "use client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { CalendarSync, Download, Pencil, Plus, Trash2, UserCog } from "lucide-react";
-import { syncSchoolYearAction, assignSecretaryAction, deleteDepartmentAction, removeSecretaryAction, saveDepartmentAction } from "@/actions/departments";
+import { CalendarSync, Download, Pencil, Plus, Trash2, UserCog, UserPlus } from "lucide-react";
+import { addMembersToDepartmentAction, syncSchoolYearAction, assignSecretaryAction, deleteDepartmentAction, removeSecretaryAction, saveDepartmentAction } from "@/actions/departments";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/form";
 import { ConfirmButton, Modal } from "@/components/ui/modal";
 import { Alert, DataTable, Td, Th } from "@/components/ui/misc";
-import { downloadCsv } from "@/components/members/credentials";
+import { csvStamp, downloadCsv } from "@/components/members/credentials";
 import type { Credential } from "@/actions/members";
 import { reportResult } from "@/components/ui/submit";
 import { cohortLabel, schoolYearStart } from "@/lib/school-year";
@@ -31,8 +32,8 @@ export function DepartmentFormButton({ dept }: { dept?: Dept }) {
       <Modal open={open} onClose={() => { setOpen(false); setCreated(null); }} title={dept ? "Sửa Chi đoàn" : "Tạo Chi đoàn"} className="max-w-md">
         {created ? (
           <div className="space-y-3">
-            <Alert tone="green">Đã tạo {created.length} tài khoản đoàn viên. <b>Mật khẩu tạm thời chỉ hiển thị một lần</b> – hãy tải về và bàn giao. Sau khi bầu bí thư, dùng nút "Chọn bí thư" để gán quyền cho một đoàn viên.</Alert>
-            <Button variant="secondary" size="sm" onClick={() => downloadCsv(created, `tai-khoan-${name || "chi-doan"}.csv`)}><Download className="size-4" />Tải danh sách tài khoản (CSV)</Button>
+            <Alert tone="green">Đã tạo {created.length} tài khoản đoàn viên. <b>Mật khẩu tạm thời chỉ hiển thị một lần</b> – tệp CSV đã được tải về máy bạn, hãy bàn giao. Sau khi bầu bí thư, dùng nút "Chọn bí thư" để gán quyền cho một đoàn viên.</Alert>
+            <Button variant="secondary" size="sm" onClick={() => downloadCsv(created, `tai-khoan-${name || "chi-doan"}.csv`)}><Download className="size-4" />Tải lại tệp CSV</Button>
             <div className="max-h-60 overflow-y-auto">
               <DataTable>
                 <thead><tr><Th>Tên đăng nhập</Th><Th>Họ tên</Th><Th>Mật khẩu tạm</Th></tr></thead>
@@ -44,8 +45,13 @@ export function DepartmentFormButton({ dept }: { dept?: Dept }) {
         ) : (
         <div className="space-y-3">
           <Field label="Tên Chi đoàn" required hint="Bắt đầu bằng khối (10, 11, 12), ví dụ 12A1 hoặc 12/1. Tên tự đổi khối theo năm học (12/1 → 11/1 → 10/1)."><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ví dụ: 12A1 hoặc 12/1" /></Field>
-          <Field label="Năm vào lớp 10 (khóa)" hint={startYear ? `Niên khóa ${cohortLabel(Number(startYear))}. Để trống: tự tính theo khối trong tên (năm học hiện tại ${schoolYearStart()}–${schoolYearStart() + 1}).` : `Để trống: tự tính theo khối trong tên (năm học hiện tại ${schoolYearStart()}–${schoolYearStart() + 1}).`}>
-            <Input type="number" inputMode="numeric" value={startYear} onChange={(e) => setStartYear(e.target.value)} placeholder={`Ví dụ: ${schoolYearStart()}`} />
+          <Field label="Năm vào lớp 10 (khóa)" hint={startYear ? `Niên khóa ${cohortLabel(Number(startYear))}.` : `Tự tính theo khối trong tên (năm học hiện tại ${schoolYearStart()}–${schoolYearStart() + 1}).`}>
+            <Select value={startYear} onChange={(e) => setStartYear(e.target.value)}>
+              <option value="">Tự động theo tên lớp</option>
+              {[...new Set([schoolYearStart() + 1, schoolYearStart(), schoolYearStart() - 1, schoolYearStart() - 2, schoolYearStart() - 3, ...(startYear ? [Number(startYear)] : [])])].sort((a, b) => b - a).map((y) => (
+                <option key={y} value={y}>{y} · niên khóa {cohortLabel(y)}{y === schoolYearStart() + 1 ? " (khóa sắp vào)" : y === schoolYearStart() ? " (đang lớp 10)" : ""}</option>
+              ))}
+            </Select>
           </Field>
           <Field label="Mô tả"><Textarea value={description} onChange={(e) => setDescription(e.target.value)} className="min-h-16" /></Field>
           {!dept && (
@@ -61,7 +67,7 @@ export function DepartmentFormButton({ dept }: { dept?: Dept }) {
               setBusy(false);
               if (!reportResult(res)) return;
               router.refresh();
-              if (res.data?.created?.length) setCreated(res.data.created);
+              if (res.data?.created?.length) { setCreated(res.data.created); downloadCsv(res.data.created, `tai-khoan-${name.trim() || "chi-doan"}-${csvStamp()}.csv`); }
               else { setOpen(false); if (!dept) { setName(""); setDescription(""); setMemberText(""); } }
             }}>Lưu</Button>
           </div>
@@ -121,5 +127,50 @@ export function SyncSchoolYearButton() {
     <ConfirmButton triggerVariant="secondary" trigger={<><CalendarSync className="size-4" /><span className="max-sm:hidden">Cập nhật năm học</span></>} triggerLabel="Cập nhật năm học"
       title="Cập nhật năm học?" description="Đổi tên khối theo năm học (10A1 → 11A1 → 12A1). Chi đoàn đã quá lớp 12 sẽ chuyển sang ra trường và khóa tài khoản đoàn viên, bí thư (dữ liệu được giữ). Hệ thống cũng tự làm việc này mỗi ngày."
       confirmLabel="Cập nhật" onConfirm={async () => { reportResult(await syncSchoolYearAction()); router.refresh(); }} />
+  );
+}
+
+/** Thêm đoàn viên vào Chi đoàn: nhập danh sách họ tên (tự tạo tài khoản + tải CSV), thêm từng người (đủ thông tin) hoặc nhập Excel. */
+export function AddMembersButton({ departmentId, departmentName }: { departmentId: string; departmentName: string }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [created, setCreated] = useState<Credential[] | null>(null);
+  const close = () => { setOpen(false); if (created) { setCreated(null); setText(""); router.refresh(); } };
+  const lines = text.split(/\r?\n/).filter((l) => l.trim()).length;
+  return (
+    <>
+      <Button variant="primary" onClick={() => setOpen(true)}><UserPlus className="size-4" /><span className="max-sm:hidden">Thêm đoàn viên</span></Button>
+      <Modal open={open} onClose={close} title={`Thêm đoàn viên vào Chi đoàn ${departmentName}`} className="max-w-lg">
+        {created ? (
+          <div className="space-y-3">
+            <Alert tone="green">Đã tạo {created.length} tài khoản đoàn viên. <b>Mật khẩu tạm thời chỉ hiển thị một lần</b> – tệp CSV đã được tải về máy bạn, hãy bàn giao.</Alert>
+            <Button variant="secondary" size="sm" onClick={() => downloadCsv(created, `tai-khoan-${departmentName}-${csvStamp()}.csv`)}><Download className="size-4" />Tải lại tệp CSV</Button>
+            <div className="max-h-60 overflow-y-auto">
+              <DataTable>
+                <thead><tr><Th>Tên đăng nhập</Th><Th>Họ tên</Th><Th>Mật khẩu tạm</Th></tr></thead>
+                <tbody>{created.map((c) => <tr key={c.code}><Td className="font-mono text-[13px]">{c.code}</Td><Td>{c.fullName}</Td><Td className="font-mono text-[13px]">{c.password}</Td></tr>)}</tbody>
+              </DataTable>
+            </div>
+            <div className="flex justify-end"><Button onClick={close}>Đóng</Button></div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <Field label="Danh sách họ tên" hint="Mỗi dòng một họ tên. Hệ thống tự tạo hồ sơ đoàn viên và tài khoản (tên đăng nhập là mã đoàn viên, mật khẩu tạm thời), tự tải tệp CSV." required>
+              <Textarea value={text} onChange={(e) => setText(e.target.value)} className="min-h-40" placeholder={"Nguyễn Văn An\nTrần Thị Bình"} />
+            </Field>
+            <div className="flex flex-wrap justify-end gap-2">
+              <Button variant="secondary" onClick={close}>Hủy</Button>
+              <Button loading={busy} disabled={!lines} onClick={async () => {
+                setBusy(true); const res = await addMembersToDepartmentAction(departmentId, text); setBusy(false);
+                if (reportResult(res) && res.data) { setCreated(res.data.created); downloadCsv(res.data.created, `tai-khoan-${departmentName}-${csvStamp()}.csv`); router.refresh(); }
+              }}>Thêm {lines ? `${lines} đoàn viên` : ""}</Button>
+            </div>
+            <p className="border-t border-border pt-3 text-xs text-muted">Cần nhập đủ ngày sinh, giới tính...? Dùng <Link href="/members/new" className="text-primary hover:underline">thêm từng đoàn viên</Link> hoặc <Link href="/members" className="text-primary hover:underline">nhập từ Excel</Link> ở mục Đoàn viên.</p>
+          </div>
+        )}
+      </Modal>
+    </>
   );
 }

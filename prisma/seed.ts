@@ -43,7 +43,7 @@ export async function seedDemo() {
   for (const [name, defaultPoints] of catDefs) cats[name] = (await db.activityCategory.create({ data: { name, defaultPoints } })).id;
 
   const admin = await db.user.create({
-    data: { username: "admin", fullName: "Quản trị viên Đoàn trường", role: "ADMIN", passwordHash, mustChangePassword: false },
+    data: { username: "admin", fullName: "Quản trị viên Đoàn trường", role: "ADMIN", superAdmin: true, passwordHash, mustChangePassword: false },
   });
 
   // 3 Chi đoàn + 3 Bí thư

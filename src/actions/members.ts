@@ -7,7 +7,7 @@ import { run, UserError } from "@/lib/action";
 import { audit } from "@/lib/audit";
 import { requireRole, requireUser } from "@/lib/auth/session";
 import { generateTempPassword, hashPassword } from "@/lib/auth/password";
-import { memberSchema, pointAdjustSchema } from "@/lib/validation";
+import { memberSchema, ownProfileSchema, pointAdjustSchema } from "@/lib/validation";
 import { createMemberWithAccount, findOrCreateClass, nextMemberCodes } from "@/lib/services/member-account";
 import { evaluateBadges } from "@/lib/services/badges";
 import { notifyUser } from "@/lib/notify";
@@ -140,6 +140,24 @@ export async function updateOwnAvatarAction(input: { avatarUrl: string; avatarPu
     }
     revalidatePath("/", "layout");
     return { message: "Đã cập nhật ảnh" };
+  });
+}
+
+/** Đoàn viên (kể cả bí thư) tự sửa một số thông tin cá nhân. Không đổi được lớp, Chi đoàn, khóa, trạng thái, điểm (Admin quản lý). */
+export async function updateOwnProfileAction(input: unknown) {
+  return run(async () => {
+    const user = await requireUser();
+    if (!user.memberId) throw new UserError("Chỉ đoàn viên mới có hồ sơ đoàn viên");
+    const data = ownProfileSchema.parse(input);
+    if (data.dateOfBirth && data.dateOfBirth > new Date()) throw new UserError("Ngày sinh không thể ở tương lai");
+    if (data.joinedAt && data.joinedAt > new Date()) throw new UserError("Ngày vào Đoàn không thể ở tương lai");
+    await db.$transaction([
+      db.member.update({ where: { id: user.memberId }, data: { fullName: data.fullName, gender: data.gender ?? null, dateOfBirth: data.dateOfBirth ?? null, joinedAt: data.joinedAt ?? null } }),
+      db.user.update({ where: { id: user.id }, data: { fullName: data.fullName } }),
+    ]);
+    await audit(user.id, "member.self_update", "Member", user.memberId, { code: user.memberCode });
+    revalidatePath("/", "layout");
+    return { message: "Đã cập nhật thông tin" };
   });
 }
 

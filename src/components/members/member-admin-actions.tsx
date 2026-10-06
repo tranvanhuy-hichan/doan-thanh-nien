@@ -10,8 +10,9 @@ import { Field, Input } from "@/components/ui/form";
 import { ConfirmButton, Modal } from "@/components/ui/modal";
 import { Alert } from "@/components/ui/misc";
 import { reportResult } from "@/components/ui/submit";
+import { downloadAccounts } from "@/components/members/credentials";
 
-export function MemberAdminActions({ id, locked, isAdmin }: { id: string; locked: boolean; isAdmin: boolean }) {
+export function MemberAdminActions({ id, locked, isAdmin, code, fullName }: { id: string; locked: boolean; isAdmin: boolean; code: string; fullName: string }) {
   const router = useRouter();
   const [pw, setPw] = useState<string | null>(null);
   const [adjust, setAdjust] = useState(false);
@@ -24,7 +25,7 @@ export function MemberAdminActions({ id, locked, isAdmin }: { id: string; locked
       {isAdmin && <Link href={`/members/${id}/edit`} aria-label="Sửa" className={buttonClass("secondary", "sm")}><Pencil className="size-3.5" /><span className="max-sm:hidden">Sửa</span></Link>}
       <ConfirmButton triggerLabel="Cấp lại mật khẩu" trigger={<><KeyRound className="size-3.5" /><span className="max-sm:hidden">Cấp lại mật khẩu</span></>} title="Cấp lại mật khẩu tạm thời?"
         description="Mật khẩu cũ sẽ không còn dùng được. Đoàn viên phải đổi mật khẩu ở lần đăng nhập kế tiếp."
-        onConfirm={async () => { const res = await resetMemberPasswordAction(id); if (reportResult(res)) setPw(res.ok ? res.data!.password : null); }} />
+        onConfirm={async () => { const res = await resetMemberPasswordAction(id); if (reportResult(res)) { setPw(res.ok ? res.data!.password : null); if (res.ok) downloadAccounts([{ username: code, fullName, detail: "Cấp lại mật khẩu", password: res.data!.password }], `mat-khau-${code}.csv`, "Ghi chú"); } }} />
       {isAdmin && (
         <>
           <Button variant="secondary" size="sm" aria-label="Điều chỉnh điểm" title="Điều chỉnh điểm" onClick={() => setAdjust(true)}><PlusCircle className="size-3.5" /><span className="max-sm:hidden">Điều chỉnh điểm</span></Button>

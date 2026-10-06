@@ -1,16 +1,17 @@
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
-import { ROLE_LABEL } from "@/lib/nav";
+import { roleLabelOf } from "@/lib/nav";
 import { formatDateTime } from "@/utils";
 import { DataTable, PageHeader, Td, Th } from "@/components/ui/misc";
 import { Tabs } from "@/components/ui/tabs";
 import { Avatar } from "@/components/ui/misc";
 import { AvatarEditor } from "@/components/members/avatar-editor";
 import { NameForm } from "@/components/members/name-form";
-import { Bell, CalendarRange, Database, Fingerprint, History, KeyRound, ListChecks, UserRound } from "lucide-react";
+import { Bell, CalendarRange, Database, Fingerprint, History, KeyRound, ListChecks, ShieldCheck, UserRound } from "lucide-react";
 import { RETENTION, storageStats } from "@/lib/services/cleanup";
 import { DataManager } from "@/components/settings/data-manager";
 import { loadCalendars } from "@/lib/services/school-calendar";
+import { LeaderManager } from "@/components/settings/leader-manager";
 import { PasskeyManager } from "@/components/settings/passkey-manager";
 import { SchoolYearManager } from "@/components/settings/school-year-manager";
 import { NotificationControls } from "@/components/notifications/controls";
@@ -27,6 +28,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     { key: "notifications", label: "Thông báo", icon: <Bell className="size-4" /> },
     { key: "password", label: "Mật khẩu", icon: <KeyRound className="size-4" /> },
     { key: "passkey", label: "Đăng nhập nhanh", icon: <Fingerprint className="size-4" /> },
+    ...(user.superAdmin ? [{ key: "leaders", label: "Ban chấp hành", icon: <ShieldCheck className="size-4" /> }] : []),
     ...(admin ? [{ key: "schoolyear", label: "Năm học", icon: <CalendarRange className="size-4" /> }, { key: "categories", label: "Loại hoạt động", icon: <ListChecks className="size-4" /> }, { key: "logs", label: "Nhật ký", icon: <History className="size-4" /> }, { key: "data", label: "Dữ liệu", icon: <Database className="size-4" /> }] : []),
   ];
   const requested = (await searchParams).tab;
@@ -37,6 +39,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const customYears = admin && tab === "schoolyear" ? new Set((await db.schoolYear.findMany({ select: { startYear: true } })).map((r) => r.startYear)) : new Set<number>();
   const calendars = admin && tab === "schoolyear" ? await loadCalendars() : [];
   const passkeys = tab === "passkey" ? await db.passkey.findMany({ where: { userId: user.id }, orderBy: { createdAt: "asc" }, select: { id: true, deviceName: true, createdAt: true, lastUsedAt: true } }) : [];
+  const leaders = user.superAdmin && tab === "leaders" ? await db.user.findMany({ where: { role: "ADMIN", superAdmin: false }, orderBy: { createdAt: "asc" }, select: { id: true, fullName: true, username: true, position: true, status: true, lastLoginAt: true } }) : [];
   const storage = admin && tab === "data" ? await storageStats() : null;
   const logs = admin && tab === "logs" ? await db.auditLog.findMany({ orderBy: { createdAt: "desc" }, take: 30, include: { user: { select: { fullName: true, username: true } } } }) : [];
 
@@ -59,7 +62,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           {!admin && <><dt className="text-muted">Họ tên</dt><dd>{user.fullName}</dd></>}
           <dt className="text-muted">Tên đăng nhập</dt><dd className="font-mono">{user.username}</dd>
           {user.memberCode && <><dt className="text-muted">Mã đoàn viên</dt><dd className="font-mono">{user.memberCode}</dd></>}
-          <dt className="text-muted">Vai trò</dt><dd>{ROLE_LABEL[user.role]}</dd>
+          <dt className="text-muted">Vai trò</dt><dd>{roleLabelOf(user)}</dd>
           {user.departmentName && <><dt className="text-muted">Chi đoàn</dt><dd>{user.departmentName}</dd></>}
         </dl>
         </>
@@ -68,6 +71,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       {tab === "notifications" && <div className="max-w-sm"><NotificationControls /></div>}
 
       {tab === "password" && <div className="max-w-sm"><ChangePasswordForm /></div>}
+
+      {tab === "leaders" && user.superAdmin && <LeaderManager leaders={leaders.map((l) => ({ ...l, lastLoginAt: l.lastLoginAt?.toISOString() ?? null }))} />}
 
       {tab === "passkey" && <PasskeyManager items={passkeys.map((p) => ({ id: p.id, deviceName: p.deviceName, createdAt: p.createdAt.toISOString(), lastUsedAt: p.lastUsedAt?.toISOString() ?? null }))} />}
 

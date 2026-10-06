@@ -5,7 +5,7 @@ import { buttonClass } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth/session";
 import { postScope } from "@/lib/services/queries";
 import { canManageDepartment } from "@/lib/permissions";
-import { ROLE_LABEL } from "@/lib/nav";
+import { roleLabelOf } from "@/lib/nav";
 import { pageParam } from "@/utils";
 import { EmptyState, PageHeader, Pagination } from "@/components/ui/misc";
 import { PostCard } from "@/components/feed/post-card";
@@ -24,7 +24,7 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
     db.post.findMany({
       where, orderBy: { createdAt: "desc" }, skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE,
       include: {
-        author: { select: { fullName: true, role: true, member: { select: { avatarUrl: true } } } },
+        author: { select: { fullName: true, role: true, superAdmin: true, position: true, member: { select: { avatarUrl: true } } } },
         department: { select: { name: true } },
         likes: { where: { userId: user.id }, select: { id: true } },
         _count: { select: { likes: true, comments: true } },
@@ -48,7 +48,7 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
           <PostCard key={p.id} meName={user.fullName} meAvatar={user.avatarUrl} post={{
             id: p.id, content: p.content, imageUrl: p.imageUrl, createdAt: p.createdAt.toISOString(),
             audience: p.department ? `Chi đoàn ${p.department.name}` : "Toàn trường",
-            author: { name: p.author.fullName, avatarUrl: p.author.member?.avatarUrl ?? null, roleLabel: ROLE_LABEL[p.author.role] },
+            author: { name: p.author.fullName, avatarUrl: p.author.member?.avatarUrl ?? null, roleLabel: roleLabelOf(p.author) },
             likes: p._count.likes, liked: p.likes.length > 0, commentCount: p._count.comments,
             canDelete: p.authorId === user.id || user.role === "ADMIN" || canManageDepartment(user, p.departmentId),
             comments: p.comments.slice().reverse().map((c) => ({

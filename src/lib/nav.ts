@@ -87,7 +87,7 @@ export function mobileNav(role: Role): { main: NavItem[]; more: NavItem[] } {
   return { main, more };
 }
 
-export const ROLE_LABEL: Record<Role, string> = { ADMIN: "Quản trị viên", SECRETARY: "Bí thư Chi đoàn", MEMBER: "Đoàn viên" };
+export const ROLE_LABEL: Record<Role, string> = { ADMIN: "Ban chấp hành Đoàn trường", SECRETARY: "Bí thư Chi đoàn", MEMBER: "Đoàn viên" };
 
 export const PAGE_TITLES: Record<string, string> = {
   dashboard: "Tổng quan", members: "Đoàn viên", departments: "Chi đoàn", activities: "Hoạt động", attendance: "Điểm danh",
@@ -99,3 +99,9 @@ export const PAGE_TITLES: Record<string, string> = {
 export const PATH_TITLES: Record<string, string> = {
   "/feed/new": "Đăng bài", "/cms/tin-tuc/new": "Đăng tin", "/cms/ke-hoach/new": "Đăng kế hoạch", "/cms/su-kien/new": "Tạo sự kiện", "/cms/thong-bao/new": "Đăng thông báo", "/chapter-reports/new": "Đăng báo cáo", "/members/new": "Thêm đoàn viên", "/activities/new": "Tạo hoạt động",
 };
+
+/** Nhãn vai trò hiển thị cho một người dùng: Admin tối cao, hoặc chức danh của thành viên BCH. */
+export function roleLabelOf(u: { role: Role; superAdmin?: boolean; position?: string | null }): string {
+  if (u.role === "ADMIN") return u.superAdmin ? "Quản trị hệ thống" : u.position || "Ban chấp hành Đoàn trường";
+  return ROLE_LABEL[u.role];
+}

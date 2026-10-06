@@ -7,7 +7,7 @@ import { canManageDepartment } from "@/lib/permissions";
 import { participationRate } from "@/lib/services/queries";
 import { cohortLabel } from "@/lib/school-year";
 import { formatDateShort, pageParam } from "@/utils";
-import { DeleteDepartmentButton, DepartmentFormButton, SecretaryButton } from "@/components/members/department-actions";
+import { AddMembersButton, DeleteDepartmentButton, DepartmentFormButton, SecretaryButton } from "@/components/members/department-actions";
 import { Avatar, DataTable, EmptyState, PageHeader, Pagination, Section, Stat, Td, Th } from "@/components/ui/misc";
 
 export const metadata = { title: "Chi đoàn" };
@@ -35,6 +35,7 @@ export default async function DepartmentDetailPage({ params, searchParams }: { p
     <>
       <PageHeader title={`Chi đoàn ${dept.name}`} description={`${dept.startYear ? `Niên khóa ${cohortLabel(dept.startYear)} · ` : ""}${dept.graduatedAt ? "Đã ra trường" : `Bí thư: ${dept.secretary?.fullName ?? "chưa phân công"}`}`}
         actions={dept.graduatedAt ? undefined : <>
+          <AddMembersButton departmentId={dept.id} departmentName={dept.name} />
           <SecretaryButton departmentId={dept.id} current={dept.secretary} candidates={candidateRows.map((m) => ({ id: m.id, userId: m.userId, label: `${m.fullName} (${m.code})` }))} />
           <DepartmentFormButton dept={{ id: dept.id, name: dept.name, description: dept.description, startYear: dept.startYear }} />
           <DeleteDepartmentButton id={dept.id} name={dept.name} />

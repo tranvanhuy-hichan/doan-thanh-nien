@@ -6,7 +6,7 @@ import { importMembersAction, type ImportResult } from "@/actions/members";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { Alert, DataTable, Td, Th } from "@/components/ui/misc";
-import { downloadCsv } from "@/components/members/credentials";
+import { csvStamp, downloadCsv } from "@/components/members/credentials";
 import { useRouter } from "next/navigation";
 
 export function ImportMembersButton() {
@@ -26,7 +26,7 @@ export function ImportMembersButton() {
     const res = await importMembersAction(fd);
     if (!res.ok) return void toast.error(res.error);
     setResult(res.data!);
-    if (res.data!.created.length) toast.success(res.message);
+    if (res.data!.created.length) { toast.success(res.message); downloadCsv(res.data!.created, `tai-khoan-doan-vien-${csvStamp()}.csv`); }
   });
 
   return (

@@ -5,6 +5,8 @@ import { PageHeader, Section } from "@/components/ui/misc";
 import { MemberProfile } from "@/components/members/member-profile";
 import { MemberCard } from "@/components/members/member-card";
 import { AvatarEditor } from "@/components/members/avatar-editor";
+import { EditOwnProfileButton } from "@/components/members/edit-own-profile";
+import { toDateInput } from "@/utils";
 
 export const metadata = { title: "Hồ sơ & thẻ đoàn viên" };
 
@@ -15,7 +17,7 @@ export default async function ProfilePage() {
   if (!member) redirect("/dashboard");
   return (
     <>
-      <PageHeader title="Hồ sơ cá nhân" />
+      <PageHeader title="Hồ sơ cá nhân" actions={<EditOwnProfileButton initial={{ fullName: member.fullName, gender: member.gender ?? "", dateOfBirth: toDateInput(member.dateOfBirth), joinedAt: toDateInput(member.joinedAt) }} />} />
       <MemberProfile member={member} />
       <Section title="Thẻ đoàn viên số" actions={<AvatarEditor />}>
         <MemberCard fullName={member.fullName} code={member.code} department={member.department.name} className={member.class.name}

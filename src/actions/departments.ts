@@ -117,3 +117,29 @@ export async function syncSchoolYearAction() {
     return { message: r.renamed || r.graduated ? `Năm học ${r.schoolYear}–${r.schoolYear + 1}: đổi tên ${r.renamed} Chi đoàn, ${r.graduated} Chi đoàn ra trường` : `Năm học ${r.schoolYear}–${r.schoolYear + 1}: không có thay đổi` };
   });
 }
+
+/** Thêm nhiều đoàn viên vào một Chi đoàn đang học bằng danh sách họ tên (mỗi dòng một người): tự tạo hồ sơ + tài khoản, trả mật khẩu tạm một lần. */
+export async function addMembersToDepartmentAction(departmentId: string, namesText: string) {
+  return run<{ created: Credential[] }>(async () => {
+    const admin = await requireRole(["ADMIN"]);
+    const dept = await db.department.findUnique({ where: { id: departmentId } });
+    if (!dept || dept.graduatedAt) throw new UserError("Không tìm thấy Chi đoàn đang học");
+    const names = [...new Set((namesText ?? "").split(/\r?\n/).map((l) => l.trim().replace(/\s+/g, " ")).filter(Boolean))];
+    if (!names.length) throw new UserError("Nhập ít nhất một họ tên");
+    if (names.some((n) => n.length < 2 || n.length > 100)) throw new UserError("Mỗi dòng là một họ tên (2–100 ký tự)");
+    if (names.length > 100) throw new UserError("Mỗi lần thêm tối đa 100 đoàn viên, có thể nhập thêm bằng file Excel");
+    const hashed = await Promise.all(names.map(async () => { const password = generateTempPassword(); return { password, passwordHash: await hashPassword(password) }; }));
+    const created: Credential[] = [];
+    await db.$transaction(async (tx) => {
+      const cls = await findOrCreateClass(tx, dept.id, dept.name);
+      const codes = await nextMemberCodes(tx, new Date().getFullYear(), names.length);
+      for (let i = 0; i < names.length; i++) {
+        await createMemberWithAccount(tx, { fullName: names[i], departmentId: dept.id, classId: cls.id, cohort: dept.startYear }, codes[i], hashed[i]);
+        created.push({ code: codes[i], fullName: names[i], className: cls.name, department: dept.name, password: hashed[i].password });
+      }
+      await audit(admin.id, "member.bulk_add", "Department", dept.id, { count: names.length }, tx);
+    }, { timeout: 60_000, maxWait: 10_000 });
+    revalidatePath(`/departments/${dept.id}`); revalidatePath("/members");
+    return { data: { created }, message: `Đã thêm ${created.length} đoàn viên vào Chi đoàn ${dept.name}` };
+  });
+}

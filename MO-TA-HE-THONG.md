@@ -83,11 +83,14 @@ Hiện đại, gọn, không nặng thẻ bo tròn. Màu chủ đạo **xanh Đo
 ### 3.1 Ba vai trò
 | Vai trò | Bản chất |
 |---|---|
-| **Quản trị viên (Admin)** | Ban chấp hành Đoàn trường. Tài khoản riêng, không có hồ sơ đoàn viên. Toàn quyền. |
+| **Quản trị hệ thống** | Quản trị tối cao. Tài khoản riêng, không có hồ sơ đoàn viên. Toàn quyền, và là người **duy nhất cấp, sửa, thu hồi, cấp lại quyền tài khoản Ban chấp hành**. |
+| **Ban chấp hành Đoàn trường** (Bí thư, Phó Bí thư, Ủy viên...) | Tài khoản riêng do Quản trị hệ thống cấp, có chức danh hiển thị. **Có đủ mọi quyền quản lý như Admin** (đoàn viên, Chi đoàn, hoạt động, thi đua, cổng thông tin, duyệt bài, lịch...), **trừ** cấp/thu hồi tài khoản Ban chấp hành. Trong ma trận bên dưới, cột "Admin" áp dụng cho cả hai. |
 | **Bí thư Chi đoàn** | **Không phải tài khoản riêng.** Là tài khoản của một đoàn viên được Admin gán thêm vai trò bí thư. Giữ nguyên quyền đoàn viên, cộng thêm quyền quản lý trong phạm vi Chi đoàn mình. |
 | **Đoàn viên** | Học sinh là đoàn viên. Có hồ sơ, thẻ số, tham gia và điểm danh hoạt động. |
 
 ### 3.2 Ma trận quyền theo chức năng
+
+> **Cột "Admin" áp dụng cho cả Quản trị hệ thống và Ban chấp hành Đoàn trường**, trừ dòng "Cấp, sửa, thu hồi tài khoản Ban chấp hành" chỉ Quản trị hệ thống làm được.
 Ký hiệu: ✔ có, ✖ không, ◐ có điều kiện (ghi chú).
 
 | Chức năng | Admin | Bí thư | Đoàn viên | Khách |
@@ -120,6 +123,7 @@ Ký hiệu: ✔ có, ✖ không, ◐ có điều kiện (ghi chú).
 | Cấu hình lịch năm học | ✔ | ✖ | ✖ | ✖ |
 | Xem báo cáo hoạt động, xuất Excel | ✔ | ✖ | ✖ | ✖ |
 | Xem nhật ký hệ thống, dung lượng, dọn dữ liệu | ✔ | ✖ | ✖ | ✖ |
+| Cấp, sửa, cấp lại mật khẩu, thu hồi tài khoản Ban chấp hành | ✔ chỉ Quản trị hệ thống | ✖ | ✖ | ✖ |
 
 ### 3.3 Nguyên tắc phạm vi dữ liệu
 - Bí thư chỉ thấy đoàn viên và hoạt động của **Chi đoàn mình** và các hoạt động **toàn trường** (xem được, không sửa được). Mở đường dẫn của Chi đoàn khác sẽ nhận trang 404, không lộ sự tồn tại.
@@ -286,13 +290,14 @@ Tìm trong tiêu đề/tóm tắt các bài viết đã đăng; cần ít nhất
 
 ### 7.2 Hồ sơ và thẻ đoàn viên số (`/profile`)
 - Hồ sơ cá nhân: thông tin, điểm, giờ tình nguyện, huy hiệu, lịch sử cộng/trừ điểm.
+- **Đoàn viên tự sửa thông tin cá nhân** (nút "Sửa thông tin" ở hồ sơ): họ tên, ngày sinh, giới tính, ngày vào Đoàn và ảnh. **Không tự đổi được lớp, Chi đoàn, khóa, trạng thái và điểm** (Ban chấp hành quản lý); ngày sinh và ngày vào Đoàn không được ở tương lai; mọi lần tự sửa được ghi nhật ký.
 - **Thẻ đoàn viên số:** ảnh, họ tên, mã đoàn viên, Chi đoàn, lớp và **mã QR định danh**; đoàn viên tự đổi ảnh. Mã QR trên thẻ chỉ chứa một mã ngẫu nhiên, không chứa thông tin cá nhân.
 
 ### 7.3 Chi đoàn (`/departments`, Admin)
 - **Danh sách** hai tab: **Đang học** và **Đã ra trường**. Cột: Chi đoàn, **Niên khóa** (ví dụ 2026–2029), Bí thư, số Đoàn viên, số Hoạt động, Tỷ lệ tham gia.
 - **Tạo Chi đoàn:** tên (bắt đầu bằng khối 10/11/12, dạng `12A1` hoặc `12/1`), mô tả, **năm vào lớp 10** (để trống thì tự tính theo khối trong tên và năm học hiện tại) và tùy chọn **danh sách họ tên đoàn viên** (mỗi dòng một người, tối đa 100): hệ thống tự tạo lớp, hồ sơ và tài khoản, hiện bảng mật khẩu tạm một lần.
 - **Không cho trùng** cùng tên và cùng khóa; cho phép cùng tên khác khóa (ví dụ 10A1 khóa 2026 và 10A1 khóa 2027).
-- **Chi tiết Chi đoàn** (`/departments/<id>`): các nút Đổi bí thư, Sửa, Xóa; chỉ số (đoàn viên, hoạt động, tỷ lệ tham gia, tổng điểm); hoạt động gần đây; danh sách đoàn viên của Chi đoàn có phân trang.
+- **Chi tiết Chi đoàn** (`/departments/<id>`): các nút **Thêm đoàn viên** (dán danh sách họ tên, hệ thống tự tạo hồ sơ + tài khoản và tự tải tệp CSV mật khẩu tạm; hoặc thêm từng người đủ thông tin, hoặc nhập Excel), Đổi bí thư, Sửa, Xóa; chỉ số (đoàn viên, hoạt động, tỷ lệ tham gia, tổng điểm); hoạt động gần đây; danh sách đoàn viên của Chi đoàn có phân trang.
 - **Xóa Chi đoàn:** chỉ khi không còn đoàn viên; các hoạt động của Chi đoàn bị xóa theo.
 
 ### 7.4 Bầu bí thư
@@ -523,6 +528,7 @@ Trang chia thành **tab** (chọn bằng địa chỉ `?tab=`), chỉ nạp dữ
 | Năm học | Admin | Lịch năm học (mục 9.1) |
 | Loại hoạt động | Admin | Thêm/sửa/xóa loại và điểm mặc định |
 | Nhật ký | Admin | 30 thao tác gần nhất (thời gian, người thực hiện, hành động, đối tượng) |
+| Ban chấp hành | Chỉ Quản trị hệ thống | Cấp tài khoản cho Bí thư, Phó Bí thư, Ủy viên Ban chấp hành Đoàn trường; sửa họ tên và chức danh; cấp lại mật khẩu tạm; thu hồi và cấp lại quyền |
 | Dữ liệu | Admin | Dung lượng database, bảng lớn nhất, chính sách giữ dữ liệu, nút **Dọn ngay** |
 
 ---

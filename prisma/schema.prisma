@@ -82,6 +82,8 @@ model User {
   role               Role
   status             AccountStatus @default(ACTIVE)
   mustChangePassword Boolean       @default(true)
+  superAdmin         Boolean       @default(false) // quản trị tối cao hệ thống (chỉ vai trò ADMIN); ADMIN không phải superAdmin = Ban chấp hành Đoàn trường
+  position           String? // chức danh (Bí thư Đoàn trường, Phó Bí thư Đoàn trường...)
   avatarUrl          String? // ảnh đại diện của tài khoản không có hồ sơ đoàn viên (vd Admin)
   avatarPublicId     String?
   lastLoginAt        DateTime?

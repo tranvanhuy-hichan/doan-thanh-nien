@@ -15,6 +15,9 @@ export type SessionUser = {
   username: string;
   fullName: string;
   role: Role;
+  /** Quản trị tối cao (chỉ vai trò ADMIN). ADMIN còn lại là Ban chấp hành Đoàn trường: đủ quyền quản lý nhưng không cấp/thu hồi tài khoản BCH. */
+  superAdmin: boolean;
+  position: string | null;
   mustChangePassword: boolean;
   memberId: string | null;
   memberCode: string | null;
@@ -83,6 +86,8 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     username: user.username,
     fullName: user.fullName,
     role: user.role,
+    superAdmin: user.role === "ADMIN" && user.superAdmin,
+    position: user.position,
     mustChangePassword: user.mustChangePassword,
     memberId: user.member?.id ?? null,
     memberCode: user.member?.code ?? null,

@@ -126,3 +126,16 @@ src/lib/qr            QR token ký HMAC, sống 90 giây
 - Tài khoản bị khóa thì không đăng nhập nhanh được; Admin **cấp lại mật khẩu tạm** cho đoàn viên sẽ **thu hồi mọi thiết bị đăng nhập nhanh** của tài khoản đó.
 - Thư viện: `@simplewebauthn/server` + `@simplewebauthn/browser`; "thử thách" (challenge) lưu trong cookie ký số 5 phút, dùng một lần.
 - Ô mật khẩu ở đăng nhập và đổi mật khẩu có nút con mắt để **xem/ẩn mật khẩu**.
+
+## Quản trị hệ thống và Ban chấp hành Đoàn trường
+
+- Có **hai cấp quản trị** (cùng vai trò `ADMIN` trong mã, khác cờ `superAdmin`):
+  - **Quản trị hệ thống** (`superAdmin = true`): quyền tối cao. Là người **cấp, sửa, cấp lại mật khẩu, thu hồi và cấp lại quyền** tài khoản Ban chấp hành ở **Cài đặt → Ban chấp hành**.
+  - **Ban chấp hành Đoàn trường** (Bí thư, Phó Bí thư, Ủy viên... `superAdmin = false`, có `position` là chức danh): **đủ mọi quyền quản lý như Admin trước đây** (đoàn viên, Chi đoàn, hoạt động, điểm danh, thi đua, cổng thông tin, duyệt bài, góp ý, bình chọn, lịch, báo cáo, cài đặt...), nhưng **không thấy và không thực hiện được** việc cấp/thu hồi tài khoản Ban chấp hành (kiểm tra ở máy chủ).
+- Thu hồi = khóa tài khoản, **có hiệu lực ngay**, dữ liệu và lịch sử thao tác được giữ nguyên; có thể cấp lại quyền sau.
+- Tài khoản mới có mật khẩu tạm hiện một lần, bắt buộc đổi ở lần đăng nhập đầu. Thanh người dùng và trang Tài khoản hiển thị đúng chức danh.
+- Các tài khoản `ADMIN` đã có từ trước được đặt thành **Quản trị hệ thống**; lệnh khởi tạo luôn bảo đảm có ít nhất một Quản trị hệ thống.
+
+### Tự động tải tệp CSV tài khoản
+
+Mật khẩu tạm chỉ hiện một lần, nên mỗi khi tạo hoặc cấp lại tài khoản, trình duyệt **tự tải về tệp CSV** (có BOM để Excel đọc đúng tiếng Việt): tạo Chi đoàn kèm danh sách, nhập Excel, thêm một đoàn viên, cấp lại mật khẩu đoàn viên, cấp/cấp lại mật khẩu tài khoản Ban chấp hành. Hộp thoại vẫn hiện mật khẩu và có nút "Tải lại tệp CSV" phòng khi trình duyệt chặn tải tự động. **Tệp chứa mật khẩu dạng chữ thường**: bàn giao xong nên xóa khỏi máy.

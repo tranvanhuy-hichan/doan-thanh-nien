@@ -8,14 +8,16 @@ export function Modal({ open, onClose, title, children, className }: {
   open: boolean; onClose: () => void; title: string; children: React.ReactNode; className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose; // luôn gọi bản onClose mới nhất mà không làm effect bên dưới chạy lại
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeRef.current();
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
-    ref.current?.focus();
+    ref.current?.focus(); // chỉ focus một lần khi hộp thoại mở (trước đây focus lại mỗi lần gõ phím)
     return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
-  }, [open, onClose]);
+  }, [open]);
   if (!open) return null;
   return (
     <div data-no-row className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-4 sm:items-center" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>

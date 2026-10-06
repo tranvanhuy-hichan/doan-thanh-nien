@@ -129,3 +129,11 @@ export const reportSchema = z.object({
   imageUrl: optionalText(500),
   imagePublicId: optionalText(300),
 });
+
+/** Các trường đoàn viên được TỰ sửa (không gồm lớp, Chi đoàn, khóa, trạng thái, điểm: do Admin quản lý). */
+export const ownProfileSchema = z.object({
+  fullName: z.string().trim().min(2, "Vui lòng nhập họ tên").max(100),
+  gender: z.preprocess(emptyToUndef, z.enum(["Nam", "Nữ", "Khác"]).optional()),
+  dateOfBirth: optionalDate,
+  joinedAt: optionalDate,
+});

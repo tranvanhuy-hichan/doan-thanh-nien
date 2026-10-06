@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import type { z } from "zod";
 import { memberSchema } from "@/lib/validation";
+import { downloadCsv } from "@/components/members/credentials";
 import { createMemberAction, updateMemberAction, type Credential } from "@/actions/members";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/form";
@@ -36,7 +37,9 @@ export function MemberForm({ id, departments, initial }: { id?: string; departme
     } else {
       const res = await createMemberAction(payload);
       if (!res.ok) return void toast.error(res.error);
-      setCreated({ ...res.data!, department: departments.find((d) => d.id === values.departmentId)?.name ?? "" });
+      const cred = { ...res.data!, department: departments.find((d) => d.id === values.departmentId)?.name ?? "" };
+      setCreated(cred);
+      downloadCsv([cred], `tai-khoan-${cred.code}.csv`);
     }
   });
 

@@ -16,7 +16,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
   return (
     <>
       <PageHeader title="Hồ sơ đoàn viên"
-        actions={user.role === "ADMIN" && <MemberAdminActions id={member.id} locked={member.user.status === "LOCKED"} isAdmin />} />
+        actions={user.role === "ADMIN" && <MemberAdminActions id={member.id} locked={member.user.status === "LOCKED"} isAdmin code={member.code} fullName={member.fullName} />} />
       <MemberProfile member={member} showAudit />
     </>
   );
