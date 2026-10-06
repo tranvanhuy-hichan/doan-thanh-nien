@@ -28,4 +28,9 @@ export const SPLASH_CSS = `
   #app-splash img{height:112px;width:auto}
   #app-splash b{font-size:20px;font-weight:700;letter-spacing:.2px}
   #app-splash span{font-size:13px;color:#cfe3f7}
-}`;
+  #app-splash img{animation:sp-pulse 1.6s ease-in-out infinite}
+  #app-splash i{display:block;margin-top:18px;width:30px;height:30px;border:3px solid rgba(255,255,255,.28);border-top-color:#ffd400;border-radius:50%;animation:sp-spin .8s linear infinite}
+}
+@keyframes sp-spin{to{transform:rotate(360deg)}}
+@keyframes sp-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@media (prefers-reduced-motion: reduce){#app-splash img,#app-splash i{animation:none}}`;

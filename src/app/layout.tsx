@@ -36,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <img src="/logo-doan.webp" alt="" width={102} height={112} />
           <b>Đoàn trường THPT Sơn Hà</b>
           <span>Đoàn TNCS Hồ Chí Minh</span>
+          <i />
         </div>
         <AppSplash />
         {children}
