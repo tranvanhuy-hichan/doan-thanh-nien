@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ClickRow } from "@/components/ui/click-row";
 import { notFound } from "next/navigation";
 import { ExternalLink, Plus } from "lucide-react";
 import type { Prisma } from "@prisma/client";
@@ -48,13 +49,13 @@ export default async function CmsKindPage({ params, searchParams }: { params: Pr
             <DataTable>
               <thead><tr><Th>Tiêu đề</Th><Th>Người đăng</Th><Th>Ngày tạo</Th><Th>Trạng thái</Th><Th /></tr></thead>
               <tbody>{items.map((a) => (
-                <tr key={a.id}>
+                <ClickRow key={a.id} href={`${base}/${a.id}`}>
                   <Td className="max-w-lg font-medium"><Link href={`${base}/${a.id}`} className="hover:text-primary">{a.title}</Link></Td>
                   <Td className="whitespace-nowrap">{(a.author?.fullName ?? "—")}</Td>
                   <Td className="whitespace-nowrap">{formatDate(a.createdAt)}</Td>
                   <Td><ArticleStatus published={a.published} pending={!a.published && a.author?.role === "SECRETARY"} /></Td>
                   <Td className="text-right whitespace-nowrap">{(isAdmin || !a.published) && <ArticleRowActions id={a.id} published={a.published} base={base} ownerOnly={!isAdmin} />}</Td>
-                </tr>
+                </ClickRow>
               ))}</tbody>
             </DataTable>
           </div>

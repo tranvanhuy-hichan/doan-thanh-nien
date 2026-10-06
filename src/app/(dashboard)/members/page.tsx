@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ClickRow } from "@/components/ui/click-row";
 import { CompactList } from "@/components/ui/compact-list";
 import { Plus, Upload } from "lucide-react";
 import type { Prisma } from "@prisma/client";
@@ -74,7 +75,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
           <thead><tr><Th>Mã đoàn viên</Th><Th>Họ tên</Th><Th>Lớp</Th><Th>Chi đoàn</Th><Th>Ngày sinh</Th><Th>Trạng thái</Th></tr></thead>
           <tbody>
             {members.map((m) => (
-              <tr key={m.id} className="hover:bg-slate-50">
+              <ClickRow key={m.id} href={`/members/${m.id}`}>
                 <Td className="font-mono text-[13px]">{m.code}</Td>
                 <Td>
                   <Link href={`/members/${m.id}`} className="flex items-center gap-2 font-medium hover:text-primary">
@@ -85,7 +86,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
                 <Td>{m.department.name}</Td>
                 <Td>{formatDate(m.dateOfBirth)}</Td>
                 <Td><MemberStatusBadge status={m.status} locked={m.user.status === "LOCKED"} /></Td>
-              </tr>
+              </ClickRow>
             ))}
           </tbody>
         </DataTable>

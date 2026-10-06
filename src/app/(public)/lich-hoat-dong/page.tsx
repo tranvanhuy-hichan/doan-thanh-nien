@@ -1,6 +1,4 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { db } from "@/lib/db";
 import { cn, formatDateTime, formatTime, str } from "@/utils";
 import { EmptyPublic, PageTitle } from "@/components/public/blocks";
@@ -20,16 +18,16 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   const sp = await searchParams;
   const nh = str(sp.nh), tuan = str(sp.tuan);
   const calendars = await loadCalendars();
-  // Mặc định: tuần hiện tại của năm học hiện tại (ngoài thời gian học thì cả năm học).
-  if (!nh) {
-    const y = schoolYearOf();
-    const cal = calendars.find((c) => c.startYear === y) ?? defaultCalendar(y);
-    const w = currentWeek(cal);
-    redirect(`/lich-hoat-dong?nh=${y}${w ? `&tuan=${w}` : ""}`);
-  }
-  const range = rangeFromParams(calendars, nh, tuan)!;
-  const cal = calendars.find((c) => String(c.startYear) === nh) ?? defaultCalendar(Number(nh));
-  const weekNo = tuan && /^\d+$/.test(tuan) ? Number(tuan) : null;
+  // Mặc định (chưa có tham số): tuần hiện tại của năm học hiện tại — hiển thị luôn, không chuyển hướng (tránh nháy khung chờ hai lần).
+  const hasNh = !!nh;
+  const curYear = schoolYearOf();
+  const curCal = calendars.find((c) => c.startYear === curYear) ?? defaultCalendar(curYear);
+  const defaultTuan = currentWeek(curCal);
+  const nhEff = nh ?? String(curYear);
+  const tuanEff = hasNh ? tuan : defaultTuan ? String(defaultTuan) : tuan;
+  const range = rangeFromParams(calendars, nhEff, tuanEff);
+  const cal = calendars.find((c) => String(c.startYear) === nhEff) ?? defaultCalendar(Number(nhEff));
+  const weekNo = tuanEff && /^\d+$/.test(tuanEff) ? Number(tuanEff) : null;
   const isWeek = !!(weekNo && weekRange(cal, weekNo));
 
   const activities = await db.activity.findMany({
@@ -40,19 +38,11 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   const byDay = new Map<string, typeof activities>();
   for (const a of activities) byDay.set(dayKey(a.startAt), [...(byDay.get(dayKey(a.startAt)) ?? []), a]);
   const today = dayKey(new Date());
-  const href = (n: number) => `/lich-hoat-dong?nh=${nh}&tuan=${n}`;
 
   return (
     <>
-      <PageTitle title="Lịch hoạt động" description={range.label} />
-      <FilterBar fields={[{ type: "schoolweek", name: "nh", calendars }]} />
-
-      {isWeek && (
-        <div className="mb-3 flex items-center justify-between gap-2">
-          {weekNo! > 1 ? <Link href={href(weekNo! - 1)} className="inline-flex items-center gap-1 rounded-md border border-border bg-white/85 px-3 py-1.5 text-sm hover:bg-slate-50"><ChevronLeft className="size-4" />Tuần {weekNo! - 1}</Link> : <span />}
-          {weekNo! < cal.totalWeeks ? <Link href={href(weekNo! + 1)} className="inline-flex items-center gap-1 rounded-md border border-border bg-white/85 px-3 py-1.5 text-sm hover:bg-slate-50">Tuần {weekNo! + 1}<ChevronRight className="size-4" /></Link> : <span />}
-        </div>
-      )}
+      <PageTitle title="Lịch hoạt động" description={range.label}
+        actions={<FilterBar className="" fields={[{ type: "schoolweek", name: "nh", calendars, defaultTuan: defaultTuan ? String(defaultTuan) : undefined }]} />} />
 
       {isWeek ? (
         // Một tuần: mỗi ngày một khối, hiện cả ngày không có hoạt động để thấy trọn tuần
@@ -62,7 +52,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
             const list = byDay.get(dayKey(d)) ?? [];
             return (
               <div key={i} className={cn("grid gap-x-4 border-b border-border px-4 py-3 last:border-0 sm:grid-cols-[9rem_1fr]", dayKey(d) === today && "bg-primary-light/50")}>
-                <div className={cn("text-sm font-semibold", dayKey(d) === today ? "text-primary" : "text-primary-dark")}>{dayLabel(d)}{dayKey(d) === today && <span className="ml-1.5 text-xs font-normal">(hôm nay)</span>}</div>
+                <div className={cn("text-sm font-semibold", dayKey(d) === today ? "text-primary" : "text-primary-dark")}>{dayLabel(d)}{dayKey(d) === today && <span className="block text-xs font-normal whitespace-nowrap">(hôm nay)</span>}</div>
                 <div className="space-y-2">
                   {list.length === 0 ? <div className="text-sm text-muted">—</div> : list.map((a) => (
                     <div key={a.id}>

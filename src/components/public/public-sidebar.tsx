@@ -19,18 +19,19 @@ const EMULATION = [
   { label: "Chi đoàn tiêu biểu", href: "/thi-dua/chi-doan-tieu-bieu" },
 ];
 
-function Group({ title, icon: Icon, open, children }: { title: string; icon: typeof BookOpen; open: boolean; children: React.ReactNode }) {
+/** Nhóm menu luôn mở sẵn ở mọi trang (người dùng vẫn có thể thu gọn thủ công). */
+function Group({ title, icon: Icon, children }: { title: string; icon: typeof BookOpen; open?: boolean; children: React.ReactNode }) {
   return (
-    <details open={open} className="group border-b border-border last:border-0">
-      <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm font-bold tracking-wide text-primary-dark uppercase hover:bg-primary-light [&::-webkit-details-marker]:hidden">
-        <Icon className="size-4" />{title}<ChevronDown className="ml-auto size-4 transition-transform group-open:rotate-180" />
+    <details open className="group">
+      <summary className="flex cursor-pointer list-none items-center gap-2 rounded-md px-3 py-2 text-[13px] font-semibold tracking-wide text-primary-dark uppercase hover:bg-primary-light/60 [&::-webkit-details-marker]:hidden">
+        <Icon className="size-4 text-primary" />{title}<ChevronDown className="ml-auto size-4 text-slate-400 transition-transform group-open:rotate-180" />
       </summary>
-      <div className="pb-2">{children}</div>
+      <div className="mt-0.5 mb-1.5 ml-[1.15rem] border-l border-slate-200 pl-1">{children}</div>
     </details>
   );
 }
 
-const itemClass = (active: boolean) => cn("block py-1.5 pr-3 pl-10 text-sm hover:bg-primary-light hover:text-primary-dark", active && "bg-primary-light font-semibold text-primary-dark");
+const itemClass = (active: boolean) => cn("-ml-px block rounded-r-md border-l-[3px] border-transparent py-1.5 pr-3 pl-3 text-sm text-slate-600 transition-colors hover:bg-primary-light/60 hover:text-primary-dark", active && "border-primary bg-primary-light/70 font-medium text-primary-dark");
 
 /** Thanh bên trái của trang công khai: Giới thiệu / Báo cáo Chi đoàn (Khối → lớp) / Thi đua. */
 export function PublicSidebar({ grades }: { grades: SidebarGrade[] }) {
@@ -38,26 +39,26 @@ export function PublicSidebar({ grades }: { grades: SidebarGrade[] }) {
   const khoi = useSearchParams().get("khoi");
   const inReports = pathname.startsWith("/bao-cao-chi-doan");
   return (
-    <nav aria-label="Danh mục" className="overflow-hidden rounded-lg border border-border bg-white/85">
-      <Group title="Giới thiệu" icon={BookOpen} open={pathname.startsWith("/gioi-thieu") || pathname === "/"}>
+    <nav aria-label="Danh mục" className="space-y-1 rounded-lg bg-white/70 p-2 shadow-sm">
+      <Group title="Giới thiệu" icon={BookOpen} open>
         {INTRO.map((i) => <Link key={i.href} href={i.href} className={itemClass(pathname === i.href)}>{i.label}</Link>)}
       </Group>
-      <Group title="Báo cáo Chi đoàn" icon={FileText} open={inReports || pathname === "/"}>
-        {grades.length === 0 && <p className="px-10 py-1.5 text-sm text-muted">Chưa có Chi đoàn</p>}
+      <Group title="Báo cáo Chi đoàn" icon={FileText} open>
+        {grades.length === 0 && <p className="px-3 py-1.5 text-sm text-muted">Chưa có Chi đoàn</p>}
         {grades.map((g) => (
           <details key={g.grade} open={inReports && (khoi === g.grade || g.depts.some((d) => pathname.includes(d.id)))} className="group/sub">
-            <summary className="flex cursor-pointer list-none items-center gap-1 py-1.5 pr-3 pl-8 text-sm font-semibold hover:bg-primary-light [&::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer list-none items-center gap-1 rounded-md py-1.5 pr-3 pl-2 text-sm font-medium text-slate-700 hover:bg-primary-light/60 [&::-webkit-details-marker]:hidden">
               <ChevronDown className="size-3.5 -rotate-90 transition-transform group-open/sub:rotate-0" />Khối {g.grade}
             </summary>
-            <div className="grid grid-cols-3 gap-1 pr-3 pb-1.5 pl-12">
+            <div className="grid grid-cols-3 gap-1 pr-2 pb-1.5 pl-6">
               {g.depts.map((d) => (
-                <Link key={d.id} href={`/bao-cao-chi-doan/${d.id}`} className={cn("rounded px-1.5 py-1 text-center text-[13px] hover:bg-primary-light hover:text-primary-dark", pathname.includes(d.id) && "bg-primary text-white hover:bg-primary hover:text-white")}>{d.name}</Link>
+                <Link key={d.id} href={`/bao-cao-chi-doan/${d.id}`} className={cn("rounded px-1.5 py-1 text-center text-[13px] text-slate-600 hover:bg-primary-light/70 hover:text-primary-dark", pathname.includes(d.id) && "bg-primary text-white hover:bg-primary hover:text-white")}>{d.name}</Link>
               ))}
             </div>
           </details>
         ))}
       </Group>
-      <Group title="Thi đua" icon={Trophy} open={pathname.startsWith("/thi-dua") || pathname === "/"}>
+      <Group title="Thi đua" icon={Trophy} open>
         {EMULATION.map((i) => <Link key={i.href} href={i.href} className={itemClass(pathname === i.href)}>{i.label}</Link>)}
       </Group>
     </nav>

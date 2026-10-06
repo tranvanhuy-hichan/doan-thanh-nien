@@ -27,16 +27,18 @@ function FormButton({ row }: { row?: Row }) {
       </Button>
       <Modal open={open} onClose={() => setOpen(false)} title={row ? `Lịch năm học ${yearLabel(row.startYear)}` : "Thêm năm học"} className="max-w-md">
         <div className="space-y-3">
-          <Field label="Năm học bắt đầu" hint={`Năm học ${yearLabel(+v.startYear || 0)}`}><Input type="number" value={v.startYear} disabled={!!row} onChange={(e) => setV({ ...v, startYear: e.target.value })} /></Field>
-          <Field label="Ngày bắt đầu Tuần 1" required><Input type="date" value={v.week1Start} onChange={(e) => setV({ ...v, week1Start: e.target.value })} /></Field>
+          <Field className="text-left" label="Năm học bắt đầu" hint={`Năm học ${yearLabel(+v.startYear || 0)}`}><Input type="number" value={v.startYear} disabled={!!row} onChange={(e) => setV({ ...v, startYear: e.target.value })} /></Field>
+          <Field label="Ngày bắt đầu Tuần 1" required className="text-left"><Input type="date" value={v.week1Start} onChange={(e) => setV({ ...v, week1Start: e.target.value })} /></Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Số tuần học kỳ 1"><Input type="number" min={1} value={v.sem1Weeks} onChange={(e) => setV({ ...v, sem1Weeks: e.target.value })} /></Field>
-            <Field label="Tổng số tuần cả năm"><Input type="number" min={2} max={52} value={v.totalWeeks} onChange={(e) => setV({ ...v, totalWeeks: e.target.value })} /></Field>
+            <Field label="Số tuần học kỳ 1" className="text-left"><Input type="number" min={1} value={v.sem1Weeks} onChange={(e) => setV({ ...v, sem1Weeks: e.target.value })} /></Field>
+            <Field label="Tổng số tuần cả năm" className="text-left"><Input type="number" min={2} max={52} value={v.totalWeeks} onChange={(e) => setV({ ...v, totalWeeks: e.target.value })} /></Field>
           </div>
           {valid && (
-            <p className="rounded-md bg-primary-light px-3 py-2 text-xs text-primary-dark">
-              {weekLabel(cal, 1)} · HK1 kết thúc: {weekLabel(cal, cal.sem1Weeks)} · {cal.totalWeeks > cal.sem1Weeks ? `HK2: ${weekLabel(cal, cal.sem1Weeks + 1)} → ${weekLabel(cal, cal.totalWeeks)}` : ""}
-            </p>
+            <ul className="space-y-0.5 rounded-md bg-primary-light px-3 py-2 text-left text-xs break-words text-primary-dark">
+              <li>Bắt đầu: <b>{weekLabel(cal, 1)}</b></li>
+              <li>Học kỳ 1 kết thúc: <b>{weekLabel(cal, cal.sem1Weeks)}</b></li>
+              <li>Học kỳ 2: <b>{weekLabel(cal, cal.sem1Weeks + 1)}</b> → <b>{weekLabel(cal, cal.totalWeeks)}</b></li>
+            </ul>
           )}
           <div className="flex justify-end gap-2">
             <Button variant="secondary" onClick={() => setOpen(false)}>Hủy</Button>

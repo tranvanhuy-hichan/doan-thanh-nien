@@ -42,7 +42,7 @@ export function PageHeader({ title, description, actions, stackActions }: {
             {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
           </div>
         ) : <h1 className="min-w-[10rem] flex-1 text-xl font-semibold">{title}</h1>}
-        {actions && <div className="page-actions ml-auto flex max-w-full shrink-0 flex-wrap items-center justify-end gap-1.5 sm:gap-2">{actions}</div>}
+        {actions && <div className={cn("page-actions ml-auto flex max-w-full shrink-0 flex-wrap items-center justify-end gap-1.5 sm:gap-2", stackActions && "max-sm:w-full")}>{actions}</div>}
       </div>
       {description && !stackActions && <p className="mt-0.5 text-sm text-muted">{description}</p>}
     </div>

@@ -13,8 +13,8 @@ function NavGroup({ item, labels }: { item: NavItem; labels: string }) {
   const pathname = usePathname();
   const children = item.children ?? [];
   const inside = children.some((c) => pathname === c.href || pathname.startsWith(c.href + "/")) || pathname.startsWith((item.match ?? item.href) + "/");
-  // Nhóm menu luôn mở sẵn (vẫn có thể thu gọn thủ công, và tự mở lại khi vào một mục bên trong).
-  const [open, setOpen] = useState(true);
+  // Nhóm mở sẵn nếu được đánh dấu `open` hoặc đang ở một mục bên trong; vẫn bấm để mở/thu gọn thủ công.
+  const [open, setOpen] = useState(item.open ?? inside);
   useEffect(() => { if (inside) setOpen(true); }, [inside]);
   return (
     <div>
@@ -38,21 +38,22 @@ function NavGroup({ item, labels }: { item: NavItem; labels: string }) {
   );
 }
 
-function NavLinks({ items, labels, onNavigate }: { items: NavItem[]; labels: string; onNavigate?: () => void }) {
+function NavLinks({ items, labels, onNavigate, badges }: { items: NavItem[]; labels: string; onNavigate?: () => void; badges?: Record<string, number> }) {
   const pathname = usePathname();
   const active = (it: NavItem) => { const h = it.match ?? it.href; return pathname === h || (h !== "/dashboard" && pathname.startsWith(h + "/")); };
   const link = (it: NavItem) => (
     <Link key={it.href} href={it.href} onClick={onNavigate} title={it.label}
-      className={cn("flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+      className={cn("relative flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
         active(it) ? "bg-white font-medium text-primary-dark" : "text-blue-50 hover:bg-white/10")}>
       <it.icon className="size-[18px] shrink-0" />
       <span className={labels}>{it.label}</span>
+      {!!badges?.[it.href] && <span className={cn("ml-auto rounded-full bg-[#ffd400] px-1.5 text-[11px] leading-5 font-bold text-[#073a70] max-lg:absolute max-lg:top-0.5 max-lg:right-0.5 max-lg:ml-0 max-lg:leading-4", "")}>{badges[it.href]}</span>}
     </Link>
   );
   return <>{items.map((it) => (it.children ? <NavGroup key={it.href} item={it} labels={labels} /> : link(it)))}</>;
 }
 
-function SidebarBody({ items, labels, onNavigate }: { items: NavItem[]; labels: string; onNavigate?: () => void }) {
+function SidebarBody({ items, labels, onNavigate, badges }: { items: NavItem[]; labels: string; onNavigate?: () => void; badges?: Record<string, number> }) {
   return (
     <>
       <div className="flex items-center gap-3 border-b border-white/15 px-4 py-4">
@@ -63,7 +64,7 @@ function SidebarBody({ items, labels, onNavigate }: { items: NavItem[]; labels: 
         </div>
       </div>
       <nav className="flex-1 space-y-0.5 overflow-y-auto p-3" aria-label="Điều hướng chính">
-        <NavLinks items={items} labels={labels} onNavigate={onNavigate} />
+        <NavLinks items={items} labels={labels} onNavigate={onNavigate} badges={badges} />
       </nav>
       <div className="space-y-0.5 border-t border-white/15 p-3">
         <NavLinks items={[{ href: "/settings", label: "Cài đặt", icon: Settings }]} labels={labels} onNavigate={onNavigate} />
@@ -77,11 +78,11 @@ function SidebarBody({ items, labels, onNavigate }: { items: NavItem[]; labels: 
   );
 }
 
-export function Sidebar({ role }: { role: Role }) {
+export function Sidebar({ role, badges }: { role: Role; badges?: Record<string, number> }) {
   // Tablet: thu gọn còn icon. Desktop: đầy đủ. Mobile dùng BottomNav nên không có thanh bên.
   return (
     <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-16 flex-col bg-primary-dark md:flex lg:w-60">
-      <SidebarBody items={navFor(role)} labels="hidden lg:inline" />
+      <SidebarBody items={navFor(role)} labels="hidden lg:inline" badges={badges} />
     </aside>
   );
 }

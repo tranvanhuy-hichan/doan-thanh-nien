@@ -13,7 +13,7 @@ export default async function PublicLayout({ children }: { children: React.React
       <SiteHeader address={settings.address} bannerUrl={settings.bannerUrl} phone={settings.phone} email={settings.email} facebook={settings.facebook} youtube={settings.youtube} marquee={marquee} />
       <div className="flex w-full flex-1 gap-6 px-4 py-6 lg:px-8">
         {/* Thanh bên trái (desktop): Giới thiệu, Báo cáo Chi đoàn theo khối/lớp, Thi đua. Trên mobile dùng menu ở đầu trang. */}
-        <aside className="hidden w-60 shrink-0 lg:block">
+        <aside className="no-print hidden w-60 shrink-0 lg:block">
           <div className="sticky top-32"><Suspense><PublicSidebar grades={grades} /></Suspense></div>
         </aside>
         <main className="min-w-0 flex-1">{children}</main>

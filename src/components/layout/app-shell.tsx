@@ -5,14 +5,14 @@ import { Topbar, type NotificationItem } from "./topbar";
 import { BottomNav } from "./bottom-nav";
 import { NotificationProvider } from "@/components/notifications/notification-center";
 
-export function AppShell({ role, user, roleLabel, notifications, unread, pushKey, children }: {
+export function AppShell({ role, user, roleLabel, notifications, unread, pushKey, badges, children }: {
   role: Role; user: { fullName: string; avatarUrl: string | null }; roleLabel: string;
-  notifications: NotificationItem[]; unread: number; pushKey: string | null; children: React.ReactNode;
+  notifications: NotificationItem[]; unread: number; pushKey: string | null; badges?: Record<string, number>; children: React.ReactNode;
 }) {
   return (
     <NotificationProvider publicKey={pushKey} latestId={notifications[0]?.id ?? null}>
     <div className="min-h-screen">
-      <Sidebar role={role} />
+      <Sidebar role={role} badges={badges} />
       <div className="md:pl-16 lg:pl-60">
         <Topbar user={user} roleLabel={roleLabel} notifications={notifications} unread={unread} />
         {/* Mobile chừa chỗ cho thanh điều hướng dưới + vùng an toàn của iOS */}

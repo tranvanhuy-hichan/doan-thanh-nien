@@ -8,6 +8,23 @@ import { cn } from "@/utils";
 import { mobileNav, type NavItem } from "@/lib/nav";
 import { logoutAction } from "@/actions/auth";
 
+/** Một dòng trong bảng "Thêm": biểu tượng + tên, cùng kích thước cho mọi mục. */
+function Row({ item, active }: { item: NavItem; active: boolean }) {
+  return (
+    <Link href={item.href} className={cn("flex min-w-0 items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm", active ? "bg-primary-light font-semibold text-primary-dark" : "text-slate-700 active:bg-slate-100")}>
+      <item.icon className="size-5 shrink-0 text-slate-500" /><span className="truncate">{item.label}</span>
+    </Link>
+  );
+}
+
+type Section = { title?: string; icon?: NavItem["icon"]; items: NavItem[] };
+/** Gom các mục đơn thành một nhóm không tiêu đề; mỗi nhóm menu là một khối có tiêu đề, mục con trải đều dạng dòng. */
+function toSections(more: NavItem[]): Section[] {
+  const singles: NavItem[] = more.filter((i) => !i.children);
+  const groups: Section[] = more.filter((i) => i.children).map((g) => ({ title: g.label, icon: g.icon, items: g.children!.map((c) => ({ href: c.href, label: c.label, icon: c.icon ?? g.icon })) }));
+  return [...(singles.length ? [{ items: singles }] : []), ...groups];
+}
+
 const isActive = (pathname: string, it: NavItem) => { const h = it.match ?? it.href; return pathname === h || (h !== "/dashboard" && pathname.startsWith(h + "/")); };
 
 function Tab({ item, active }: { item: NavItem; active: boolean }) {
@@ -25,7 +42,8 @@ export function BottomNav({ role }: { role: Role }) {
   const { main, more } = mobileNav(role);
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(false), [pathname]);
-  const moreActive = more.some((i) => isActive(pathname, i));
+  const moreActive = more.some((i) => isActive(pathname, i) || (i.children ?? []).some((c) => pathname === c.href || pathname.startsWith(c.href + "/")));
+  const sections = toSections(more);
 
   return (
     <>
@@ -34,24 +52,18 @@ export function BottomNav({ role }: { role: Role }) {
           <div className="absolute inset-0 bg-slate-900/40" />
           <div className="absolute inset-x-0 bottom-0 rounded-t-2xl bg-white pb-[calc(5.5rem+env(safe-area-inset-bottom))] shadow-2xl" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Chức năng khác">
             <div className="mx-auto my-2 h-1 w-10 rounded-full bg-slate-200" />
-            <div className="grid grid-cols-3 gap-2 px-4 pt-2">
-              {more.map((it) => it.children ? (
-                <div key={it.href} className="col-span-3 rounded-xl bg-slate-50 p-2">
-                  <div className="flex items-center gap-2 px-2 pb-1.5 text-xs font-semibold text-slate-600"><it.icon className="size-4" />{it.label}</div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {it.children.map((c) => (
-                      <Link key={c.href} href={c.href} className={cn("rounded-lg px-3 py-2 text-center text-xs", pathname === c.href || pathname.startsWith(c.href + "/") ? "bg-primary-light font-semibold text-primary-dark" : "bg-white text-slate-700 active:bg-slate-100")}>{c.label}</Link>
-                    ))}
+            <div className="max-h-[75dvh] overflow-y-auto overscroll-contain px-3 pt-1 pb-2">
+              {sections.map((sec, i) => (
+                <div key={i} className="mb-2">
+                  {sec.title && <div className="flex items-center gap-1.5 px-2 pt-2 pb-1 text-[11px] font-semibold tracking-wide text-slate-500 uppercase">{sec.icon && <sec.icon className="size-3.5" />}{sec.title}</div>}
+                  <div className="grid grid-cols-2 gap-1">
+                    {sec.items.map((it) => <Row key={it.href} item={it} active={isActive(pathname, it)} />)}
                   </div>
                 </div>
-              ) : (
-                <Link key={it.href} href={it.href} className={cn("flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 text-center text-xs", isActive(pathname, it) ? "bg-primary-light font-semibold text-primary-dark" : "bg-slate-50 text-slate-700 active:bg-slate-100")}>
-                  <it.icon className="size-6" />{it.label}
-                </Link>
               ))}
-              <form action={logoutAction} className="contents">
-                <button type="submit" className="flex flex-col items-center gap-1.5 rounded-xl bg-slate-50 px-2 py-3 text-center text-xs text-danger active:bg-slate-100">
-                  <LogOut className="size-6" />Đăng xuất
+              <form action={logoutAction} className="mt-1 border-t border-border pt-2">
+                <button type="submit" className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-danger active:bg-slate-100">
+                  <LogOut className="size-5 shrink-0" />Đăng xuất
                 </button>
               </form>
             </div>

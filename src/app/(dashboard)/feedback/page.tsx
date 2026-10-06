@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
+import { ClickRow } from "@/components/ui/click-row";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/auth/session";
 import { formatDateTime, pageParam, str } from "@/utils";
@@ -34,12 +35,12 @@ export default async function FeedbackListPage({ searchParams }: { searchParams:
             <DataTable>
               <thead><tr><Th>Nội dung</Th><Th>Chủ đề</Th><Th>Thời gian</Th><Th>Trạng thái</Th></tr></thead>
               <tbody>{items.map((f) => (
-                <tr key={f.id}>
+                <ClickRow key={f.id} href={`/feedback/${f.id}`}>
                   <Td className="max-w-xl"><Link href={`/feedback/${f.id}`} className={`line-clamp-2 hover:text-primary ${f.status === "NEW" ? "font-semibold" : ""}`}>{f.content}</Link></Td>
                   <Td className="whitespace-nowrap">{f.category ?? "Khác"}</Td>
                   <Td className="whitespace-nowrap">{formatDateTime(f.createdAt)}</Td>
                   <Td>{badge(f.status)}</Td>
-                </tr>
+                </ClickRow>
               ))}</tbody>
             </DataTable>
           </div>

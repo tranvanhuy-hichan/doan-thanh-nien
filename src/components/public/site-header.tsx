@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, ExternalLink, Home, LayoutDashboard, LogIn, Mail, Menu, Phone, Search, X } from "lucide-react";
+import { ChevronDown, ExternalLink, Home, Mail, MapPin, Menu, Phone, Search, X } from "lucide-react";
 import { cn } from "@/utils";
 import { DoanLogo } from "@/components/layout/logo";
 
@@ -23,6 +23,7 @@ const MENU: Item[] = [
   { label: "Sự kiện", href: "/su-kien" },
   { label: "Tin tức", href: "/tin-tuc" },
   { label: "Lịch hoạt động", href: "/lich-hoat-dong" },
+  { label: "Lịch công tác", href: "/lich-cong-tac" },
   { label: "Thông báo", href: "/thong-bao" },
   { label: "Góp ý", href: "/gop-y" },
   {
@@ -49,6 +50,7 @@ const EXTERNAL_LINKS = [
   { label: "Sở GD&ĐT Quảng Ngãi", href: "https://quangngai.edu.vn/" },
   { label: "Bộ Giáo dục và Đào tạo", href: "https://moet.gov.vn/" },
   { label: "Trung ương Đoàn TNCS Hồ Chí Minh", href: "https://doanthanhnien.vn/" },
+  { label: "Tỉnh Đoàn Quảng Ngãi", href: "https://tinhdoan.quangngai.gov.vn/" },
 ];
 
 const isActive = (pathname: string, href: string) => {
@@ -88,7 +90,7 @@ function SearchBox({ className }: { className?: string }) {
   );
 }
 
-export function SiteHeader({ bannerUrl, phone, email, facebook, youtube, marquee }: { address?: string; bannerUrl?: string; phone?: string; email?: string; facebook?: string; youtube?: string; marquee: { id: string; text: string; link: string | null }[] }) {
+export function SiteHeader({ address, bannerUrl, phone, email, facebook, youtube, marquee }: { address?: string; bannerUrl?: string; phone?: string; email?: string; facebook?: string; youtube?: string; marquee: { id: string; text: string; link: string | null }[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   // Chỉ đóng menu khi thật sự chuyển trang (không đóng ngay sau khi vừa bấm mở)
@@ -100,7 +102,7 @@ export function SiteHeader({ bannerUrl, phone, email, facebook, youtube, marquee
   const main = MENU.filter((it) => !it.children); // Giới thiệu, Báo cáo Chi đoàn, Thi đua nằm ở thanh bên trái
 
   return (
-    <header>
+    <header className="no-print">
       {/* Thanh liên hệ */}
       {(phone || email || facebook || youtube) && (
         <div className="bg-[#0a4a94] text-white">
@@ -118,18 +120,16 @@ export function SiteHeader({ bannerUrl, phone, email, facebook, youtube, marquee
       )}
       {/* Hàng thương hiệu: logo + tên | tìm kiếm | đăng nhập (thấp, gọn) */}
       <div className="border-b border-border bg-white">
-        <div className="flex w-full items-center gap-4 px-3 py-3 sm:px-4 sm:py-4 lg:px-8">
+        <div className="flex w-full items-center gap-4 px-3 py-2.5 sm:px-4 sm:py-3 lg:px-8">
           <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5" aria-label="Trang chủ">
-            <DoanLogo className="h-12 shrink-0 sm:h-16" />
+            <DoanLogo className="h-11 shrink-0 sm:h-14" />
             <div className="min-w-0 leading-tight">
               <p className="text-[10px] font-semibold tracking-[0.15em] text-slate-500 uppercase sm:text-[13px]">Đoàn TNCS Hồ Chí Minh</p>
               <h1 className="text-sm font-extrabold tracking-wide text-primary-dark uppercase sm:text-xl">Đoàn trường THPT Sơn Hà</h1>
+              {address && <p className="mt-0.5 flex items-center gap-1 text-[11px] text-slate-500 sm:text-xs"><MapPin className="size-3 shrink-0 text-primary" /><span className="truncate">{address}</span></p>}
             </div>
           </Link>
-          <SearchBox className="mx-auto hidden w-full max-w-2xl lg:flex" />
-          <Link href={loggedIn ? "/dashboard" : "/login"} className="ml-auto hidden h-10 shrink-0 items-center gap-1.5 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-dark lg:inline-flex lg:ml-0">
-            {loggedIn ? <><LayoutDashboard className="size-4" />Trang quản lý</> : <><LogIn className="size-4" />Đăng nhập</>}
-          </Link>
+          <SearchBox className="ml-auto hidden w-full max-w-xl lg:flex" />
         </div>
       </div>
 
@@ -164,8 +164,8 @@ export function SiteHeader({ bannerUrl, phone, email, facebook, youtube, marquee
                 </ul>
               </li>
             </ul>
-            <Link href={loggedIn ? "/dashboard" : "/login"} aria-label={loggedIn ? "Trang quản lý" : "Đăng nhập"} className="ml-auto my-1.5 mr-1 inline-flex h-9 shrink-0 lg:hidden items-center gap-1.5 rounded bg-[#ffd400] px-3 text-sm max-sm:w-10 max-sm:justify-center max-sm:px-0 sm:px-3.5 font-bold text-[#073a70] hover:bg-yellow-300">
-              {loggedIn ? <LayoutDashboard className="size-4" /> : <LogIn className="size-4" />}<span className="max-sm:hidden">{loggedIn ? "Trang quản lý" : "Đăng nhập"}</span>
+            <Link href={loggedIn ? "/dashboard" : "/login"} className="ml-auto flex shrink-0 items-center px-3 py-2.5 text-xs font-semibold tracking-wide whitespace-nowrap text-white/90 uppercase hover:bg-white/10 hover:text-white sm:px-4 sm:text-sm">
+              {loggedIn ? "Trang quản lý" : "Đăng nhập"}
             </Link>
           </div>
           {open && (
@@ -193,26 +193,27 @@ export function SiteHeader({ bannerUrl, phone, email, facebook, youtube, marquee
 
       {/* Banner full chiều ngang (chỉ trang chủ) */}
       {pathname === "/" && (
-        <div className={cn("relative h-28 w-full overflow-hidden bg-primary-dark sm:h-40 lg:h-52", !bannerUrl && "max-sm:hidden")}>
+        <div className={cn("relative h-24 w-full overflow-hidden bg-primary-dark sm:h-32 lg:h-36", !bannerUrl && "max-sm:hidden")}>
           {bannerUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={bannerUrl} alt="Banner Đoàn trường THPT Sơn Hà" className="size-full object-cover object-center" />
           ) : (
-            <div className="relative flex size-full items-center justify-center gap-4 bg-gradient-to-r from-primary-dark via-primary to-primary-dark px-4 text-center text-white" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.08) 1.5px, transparent 2px)", backgroundSize: "26px 26px" }}>
+            <div className="relative flex size-full items-center justify-center gap-4 border-b-[3px] border-[#ffd400] bg-gradient-to-r from-[#052f63] via-[#0b63b8] to-[#052f63] px-4 text-center text-white">
               {/* Trang trí hai bên: sóng cờ và ngôi sao */}
               {(["left", "right"] as const).map((side) => (
                 <div key={side} aria-hidden className={cn("pointer-events-none absolute inset-y-0 hidden w-1/4 overflow-hidden md:block lg:w-[30%]", side === "left" ? "left-0" : "right-0 -scale-x-100")} style={{ maskImage: "linear-gradient(to right, #000 45%, transparent)", WebkitMaskImage: "linear-gradient(to right, #000 45%, transparent)" }}>
                   <svg viewBox="0 0 300 208" preserveAspectRatio="none" className="absolute inset-0 size-full">
-                    <path d="M0 150 C 60 110, 120 190, 190 140 S 280 120, 300 130 V208 H0Z" fill="#ffffff" fillOpacity="0.07" />
-                    <path d="M0 175 C 70 140, 130 205, 200 165 S 280 150, 300 160 V208 H0Z" fill="#ffd400" fillOpacity="0.12" />
-                    <path d="M0 40 L 120 0 H 0Z" fill="#ffd400" fillOpacity="0.14" />
+                    <path d="M0 150 C 60 110, 120 190, 190 140 S 280 120, 300 130 V208 H0Z" fill="#ffffff" fillOpacity="0.14" />
+                    <path d="M0 175 C 70 140, 130 205, 200 165 S 280 150, 300 160 V208 H0Z" fill="#6db3ff" fillOpacity="0.28" />
+                    <path d="M0 150 C 60 110, 120 190, 190 140 S 280 120, 300 130" fill="none" stroke="#ffd400" strokeOpacity="0.55" strokeWidth="1.5" />
+                    <path d="M0 40 L 120 0 H 0Z" fill="#6db3ff" fillOpacity="0.3" />
                   </svg>
-                  <svg viewBox="0 0 24 24" className="absolute top-6 right-10 size-5 text-[#ffd400]/60" fill="currentColor"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7.1L12 17.6 5.7 21.3l1.7-7.1L2 9.5l7.1-.6z" /></svg>
-                  <svg viewBox="0 0 24 24" className="absolute right-24 bottom-8 size-3 text-white/50" fill="currentColor"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7.1L12 17.6 5.7 21.3l1.7-7.1L2 9.5l7.1-.6z" /></svg>
+                  <svg viewBox="0 0 24 24" className="absolute top-6 right-10 size-5 text-[#ffd400]" fill="currentColor"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7.1L12 17.6 5.7 21.3l1.7-7.1L2 9.5l7.1-.6z" /></svg>
+                  <svg viewBox="0 0 24 24" className="absolute right-24 bottom-8 size-3 text-white/80" fill="currentColor"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7.1L12 17.6 5.7 21.3l1.7-7.1L2 9.5l7.1-.6z" /></svg>
                 </div>
               ))}
-              <DoanLogo className="relative h-16 drop-shadow-lg sm:h-28 lg:h-36" />
-              <div className="relative text-left leading-tight"><p className="text-xs font-bold tracking-[0.18em] text-white uppercase sm:text-xl lg:text-2xl">Cổng thông tin điện tử</p><p className="mt-1 text-lg font-extrabold tracking-wide text-[#ffd400] uppercase sm:text-3xl lg:text-5xl">Đoàn trường THPT Sơn Hà</p><p className="mt-1.5 text-[11px] font-semibold tracking-[0.2em] text-blue-200 uppercase sm:text-sm">Đoàn TNCS Hồ Chí Minh</p></div>
+              <DoanLogo className="relative h-14 drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)] sm:h-20 lg:h-24" />
+              <div className="relative text-left leading-tight"><p className="text-[11px] font-bold tracking-[0.18em] text-white uppercase [text-shadow:0_1px_3px_rgba(0,0,0,0.5)] sm:text-base lg:text-xl">Cổng thông tin điện tử</p><p className="mt-0.5 text-base font-extrabold tracking-wide text-[#ffd400] uppercase [text-shadow:0_2px_4px_rgba(0,0,0,0.5)] sm:text-2xl lg:text-4xl">Đoàn trường THPT Sơn Hà</p><p className="mt-1 text-[10px] font-semibold tracking-[0.2em] text-blue-100 uppercase [text-shadow:0_1px_2px_rgba(0,0,0,0.5)] sm:text-xs">Đoàn TNCS Hồ Chí Minh</p></div>
             </div>
           )}
         </div>
@@ -232,14 +233,21 @@ export function SiteHeader({ bannerUrl, phone, email, facebook, youtube, marquee
 
 /** Chữ chạy ngang; rê chuột để dừng. Người dùng bật "giảm chuyển động" thì hiện đứng yên. */
 function Marquee({ items, className }: { items: { id: string; text: string; link: string | null }[]; className?: string }) {
-  const chars = items.reduce((n, i) => n + i.text.length + 6, 0);
-  const content = items.map((it, i) => {
+  const chars = items.reduce((n, i) => n + i.text.length + 4, 0);
+  // Nội dung được lặp đủ rộng (>= ~2000px) rồi nhân đôi, chạy -50% => các dòng chữ nối đuôi nhau liên tục, không có khoảng trống.
+  const repeat = Math.max(1, Math.ceil(2000 / (chars * 11)));
+  const set = items.map((it) => {
     const node = it.link ? <Link href={it.link} className="hover:underline">{it.text}</Link> : <span>{it.text}</span>;
-    return <span key={it.id} className="inline-flex items-center">{i > 0 && <span className="mx-6 text-[#e0a800]" aria-hidden>★</span>}{node}</span>;
+    return <span key={it.id} className="inline-flex shrink-0 items-center">{node}<span className="mx-6 text-[#e0a800]" aria-hidden>★</span></span>;
   });
+  const group = (k: number) => (
+    <div key={k} className="inline-flex shrink-0 items-center" aria-hidden={k === 1}>
+      {Array.from({ length: repeat }, (_, r) => <span key={r} className="inline-flex shrink-0 items-center">{set}</span>)}
+    </div>
+  );
   return (
     <div className={cn("marquee text-sm font-extrabold tracking-wide text-primary uppercase sm:text-base", className)} role="marquee" aria-label="Thông điệp">
-      <div className="marquee-track" style={{ animationDuration: `${Math.max(14, chars * 0.16)}s` }}>{content}</div>
+      <div className="marquee-track" style={{ animationDuration: `${Math.max(20, chars * repeat * 0.2)}s` }}>{group(0)}{group(1)}</div>
     </div>
   );
 }

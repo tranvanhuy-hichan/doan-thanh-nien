@@ -19,42 +19,55 @@ export function Block({ title, href, children, className }: { title: string; hre
   );
 }
 
-export function PageTitle({ title, description }: { title: string; description?: string }) {
+/** `actions`: bộ lọc/nút đặt cùng hàng với tiêu đề (ở màn hình lớn), xuống dưới tiêu đề khi chật. */
+export function PageTitle({ title, description, actions }: { title: string; description?: string; actions?: React.ReactNode }) {
   return (
-    <div className="mb-5 border-b-2 border-primary pb-2">
-      <h1 className="text-2xl font-bold text-primary-dark">{title}</h1>
-      {description && <p className="mt-1 text-sm text-muted">{description}</p>}
+    <div className="mb-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b-2 border-primary pb-2">
+      <div className="min-w-0">
+        <h1 className="text-2xl font-bold text-primary-dark">{title}</h1>
+        {description && <p className="mt-1 text-sm text-muted">{description}</p>}
+      </div>
+      {actions && <div className="max-lg:w-full">{actions}</div>}
     </div>
   );
 }
 
 export type CardArticle = { id: string; kind: ArticleKind; title: string; slug: string; summary: string | null; coverUrl: string | null; attachments?: { url: string; name: string }[]; publishedAt: Date | null; eventAt: Date | null; eventLocation: string | null };
 
-export function ArticleRow({ a, showKind }: { a: CardArticle; showKind?: boolean }) {
+export function ArticleRow({ a, showKind, compact }: { a: CardArticle; showKind?: boolean; /** Khối hẹp (nửa chiều ngang): thumbnail nhỏ, meta một dòng, không tóm tắt. */ compact?: boolean }) {
   return (
     <article className="flex gap-3 border-b border-border py-3 last:border-0">
-      <Thumb a={a} className="h-20 w-28 sm:h-24 sm:w-36" />
+      <Thumb a={a} className={compact ? "h-16 w-24" : "h-20 w-28 sm:h-24 sm:w-36"} />
       <div className="min-w-0 flex-1">
         <Link href={articleHref(a.slug)} className="line-clamp-2 font-semibold hover:text-primary">{a.title}</Link>
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted">
-          {showKind && <span className="rounded bg-primary-light px-1.5 py-0.5 font-medium text-primary-dark">{KIND_LABEL[a.kind]}</span>}
-          {a.publishedAt && <span>{formatDate(a.publishedAt)}</span>}
-          {a.kind === "EVENT" && a.eventAt && <span className="inline-flex items-center gap-1"><CalendarDays className="size-3" />{formatDateTime(a.eventAt)}</span>}
-          {a.kind === "EVENT" && a.eventLocation && <span className="inline-flex items-center gap-1"><MapPin className="size-3" />{a.eventLocation}</span>}
-        </div>
-        {a.summary && <p className="mt-1 line-clamp-2 text-sm text-slate-600">{a.summary}</p>}
+        {compact ? (
+          <div className="mt-0.5 truncate text-xs text-muted">
+            {a.kind === "EVENT" && a.eventAt ? formatDateTime(a.eventAt) : a.publishedAt && formatDate(a.publishedAt)}
+            {a.kind === "EVENT" && a.eventLocation && <> · {a.eventLocation}</>}
+          </div>
+        ) : (
+          <>
+            <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted">
+              {showKind && <span className="rounded bg-primary-light px-1.5 py-0.5 font-medium text-primary-dark">{KIND_LABEL[a.kind]}</span>}
+              {a.publishedAt && <span>{formatDate(a.publishedAt)}</span>}
+              {a.kind === "EVENT" && a.eventAt && <span className="inline-flex items-center gap-1"><CalendarDays className="size-3" />{formatDateTime(a.eventAt)}</span>}
+              {a.kind === "EVENT" && a.eventLocation && <span className="inline-flex items-center gap-1"><MapPin className="size-3" />{a.eventLocation}</span>}
+            </div>
+            {a.summary && <p className="mt-1 line-clamp-2 text-sm text-slate-600">{a.summary}</p>}
+          </>
+        )}
       </div>
     </article>
   );
 }
 
 /** Danh sách bài gọn (ảnh nhỏ + tiêu đề + ngày) cho cột bên. */
-export function SideArticleList({ items }: { items: CardArticle[] }) {
+export function SideArticleList({ items, thumbClass = "size-14" }: { items: CardArticle[]; thumbClass?: string }) {
   return (
     <ul className="divide-y divide-border">
       {items.map((a) => (
         <li key={a.id} className="flex gap-3 py-2.5 first:pt-0 last:pb-0">
-          <Thumb a={a} className="size-14" />
+          <Thumb a={a} className={thumbClass} />
           <div className="min-w-0">
             <Link href={articleHref(a.slug)} className="line-clamp-2 text-sm font-medium hover:text-primary">{a.title}</Link>
             <span className="text-xs text-muted">{a.publishedAt && formatDate(a.publishedAt)}</span>

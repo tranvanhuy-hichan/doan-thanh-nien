@@ -18,6 +18,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
       : Promise.resolve([]),
   ]);
   const unread = rows[0]?.unread ?? 0;
+  // Admin: số mục đang chờ xử lý (bài nháp của bí thư + góp ý mới) hiện ở menu "Hàng chờ duyệt"
+  const pending = user.role === "ADMIN"
+    ? (await db.article.count({ where: { published: false, author: { role: "SECRETARY" } } })) + (await db.feedback.count({ where: { status: "NEW" } }))
+    : 0;
   const items = rows;
   return (
     <AppShell
@@ -26,6 +30,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       roleLabel={ROLE_LABEL[user.role]}
       unread={unread}
       pushKey={process.env.VAPID_PUBLIC_KEY ?? null}
+      badges={pending ? { "/approvals": pending } : undefined}
       notifications={items.map((n) => ({ id: n.id, title: n.title, body: n.body, link: n.link, read: !!n.readAt, createdAt: n.createdAt.toISOString() }))}
     >
       {children}

@@ -573,3 +573,34 @@ model SchoolYear {
   sem1Weeks  Int    @default(18) // số tuần học kỳ 1
   totalWeeks Int    @default(35) // tổng số tuần (HK1 + HK2)
 }
+
+/// Lịch công tác tuần chính thức (theo lịch năm học): Admin soạn, công bố thì hiện trên trang công khai.
+model WeeklySchedule {
+  id          String    @id @default(cuid())
+  startYear   Int // năm học (2026 = 2026–2027)
+  week        Int // tuần trong năm học
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  items WeeklyScheduleItem[]
+
+  @@unique([startYear, week])
+}
+
+model WeeklyScheduleItem {
+  id         String   @id @default(cuid())
+  scheduleId String
+  date       DateTime // ngày (00:00 giờ VN) thuộc tuần
+  time       String? // vd "07:30" hoặc "Cả ngày"
+  content    String // nội dung công việc
+  assignee   String? // người/đơn vị phụ trách
+  place      String? // địa điểm
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  schedule WeeklySchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@index([scheduleId, date])
+}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ClickRow } from "@/components/ui/click-row";
 import { Plus } from "lucide-react";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/auth/session";
@@ -32,11 +33,11 @@ export default async function ChapterReportsPage({ searchParams }: { searchParam
             <DataTable>
               <thead><tr><Th>Tiêu đề</Th><Th>Chi đoàn</Th><Th>Ngày đăng</Th><Th /></tr></thead>
               <tbody>{items.map((r) => (
-                <tr key={r.id}>
+                <ClickRow key={r.id} href={`/chapter-reports/${r.id}`}>
                   <Td className="font-medium"><Link href={`/chapter-reports/${r.id}`} className="hover:text-primary">{r.title}</Link></Td>
                   <Td>{r.department.name}</Td><Td className="whitespace-nowrap">{formatDate(r.createdAt)}</Td>
                   <Td className="text-right"><ReportRowActions id={r.id} /></Td>
-                </tr>
+                </ClickRow>
               ))}</tbody>
             </DataTable>
           </div>

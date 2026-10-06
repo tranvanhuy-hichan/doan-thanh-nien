@@ -74,7 +74,7 @@ src/lib/qr            QR token ký HMAC, sống 90 giây
 - **Nhắc lịch**: Vercel Cron gọi `/api/cron/reminders` mỗi ngày 07:00 (giờ VN, `vercel.json`), gửi thông báo + push cho người đã đăng ký hoạt động sắp diễn ra trong 24 giờ. Cần đặt biến `CRON_SECRET` trên Vercel (Vercel tự gửi kèm khi gọi cron). Mỗi hoạt động chỉ nhắc một lần; đổi giờ bắt đầu thì được nhắc lại. Gói Hobby chỉ cho cron mỗi ngày một lần.
 - **Góp ý ẩn danh**: trang công khai `/gop-y` (không đăng nhập, không lưu danh tính, có ô bẫy bot và giới hạn 30 góp ý/giờ). Admin xem/xử lý ở mục **Góp ý**.
 - **Bình chọn**: Admin tạo ở mục **Bình chọn**; mọi tài khoản đăng nhập bỏ phiếu (đổi được lựa chọn khi chưa kết thúc), kết quả hiện dạng thanh phần trăm.
-- **Đếm ngược**: Admin đặt tên + thời điểm tại **Website công khai → Thông tin website**; hiện đầu trang chủ cho tới khi hết giờ.
+- **Đếm ngược**: Admin đặt tên + thời điểm tại **Cổng thông tin → Thông tin website**; hiện đầu trang chủ cho tới khi hết giờ.
 
 ## Niên khóa & chuyển năm học
 
@@ -96,3 +96,8 @@ src/lib/qr            QR token ký HMAC, sống 90 giây
 - Bộ lọc thời gian dùng chung (hoạt động, lịch sử, báo cáo + xuất Excel, lịch hoạt động công khai): chọn **Năm học** rồi **Tuần** (hiện kèm ngày tháng, ví dụ "Tuần 1 (05/09 – 11/09)"), hoặc **Học kỳ 1/2**, hoặc cả năm học. URL: `?nh=2026&tuan=3|hk1|hk2`.
 - Thi đua: kỳ **Tuần / Học kỳ / Năm học** theo lịch này (tuần có dạng `2026-T03`); kỳ **Tháng** vẫn theo lịch dương.
 - Trang công khai **Lịch hoạt động** hiển thị theo tuần (mặc định tuần hiện tại, có nút tuần trước/sau).
+
+## Hàng chờ duyệt & Lịch công tác tuần
+
+- **Hàng chờ duyệt** (`/approvals`, Admin): gom bài nháp bí thư gửi lên (bấm **Duyệt & đăng** là hiển thị công khai), góp ý chưa xem và báo cáo Chi đoàn mới trong 7 ngày. Menu có huy hiệu số việc đang chờ (bài nháp + góp ý mới).
+- **Lịch công tác tuần** (`/schedule`, Admin): chọn Năm học → Tuần (theo lịch năm học), thêm công việc theo từng ngày (thời gian, nội dung, phụ trách, địa điểm), **Sao chép tuần trước**, **Công bố** (tùy chọn gửi thông báo cho mọi người dùng). Lịch đã công bố hiện ở trang công khai `/lich-cong-tac` (mặc định tuần hiện tại, có nút tuần trước/sau và **In lịch**); Admin xem được bản nháp để xem trước.

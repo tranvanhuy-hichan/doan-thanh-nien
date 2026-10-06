@@ -4,7 +4,7 @@ import { emulationRanking } from "@/lib/services/emulation";
 import { currentValue, resolvePeriod } from "@/lib/emulation-period";
 import { latestArticles, upcomingActivities, articleHref } from "@/lib/services/public";
 import { formatDate, formatDateTime, formatTime } from "@/utils";
-import { ArticleRow, Block, EmptyPublic } from "@/components/public/blocks";
+import { ArticleRow, Block, EmptyPublic, SideArticleList } from "@/components/public/blocks";
 import { Thumb } from "@/components/public/thumb";
 import { Countdown } from "@/components/public/countdown";
 import { getSiteSettings } from "@/lib/services/site-settings";
@@ -28,29 +28,30 @@ export default async function HomePage() {
         <div className="space-y-6 xl:col-span-2">
           <Block title="Tin tức" href="/tin-tuc">
             {news.length === 0 ? <EmptyPublic text="Chưa có tin tức." /> : (
-              <>
+              // Một tin nổi bật (ảnh lớn) bên trái + danh sách 3 tin bên phải
+              <div className="grid gap-5 md:grid-cols-5">
                 {featured && (
-                  <Link href={articleHref(featured.slug)} className="group mb-3 block">
-                    {featured.coverUrl && (
+                  <Link href={articleHref(featured.slug)} className="group block md:col-span-3">
+                    {featured.coverUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={featured.coverUrl} alt="" className="mb-3 aspect-video w-full rounded-lg object-cover" />
-                    )}
+                      <img src={featured.coverUrl} alt="" className="mb-3 aspect-[16/10] w-full rounded-lg object-cover" />
+                    ) : <Thumb a={featured} className="mb-3 aspect-[16/10] w-full" />}
                     <h3 className="text-lg font-bold group-hover:text-primary">{featured.title}</h3>
                     <p className="text-xs text-muted">{featured.publishedAt && formatDate(featured.publishedAt)}</p>
                     {featured.summary && <p className="mt-1 line-clamp-3 text-sm text-slate-600">{featured.summary}</p>}
                   </Link>
                 )}
-                {restNews.map((a) => <ArticleRow key={a.id} a={a} />)}
-              </>
+                <div className="md:col-span-2"><SideArticleList items={restNews} thumbClass="h-16 w-24" /></div>
+              </div>
             )}
           </Block>
 
           <div className="grid gap-6 md:grid-cols-2">
             <Block title="Sự kiện" href="/su-kien">
-              {events.length === 0 ? <EmptyPublic text="Chưa có sự kiện." /> : events.map((a) => <ArticleRow key={a.id} a={a} />)}
+              {events.length === 0 ? <EmptyPublic text="Chưa có sự kiện." /> : events.map((a) => <ArticleRow key={a.id} a={a} compact />)}
             </Block>
             <Block title="Kế hoạch" href="/ke-hoach">
-              {plans.length === 0 ? <EmptyPublic text="Chưa có kế hoạch." /> : plans.map((a) => <ArticleRow key={a.id} a={a} />)}
+              {plans.length === 0 ? <EmptyPublic text="Chưa có kế hoạch." /> : plans.map((a) => <ArticleRow key={a.id} a={a} compact />)}
             </Block>
           </div>
         </div>

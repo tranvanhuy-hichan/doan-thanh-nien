@@ -3,7 +3,7 @@ import { DoanLogo } from "@/components/layout/logo";
 
 export function SiteFooter({ address, phone, email }: { address: string; phone: string; email: string }) {
   return (
-    <footer className="mt-12 bg-primary-dark text-blue-100">
+    <footer className="no-print mt-12 bg-primary-dark text-blue-100">
       <div className="grid w-full gap-6 px-4 py-8 sm:grid-cols-2 lg:grid-cols-3 lg:px-8">
         <div className="flex items-start gap-3">
           <DoanLogo className="h-14 shrink-0 drop-shadow-lg" />
@@ -16,7 +16,7 @@ export function SiteFooter({ address, phone, email }: { address: string; phone: 
           </div>
         </div>
         <ul className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm">
-          {[["Giới thiệu", "/gioi-thieu/doan-truong"], ["Tin tức", "/tin-tuc"], ["Sự kiện", "/su-kien"], ["Kế hoạch", "/ke-hoach"], ["Thông báo", "/thong-bao"], ["Lịch hoạt động", "/lich-hoat-dong"], ["Thi đua", "/thi-dua"], ["Báo cáo Chi đoàn", "/bao-cao-chi-doan"], ["Góp ý ẩn danh", "/gop-y"]].map(([l, h]) => (
+          {[["Giới thiệu", "/gioi-thieu/doan-truong"], ["Tin tức", "/tin-tuc"], ["Sự kiện", "/su-kien"], ["Kế hoạch", "/ke-hoach"], ["Thông báo", "/thong-bao"], ["Lịch hoạt động", "/lich-hoat-dong"], ["Lịch công tác", "/lich-cong-tac"], ["Thi đua", "/thi-dua"], ["Báo cáo Chi đoàn", "/bao-cao-chi-doan"], ["Góp ý ẩn danh", "/gop-y"]].map(([l, h]) => (
             <li key={h}><Link href={h} className="hover:text-white hover:underline">{l}</Link></li>
           ))}
         </ul>

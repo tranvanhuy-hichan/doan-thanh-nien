@@ -1,7 +1,7 @@
 "use client";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Input, Select } from "./form";
 import { currentWeek, schoolYearOf, weekLabel, yearLabel, type SchoolCalendar } from "@/lib/school-calendar";
 
@@ -10,24 +10,32 @@ function SchoolWeekFilter({ calendars, nh, tuan, onChange }: { calendars: School
   const cur = schoolYearOf();
   const cal = calendars.find((c) => String(c.startYear) === nh);
   const nowWeek = cal ? currentWeek(cal) : null;
+  const weekNo = /^\d+$/.test(tuan) ? Number(tuan) : null;
   const cls = "max-sm:min-w-[calc(50%-0.25rem)] max-sm:flex-1";
   const week = (n: number) => <option key={n} value={String(n)}>{weekLabel(cal!, n)}{n === nowWeek ? " · hiện tại" : ""}</option>;
   return (
     <>
-      <Select aria-label="Năm học" value={nh} onChange={(e) => onChange(e.target.value, tuan)} className={`w-auto min-w-36 ${cls}`}>
+      <Select aria-label="Năm học" value={nh} onChange={(e) => onChange(e.target.value, tuan)} className="w-full sm:w-auto sm:min-w-36">
         {calendars.map((c) => <option key={c.startYear} value={c.startYear}>Năm học {yearLabel(c.startYear)}{c.startYear === cur ? " (hiện tại)" : ""}</option>)}
       </Select>
-      <Select aria-label="Tuần" value={tuan} onChange={(e) => onChange(nh, e.target.value)} className={`w-auto min-w-52 ${cls}`}>
-        <option value="">Cả năm học</option>
-        {cal && (
-          <>
-            <option value="hk1">Học kỳ 1 (Tuần 1–{cal.sem1Weeks})</option>
-            <option value="hk2">Học kỳ 2 (Tuần {cal.sem1Weeks + 1}–{cal.totalWeeks})</option>
-            <optgroup label="Học kỳ 1">{Array.from({ length: cal.sem1Weeks }, (_, i) => week(i + 1))}</optgroup>
-            <optgroup label="Học kỳ 2">{Array.from({ length: cal.totalWeeks - cal.sem1Weeks }, (_, i) => week(cal.sem1Weeks + i + 1))}</optgroup>
-          </>
-        )}
-      </Select>
+      {/* ‹ Tuần › : nút chuyển tuần hai bên ô chọn tuần */}
+      <div className="flex w-full items-center gap-1 sm:w-auto">
+        <button type="button" aria-label="Tuần trước" disabled={!cal || (weekNo !== null && weekNo <= 1)} onClick={() => onChange(nh, String(weekNo === null ? nowWeek ?? 1 : weekNo - 1))}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-white/85 hover:bg-slate-50 disabled:opacity-40"><ChevronLeft className="size-4" /></button>
+        <Select aria-label="Tuần" value={tuan} onChange={(e) => onChange(nh, e.target.value)} className="w-auto min-w-0 flex-1 sm:min-w-52">
+          <option value="">Cả năm học</option>
+          {cal && (
+            <>
+              <option value="hk1">Học kỳ 1 (Tuần 1–{cal.sem1Weeks})</option>
+              <option value="hk2">Học kỳ 2 (Tuần {cal.sem1Weeks + 1}–{cal.totalWeeks})</option>
+              <optgroup label="Học kỳ 1">{Array.from({ length: cal.sem1Weeks }, (_, i) => week(i + 1))}</optgroup>
+              <optgroup label="Học kỳ 2">{Array.from({ length: cal.totalWeeks - cal.sem1Weeks }, (_, i) => week(cal.sem1Weeks + i + 1))}</optgroup>
+            </>
+          )}
+        </Select>
+        <button type="button" aria-label="Tuần sau" disabled={!cal || (weekNo !== null && cal !== undefined && weekNo >= cal.totalWeeks)} onClick={() => onChange(nh, String(weekNo === null ? nowWeek ?? 1 : weekNo + 1))}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-white/85 hover:bg-slate-50 disabled:opacity-40"><ChevronRight className="size-4" /></button>
+      </div>
     </>
   );
 }
@@ -59,10 +67,10 @@ export type FilterField =
   | { type: "select"; name: string; label: string; options: { value: string; label: string }[] }
   | { type: "month"; name: string }
   /** Lọc theo năm học + tuần/học kỳ (URL: ?nh=2026&tuan=3|hk1|hk2). `name` luôn là "nh". */
-  | { type: "schoolweek"; name: "nh"; calendars: SchoolCalendar[] };
+  | { type: "schoolweek"; name: "nh"; calendars: SchoolCalendar[]; /** Tuần mặc định khi URL chưa có tham số (trang tự hiện tuần hiện tại, không cần chuyển hướng). */ defaultTuan?: string };
 
 /** Bộ lọc đồng bộ với URL (search params) -> render phía server, có thể chia sẻ link. */
-export function FilterBar({ fields }: { fields: FilterField[] }) {
+export function FilterBar({ fields, className = "mb-4" }: { fields: FilterField[]; className?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
@@ -79,10 +87,9 @@ export function FilterBar({ fields }: { fields: FilterField[] }) {
     next.delete("page");
     start(() => router.replace(`${pathname}?${next}`));
   };
-  const active = fields.some((f) => sp.get(f.name));
 
   return (
-    <div className="mb-4 flex flex-wrap items-center gap-2">
+    <div className={`flex flex-wrap items-center gap-2 ${className}`}>
       {fields.map((f) =>
         f.type === "search" ? (
           <div key={f.name} className="relative w-full sm:w-64">
@@ -96,7 +103,7 @@ export function FilterBar({ fields }: { fields: FilterField[] }) {
             {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </Select>
         ) : f.type === "schoolweek" ? (
-          <SchoolWeekFilter key="schoolweek" calendars={f.calendars} nh={sp.get("nh") || String(schoolYearOf())} tuan={sp.get("tuan") ?? ""}
+          <SchoolWeekFilter key="schoolweek" calendars={f.calendars} nh={sp.get("nh") || String(schoolYearOf())} tuan={sp.get("tuan") ?? (sp.get("nh") ? "" : f.defaultTuan ?? "")}
             onChange={(nh, tuan) => {
               const next = new URLSearchParams(sp.toString());
               if (nh) next.set("nh", nh); else next.delete("nh");
@@ -107,12 +114,6 @@ export function FilterBar({ fields }: { fields: FilterField[] }) {
         ) : (
           <MonthYearFilter key={f.name} value={sp.get(f.name) ?? ""} onChange={(v) => update(f.name, v)} />
         ),
-      )}
-      {active && (
-        <button className="inline-flex items-center gap-1 text-[13px] text-muted hover:text-foreground"
-          onClick={() => { setQ(""); start(() => router.replace(pathname)); }}>
-          <X className="size-3.5" />Xóa lọc
-        </button>
       )}
     </div>
   );

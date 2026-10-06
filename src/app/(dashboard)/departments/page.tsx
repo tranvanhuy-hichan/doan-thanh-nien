@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ClickRow } from "@/components/ui/click-row";
 import { CompactList } from "@/components/ui/compact-list";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/auth/session";
@@ -56,7 +57,7 @@ export default async function DepartmentsPage({ searchParams }: { searchParams: 
           <thead><tr><Th>Chi đoàn</Th><Th>Niên khóa</Th><Th>Bí thư</Th><Th className="text-right">Đoàn viên</Th><Th className="text-right">Hoạt động</Th><Th className="text-right">Tỷ lệ tham gia</Th>{isAdmin && <Th />}</tr></thead>
           <tbody>
             {departments.map((d, i) => (
-              <tr key={d.id} className="hover:bg-slate-50">
+              <ClickRow key={d.id} href={`/departments/${d.id}`}>
                 <Td><Link href={`/departments/${d.id}`} className="font-medium text-primary hover:underline">{d.name}</Link></Td>
                 <Td className="whitespace-nowrap">{cohortLabel(d.startYear) || "—"}</Td>
                 <Td>{d.secretary ? d.secretary.fullName : <span className="text-muted">Chưa phân công</span>}</Td>
@@ -70,7 +71,7 @@ export default async function DepartmentsPage({ searchParams }: { searchParams: 
                     <DeleteDepartmentButton id={d.id} name={d.name} />
                   </Td>
                 )}
-              </tr>
+              </ClickRow>
             ))}
           </tbody>
         </DataTable>

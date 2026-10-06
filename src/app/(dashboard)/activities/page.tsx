@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ClickRow } from "@/components/ui/click-row";
 import { CompactList } from "@/components/ui/compact-list";
 import { Plus } from "lucide-react";
 import type { Prisma } from "@prisma/client";
@@ -70,7 +71,7 @@ export default async function ActivitiesPage({ searchParams }: { searchParams: P
           <thead><tr><Th>Hoạt động</Th><Th>Thời gian</Th><Th>Địa điểm</Th><Th>Tổ chức</Th><Th className="text-right">Đăng ký</Th><Th className="text-right">Tham gia</Th><Th>Trạng thái</Th></tr></thead>
           <tbody>
             {activities.map((a) => (
-              <tr key={a.id} className="hover:bg-slate-50">
+              <ClickRow key={a.id} href={`/activities/${a.id}`}>
                 <Td>
                   <Link href={`/activities/${a.id}`} className="font-medium hover:text-primary">{a.title}</Link>
                   <div className="text-xs text-muted">{a.category.name} · {a.points} điểm</div>
@@ -81,7 +82,7 @@ export default async function ActivitiesPage({ searchParams }: { searchParams: P
                 <Td className="text-right tabular-nums">{a._count.registrations}{a.maxParticipants ? ` / ${a.maxParticipants}` : ""}</Td>
                 <Td className="text-right tabular-nums">{a._count.attendances}</Td>
                 <Td><ActivityStatusBadge status={activityStatus(a, now)} /></Td>
-              </tr>
+              </ClickRow>
             ))}
           </tbody>
         </DataTable>
