@@ -9,12 +9,12 @@ import { Thumb } from "./thumb";
 /** Tiêu đề khối có vạch xanh bên trái, giống bố cục trang trường. */
 export function Block({ title, href, children, className }: { title: string; href?: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={cn("overflow-hidden rounded-lg border border-primary/20 bg-white/85 shadow-sm", className)}>
-      <div className="flex items-center justify-between bg-gradient-to-r from-primary-dark to-primary px-4 py-2.5">
-        <h2 className="border-l-4 border-[#ffd400] pl-3 text-[15px] font-bold tracking-wide text-white uppercase">{title}</h2>
-        {href && <Link href={href} className="text-[13px] font-medium text-[#ffd400] hover:underline">Xem tất cả</Link>}
+    <section className={cn("overflow-hidden rounded-lg border border-primary/20 bg-white/85 shadow-sm max-sm:border-slate-200 max-sm:shadow-none", className)}>
+      <div className="flex items-center justify-between bg-gradient-to-r from-primary-dark to-primary px-4 py-2.5 max-sm:border-b max-sm:border-slate-100 max-sm:bg-white max-sm:bg-none max-sm:px-3 max-sm:py-3">
+        <h2 className="border-l-4 border-[#ffd400] pl-3 text-[15px] font-bold tracking-wide text-white uppercase max-sm:text-primary-dark">{title}</h2>
+        {href && <Link href={href} className="text-[13px] font-medium text-[#ffd400] hover:underline max-sm:text-primary">Xem tất cả</Link>}
       </div>
-      <div className="p-4">{children}</div>
+      <div className="p-4 max-sm:p-3">{children}</div>
     </section>
   );
 }

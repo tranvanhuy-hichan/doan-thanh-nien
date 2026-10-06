@@ -1,9 +1,13 @@
 import type { Metadata, Viewport } from "next";
+import { Dancing_Script } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { AppSplash, SPLASH_CSS } from "@/components/layout/app-splash";
 
 // Ảnh khởi động iOS (portrait) theo từng cỡ máy: public/splash/<rộng>x<cao>@<tỉ lệ>.png (sinh bằng scripts/gen-splash.mjs)
+// Phông chữ viết tay cho khẩu hiệu trên banner (có tiếng Việt)
+const script = Dancing_Script({ subsets: ["vietnamese", "latin"], weight: ["600", "700"], variable: "--font-script", display: "swap" });
+
 const IOS_SPLASH: [number, number, number][] = [[430, 932, 3], [393, 852, 3], [428, 926, 3], [390, 844, 3], [375, 812, 3], [414, 896, 3], [414, 896, 2], [414, 736, 3], [375, 667, 2], [320, 568, 2], [834, 1194, 2], [1024, 1366, 2], [810, 1080, 2], [768, 1024, 2]];
 
 export const metadata: Metadata = {
@@ -27,7 +31,7 @@ export const viewport: Viewport = { themeColor: "#0b63b8", viewportFit: "cover",
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi">
+    <html lang="vi" className={script.variable}>
       <head><style dangerouslySetInnerHTML={{ __html: SPLASH_CSS }} /></head>
       <body className="font-sans antialiased">
         {/* Màn hình chờ khi mở app đã cài (chỉ hiện ở chế độ standalone); do React quản lý nên gỡ an toàn */}

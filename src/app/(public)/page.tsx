@@ -34,9 +34,9 @@ export default async function HomePage() {
                   <Link href={articleHref(featured.slug)} className="group block md:col-span-3">
                     {featured.coverUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={featured.coverUrl} alt="" className="mb-3 aspect-[16/10] w-full rounded-lg object-cover" />
-                    ) : <Thumb a={featured} className="mb-3 aspect-[16/10] w-full" />}
-                    <h3 className="text-lg font-bold group-hover:text-primary">{featured.title}</h3>
+                      <img src={featured.coverUrl} alt="" className="mb-2.5 aspect-[16/9] w-full rounded-lg object-cover sm:mb-3 sm:aspect-[16/10]" />
+                    ) : <Thumb a={featured} className="mb-2.5 aspect-[16/9] w-full sm:mb-3 sm:aspect-[16/10]" />}
+                    <h3 className="text-base leading-snug font-bold group-hover:text-primary sm:text-lg">{featured.title}</h3>
                     <p className="text-xs text-muted">{featured.publishedAt && formatDate(featured.publishedAt)}</p>
                     {featured.summary && <p className="mt-1 line-clamp-3 text-sm text-slate-600">{featured.summary}</p>}
                   </Link>
