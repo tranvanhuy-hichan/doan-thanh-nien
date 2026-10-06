@@ -121,24 +121,24 @@ export function SiteHeader({ address, bannerUrl, phone, email, facebook, youtube
       )}
       {/* Đầu trang trên điện thoại/máy tính bảng: MỘT thanh gọn kiểu ứng dụng (☰ + logo + tên | tìm kiếm | đăng nhập) */}
       <div className="sticky top-0 z-50 border-b border-border bg-white shadow-sm lg:hidden">
-        <div className="flex h-14 items-center gap-1 px-2">
+        <div className="flex h-14 items-center gap-0.5 px-1.5">
           <button type="button" onClick={() => { setOpen((o) => !o); setSearchOpen(false); }} aria-label={open ? "Đóng menu" : "Mở menu"} aria-expanded={open}
-            className="flex size-10 shrink-0 touch-manipulation items-center justify-center rounded-full text-primary-dark hover:bg-primary-light active:bg-primary-light">
+            className="flex size-9 shrink-0 touch-manipulation items-center justify-center rounded-full text-primary-dark hover:bg-primary-light active:bg-primary-light">
             {open ? <X className="size-6" /> : <Menu className="size-6" />}
           </button>
-          <Link href="/" className="flex min-w-0 flex-1 items-center gap-2" aria-label="Trang chủ">
-            <DoanLogo className="h-9 shrink-0" />
+          <Link href="/" className="flex min-w-0 flex-1 items-center gap-1.5 pl-0.5" aria-label="Trang chủ">
+            <DoanLogo className="h-8 shrink-0" />
             <div className="min-w-0 leading-tight">
-              <div className="truncate text-[10px] font-semibold tracking-[0.14em] text-slate-500 uppercase">Đoàn TNCS Hồ Chí Minh</div>
-              <div className="truncate text-[14px] font-extrabold tracking-wide text-primary-dark uppercase">Đoàn trường THPT Sơn Hà</div>
+              <div className="truncate text-[9px] font-semibold tracking-[0.1em] text-slate-500 uppercase">Đoàn TNCS Hồ Chí Minh</div>
+              <div className="whitespace-nowrap text-[clamp(11px,3.5vw,14px)] font-extrabold tracking-normal text-primary-dark uppercase">Đoàn trường THPT Sơn Hà</div>
             </div>
           </Link>
           <button type="button" onClick={() => { setSearchOpen((o) => !o); setOpen(false); }} aria-label="Tìm kiếm" aria-expanded={searchOpen}
-            className="flex size-10 shrink-0 items-center justify-center rounded-full text-primary-dark hover:bg-primary-light active:bg-primary-light">
+            className="flex size-9 shrink-0 items-center justify-center rounded-full text-primary-dark hover:bg-primary-light active:bg-primary-light">
             {searchOpen ? <X className="size-5" /> : <Search className="size-5" />}
           </button>
           <Link href={loggedIn ? "/dashboard" : "/login"} aria-label={loggedIn ? "Trang quản lý" : "Đăng nhập"}
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-white hover:bg-primary-dark">
+            className="ml-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-white hover:bg-primary-dark">
             {loggedIn ? <LayoutDashboard className="size-[18px]" /> : <LogIn className="size-[18px]" />}
           </Link>
         </div>
