@@ -28,6 +28,7 @@
 body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background: url("/logo-doan.webp") 50% 55% / min(70vmin, 560px) no-repeat; opacity: 0.12;
+  transform: translateZ(0); will-change: transform; /* tách thành lớp riêng: cuộn không phải vẽ lại nền */
 }
 @media (min-width: 1024px) {
   body::before { background-position: calc(50% + 7.5rem) 55%; } /* lệch sang phải theo bề rộng thanh bên */
@@ -86,7 +87,7 @@ body::before {
 
 /* Dòng chữ chạy ở đầu trang công khai */
 .marquee { overflow: hidden; white-space: nowrap; }
-.marquee-track { display: flex; width: max-content; animation: marquee-scroll linear infinite; }
+.marquee-track { display: flex; width: max-content; will-change: transform; animation: marquee-scroll linear infinite; }
 .marquee:hover .marquee-track { animation-play-state: paused; }
 @keyframes marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) {

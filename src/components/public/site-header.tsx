@@ -90,46 +90,6 @@ function SearchBox({ className, autoFocus }: { className?: string; autoFocus?: b
   );
 }
 
-/** Tranh nền banner mặc định: tia nắng, mây, trường học bên trái, nhà cao tầng + cờ bên phải, ngôi sao. */
-function BannerArt() {
-  const star = "M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7.1L12 17.6 5.7 21.3l1.7-7.1L2 9.5l7.1-.6z";
-  return (
-    <svg aria-hidden viewBox="0 0 1600 240" preserveAspectRatio="xMidYMax slice" className="pointer-events-none absolute inset-0 size-full">
-      {/* tia nắng toả từ giữa */}
-      <g fill="#ffffff" opacity=".32">
-        {Array.from({ length: 18 }, (_, i) => { const a = (-80 + i * 9.4) * Math.PI / 180; const w = 0.045; const r = 900; return <path key={i} d={`M800 250 L ${800 + r * Math.sin(a - w)} ${250 - r * Math.cos(a - w)} L ${800 + r * Math.sin(a + w)} ${250 - r * Math.cos(a + w)} Z`} />; })}
-      </g>
-      {/* mây */}
-      <g fill="#fff" opacity=".85"><ellipse cx="300" cy="48" rx="150" ry="20" /><ellipse cx="400" cy="62" rx="100" ry="16" /><ellipse cx="1250" cy="40" rx="140" ry="19" /><ellipse cx="1360" cy="58" rx="90" ry="14" /><ellipse cx="800" cy="26" rx="110" ry="14" /></g>
-      {/* đồi */}
-      <path d="M0 240V196c120-26 260-30 400-8 120 18 220 22 330 10v42z" fill="#b7d6ef" opacity=".7" />
-      <path d="M870 240v-40c120 14 260 12 380-6 120-18 240-12 350 14v32z" fill="#b7d6ef" opacity=".7" />
-      {/* trường học (trái) */}
-      <g>
-        <path d="M120 240V132h300v108z" fill="#9cc3e6" />
-        <path d="M100 132 L270 74 L440 132z" fill="#86b3dc" />
-        <rect x="258" y="38" width="3" height="40" fill="#7aa8d4" /><path d="M261 40h42l-8 10 8 10h-42z" fill="#d9272e" /><path transform="translate(272 41) scale(.5)" d={star} fill="#ffd400" />
-        {[0, 1, 2, 3, 4, 5].map((i) => <rect key={i} x={150 + i * 46} y={150} width="14" height="90" fill="#cfe3f5" />)}
-        {[0, 1, 2, 3, 4, 5, 6].map((i) => <rect key={`w${i}`} x={138 + i * 42} y={140} width="10" height="8" fill="#eaf4fd" />)}
-        <rect x="236" y="196" width="68" height="44" fill="#7aa8d4" />
-        <path d="M30 240V176l60-14v78z" fill="#a9cbe8" /><path d="M450 240V170l70 14v56z" fill="#a9cbe8" />
-        <circle cx="70" cy="214" r="22" fill="#9fd1b9" opacity=".8" /><circle cx="560" cy="218" r="18" fill="#9fd1b9" opacity=".8" />
-      </g>
-      {/* nhà cao tầng + cờ (phải) */}
-      <g>
-        <rect x="1120" y="86" width="86" height="154" fill="#9cc3e6" /><rect x="1206" y="126" width="120" height="114" fill="#b0cfec" /><rect x="1326" y="104" width="74" height="136" fill="#9cc3e6" />
-        {[0, 1, 2, 3, 4].map((r) => [0, 1, 2].map((c) => <rect key={`t${r}${c}`} x={1132 + c * 24} y={100 + r * 26} width="12" height="14" fill="#eaf4fd" />))}
-        {[0, 1, 2, 3].map((r) => [0, 1, 2, 3, 4].map((c) => <rect key={`u${r}${c}`} x={1216 + c * 22} y={140 + r * 24} width="11" height="12" fill="#eaf4fd" />))}
-        {[0, 1, 2, 3].map((r) => [0, 1].map((c) => <rect key={`v${r}${c}`} x={1340 + c * 26} y={118 + r * 28} width="12" height="14" fill="#eaf4fd" />))}
-        <rect x="1162" y="44" width="3" height="46" fill="#7aa8d4" /><path d="M1165 46h44l-8 10 8 10h-44z" fill="#d9272e" /><path transform="translate(1176 47) scale(.55)" d={star} fill="#ffd400" />
-        <circle cx="1060" cy="218" r="20" fill="#9fd1b9" opacity=".8" /><circle cx="1420" cy="224" r="16" fill="#9fd1b9" opacity=".8" />
-      </g>
-      {/* ngôi sao */}
-      <g fill="#ffd400" opacity=".9">{[[640, 30, .5], [980, 44, .45], [760, 190, .35], [90, 40, .4], [1560, 150, .4]].map(([x, y, k], i) => <path key={i} transform={`translate(${x} ${y}) scale(${k})`} d={star} />)}</g>
-    </svg>
-  );
-}
-
 export function SiteHeader({ address, bannerUrl, phone, email, facebook, youtube, marquee }: { address?: string; bannerUrl?: string; phone?: string; email?: string; facebook?: string; youtube?: string; marquee: { id: string; text: string; link: string | null }[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -169,8 +129,8 @@ export function SiteHeader({ address, bannerUrl, phone, email, facebook, youtube
           <Link href="/" className="flex min-w-0 flex-1 items-center gap-2" aria-label="Trang chủ">
             <DoanLogo className="h-9 shrink-0" />
             <div className="min-w-0 leading-tight">
-              <div className="truncate text-[13px] font-extrabold tracking-wide text-primary-dark uppercase">Đoàn trường THPT Sơn Hà</div>
-              <div className="truncate text-[10px] font-medium tracking-wider text-slate-500 uppercase">Cổng thông tin điện tử</div>
+              <div className="truncate text-[10px] font-semibold tracking-[0.14em] text-slate-500 uppercase">Đoàn TNCS Hồ Chí Minh</div>
+              <div className="truncate text-[14px] font-extrabold tracking-wide text-primary-dark uppercase">Đoàn trường THPT Sơn Hà</div>
             </div>
           </Link>
           <button type="button" onClick={() => { setSearchOpen((o) => !o); setOpen(false); }} aria-label="Tìm kiếm" aria-expanded={searchOpen}
@@ -273,8 +233,11 @@ export function SiteHeader({ address, bannerUrl, phone, email, facebook, youtube
               <img src={bannerUrl} alt="Banner Đoàn trường THPT Sơn Hà" className="size-full object-cover object-center" />
             </div>
           ) : (
-            <div className="relative h-32 bg-gradient-to-b from-[#bcdcf7] via-[#dcecfa] to-[#f2f8fe] sm:h-40 lg:h-52">
-              <BannerArt />
+            <div className="relative h-32 bg-gradient-to-b from-[#5a9fe0] via-[#97c6ee] to-[#d9ecfb] sm:h-40 lg:h-52">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/banner-art.webp" alt="" aria-hidden decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover object-bottom" />
+              {/* quầng sáng nhẹ sau khối chữ giữa để chữ luôn rõ trên nền đậm */}
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_42%_75%_at_50%_52%,rgba(255,255,255,0.62),rgba(255,255,255,0)_72%)]" />
 
               {/* Hai bên: các dòng viết tay (từ màn hình lớn) */}
               <div className="pointer-events-none absolute top-1/2 left-[3%] hidden -translate-y-1/2 -rotate-3 font-script text-[#0a3d82] xl:block">
