@@ -106,3 +106,9 @@ src/lib/qr            QR token ký HMAC, sống 90 giây
 
 - Mỗi ngày (`/api/cron/cleanup`, dùng chung `CRON_SECRET`) hệ thống xóa: thông báo **đã đọc** quá 90 ngày, thông báo chưa đọc quá 120 ngày và **nhật ký hệ thống** quá 120 ngày. Điểm danh, điểm, huy hiệu, báo cáo, bài viết được giữ lâu dài. Chỉnh số ngày trong `RETENTION` ở `src/lib/services/cleanup.ts`.
 - Admin theo dõi dung lượng database và các bảng lớn nhất, hoặc bấm **Dọn ngay**, ở **Cài đặt → Dữ liệu**.
+
+## Màn hình khởi động của ứng dụng cài trên điện thoại (PWA)
+
+- **Android (Chrome):** màn hình khởi động do hệ điều hành dựng từ `manifest` (nền `#0b63b8`, biểu tượng nền xanh, tên ứng dụng). Cần **gỡ rồi cài lại** ứng dụng để Android cập nhật.
+- **iOS (Safari):** dùng 14 ảnh khởi động ở `public/splash/` (nền xanh + huy hiệu + tên), khai báo trong `src/app/layout.tsx`. Tạo lại bằng `node scripts/gen-splash.mjs`. iOS chỉ dùng ảnh khi thiết bị khớp đúng kích thước đã khai báo, và cũng cần **gỡ rồi thêm lại** vào màn hình chính.
+- **Trong lúc trang tải:** có một lớp phủ nền xanh + huy hiệu + tên hiển thị ngay từ khung hình đầu và mờ dần khi ứng dụng sẵn sàng (tối đa 6 giây). Chỉ hiện khi mở từ biểu tượng đã cài (chế độ standalone), trình duyệt thường không thấy.
