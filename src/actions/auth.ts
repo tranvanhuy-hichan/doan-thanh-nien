@@ -64,7 +64,7 @@ export async function loginAction(input: unknown) {
 
 export async function logoutAction() {
   await destroySession();
-  redirect("/login");
+  redirect("/"); // đăng xuất xong về trang chủ công khai
 }
 
 export async function changePasswordAction(input: unknown) {
