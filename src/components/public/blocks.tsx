@@ -10,11 +10,11 @@ import { Thumb } from "./thumb";
 export function Block({ title, href, children, className }: { title: string; href?: string; children: React.ReactNode; className?: string }) {
   return (
     <section className={cn("overflow-hidden rounded-lg border border-primary/20 bg-white/85 shadow-sm max-sm:border-slate-200 max-sm:shadow-none", className)}>
-      <div className="flex items-center justify-between bg-gradient-to-r from-primary-dark to-primary px-4 py-2.5 max-sm:border-b max-sm:border-slate-100 max-sm:bg-white max-sm:bg-none max-sm:px-3 max-sm:py-3">
+      <div className="flex items-center justify-between bg-gradient-to-r from-primary-dark to-primary px-1.5 py-[3px] max-sm:border-b max-sm:border-slate-100 max-sm:bg-white max-sm:bg-none max-sm:px-1 max-sm:py-1">
         <h2 className="border-l-4 border-[#ffd400] pl-3 text-[15px] font-bold tracking-wide text-white uppercase max-sm:text-primary-dark">{title}</h2>
         {href && <Link href={href} className="text-[13px] font-medium text-[#ffd400] hover:underline max-sm:text-primary">Xem tất cả</Link>}
       </div>
-      <div className="p-4 max-sm:p-3">{children}</div>
+      <div className="p-1.5 max-sm:p-1">{children}</div>
     </section>
   );
 }
@@ -22,7 +22,7 @@ export function Block({ title, href, children, className }: { title: string; hre
 /** `actions`: bộ lọc/nút đặt cùng hàng với tiêu đề (ở màn hình lớn), xuống dưới tiêu đề khi chật. */
 export function PageTitle({ title, description, actions }: { title: string; description?: string; actions?: React.ReactNode }) {
   return (
-    <div className="mb-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b-2 border-primary pb-2">
+    <div className="mb-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 border-b-2 border-primary pb-1">
       <div className="min-w-0">
         <h1 className="text-2xl font-bold text-primary-dark">{title}</h1>
         {description && <p className="mt-1 text-sm text-muted">{description}</p>}
@@ -36,7 +36,7 @@ export type CardArticle = { id: string; kind: ArticleKind; title: string; slug: 
 
 export function ArticleRow({ a, showKind, compact }: { a: CardArticle; showKind?: boolean; /** Khối hẹp (nửa chiều ngang): thumbnail nhỏ, meta một dòng, không tóm tắt. */ compact?: boolean }) {
   return (
-    <article className="flex gap-3 border-b border-border py-3 last:border-0">
+    <article className="flex gap-1 border-b border-border py-1 last:border-0">
       <Thumb a={a} className={compact ? "h-16 w-24" : "h-20 w-28 sm:h-24 sm:w-36"} />
       <div className="min-w-0 flex-1">
         <Link href={articleHref(a.slug)} className="line-clamp-2 font-semibold hover:text-primary">{a.title}</Link>
@@ -66,7 +66,7 @@ export function SideArticleList({ items, thumbClass = "size-14" }: { items: Card
   return (
     <ul className="divide-y divide-border">
       {items.map((a) => (
-        <li key={a.id} className="flex gap-3 py-2.5 first:pt-0 last:pb-0">
+        <li key={a.id} className="flex gap-1 py-[3px] first:pt-0 last:pb-0">
           <Thumb a={a} className={thumbClass} />
           <div className="min-w-0">
             <Link href={articleHref(a.slug)} className="line-clamp-2 text-sm font-medium hover:text-primary">{a.title}</Link>

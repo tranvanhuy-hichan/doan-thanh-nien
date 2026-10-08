@@ -22,20 +22,20 @@ export default async function HomePage() {
   const [featured, ...restNews] = news;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
       {countdownTarget && countdownTarget.getTime() > Date.now() && <Countdown title={settings.countdownTitle} target={countdownTarget.toISOString()} link={settings.countdownLink || undefined} />}
-      <div className="grid gap-6 xl:grid-cols-3">
-        <div className="space-y-6 xl:col-span-2">
+      <div className="grid gap-2 xl:grid-cols-3">
+        <div className="space-y-2 xl:col-span-2">
           <Block title="Tin tức" href="/tin-tuc">
             {news.length === 0 ? <EmptyPublic text="Chưa có tin tức." /> : (
               // Một tin nổi bật (ảnh lớn) bên trái + danh sách 3 tin bên phải
-              <div className="grid gap-5 md:grid-cols-5">
+              <div className="grid gap-2 md:grid-cols-5">
                 {featured && (
                   <Link href={articleHref(featured.slug)} className="group block md:col-span-3">
                     {featured.coverUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={featured.coverUrl} alt="" className="mb-2.5 aspect-[16/9] w-full rounded-lg object-cover sm:mb-3 sm:aspect-[16/10]" />
-                    ) : <Thumb a={featured} className="mb-2.5 aspect-[16/9] w-full sm:mb-3 sm:aspect-[16/10]" />}
+                      <img src={featured.coverUrl} alt="" className="mb-1 aspect-[16/9] w-full rounded-lg object-cover sm:aspect-[16/10]" />
+                    ) : <Thumb a={featured} className="mb-1 aspect-[16/9] w-full sm:aspect-[16/10]" />}
                     <h3 className="text-base leading-snug font-bold group-hover:text-primary sm:text-lg">{featured.title}</h3>
                     <p className="text-xs text-muted">{featured.publishedAt && formatDate(featured.publishedAt)}</p>
                     {featured.summary && <p className="mt-1 line-clamp-3 text-sm text-slate-600">{featured.summary}</p>}
@@ -46,7 +46,7 @@ export default async function HomePage() {
             )}
           </Block>
 
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-2 md:grid-cols-2">
             <Block title="Sự kiện" href="/su-kien">
               {events.length === 0 ? <EmptyPublic text="Chưa có sự kiện." /> : events.map((a) => <ArticleRow key={a.id} a={a} compact />)}
             </Block>
@@ -56,12 +56,12 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <aside className="space-y-6">
+        <aside className="space-y-2">
           <Block title="Thông báo" href="/thong-bao">
             {announcements.length === 0 ? <EmptyPublic text="Chưa có thông báo." /> : (
               <ul className="divide-y divide-border">
                 {announcements.map((a) => (
-                  <li key={a.id} className="flex gap-3 py-2">
+                  <li key={a.id} className="flex gap-1 py-[3px]">
                     <Thumb a={a} className="size-14" />
                     <div className="min-w-0">
                       <Link href={articleHref(a.slug)} className="line-clamp-2 text-sm font-medium hover:text-primary">{a.title}</Link>
@@ -75,7 +75,7 @@ export default async function HomePage() {
 
           <Block title="Hoạt động sắp tới" href="/lich-hoat-dong">
             {upcoming.length === 0 ? <EmptyPublic text="Chưa có hoạt động sắp tới." /> : (
-              <ul className="space-y-3">
+              <ul className="space-y-1">
                 {upcoming.map((a) => (
                   <li key={a.id} className="flex gap-3">
                     <div className="flex w-12 shrink-0 flex-col items-center rounded-md bg-primary-light py-1 text-primary-dark">
@@ -94,7 +94,7 @@ export default async function HomePage() {
           </Block>
 
           <Block title={`Thi đua ${period.label.toLowerCase()}`} href="/thi-dua">
-            <ol className="space-y-2">
+            <ol className="space-y-[3px]">
               {ranking.slice(0, 3).map((r) => (
                 <li key={r.id} className="flex items-center gap-3 text-sm">
                   <span className={`flex size-7 items-center justify-center rounded-full text-[13px] font-bold ${r.rank === 1 ? "bg-primary text-white" : "bg-slate-100 text-slate-600"}`}>{r.rank}</span>

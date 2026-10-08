@@ -12,7 +12,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ p
   return (
     <>
       <PageTitle title="Sự kiện" description="Các sự kiện của Đoàn trường" />
-      <div className="rounded-lg border border-border bg-white/85 px-4">
+      <div className="rounded-lg border border-border bg-white/85 px-1.5">
         {items.length === 0 ? <EmptyPublic /> : items.map((a) => <ArticleRow key={a.id} a={a} />)}
       </div>
       <Pagination page={page} pageSize={PAGE_SIZE} total={total} basePath="/su-kien" params={{}} />
