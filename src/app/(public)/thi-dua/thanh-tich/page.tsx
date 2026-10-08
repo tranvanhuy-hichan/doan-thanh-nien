@@ -15,7 +15,7 @@ export default async function AchievementsPublicPage() {
       <PageTitle title="Thành tích thi đua" description="Ba Chi đoàn dẫn đầu mỗi tháng" />
       <div className="grid gap-4 md:grid-cols-2">
         {results.map(({ period, ranking }) => (
-          <section key={period.value} className="rounded-lg border border-border bg-white/85">
+          <section key={period.value} className="rounded border border-border bg-white/85">
             <h2 className="border-b border-border px-4 py-2.5 text-[15px] font-bold text-primary-dark">{period.label}</h2>
             {ranking.filter((r) => r.total !== 0).length === 0 ? <p className="p-4 text-sm text-muted">Chưa có dữ liệu.</p> : (
               <ol className="divide-y divide-border">

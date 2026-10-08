@@ -23,7 +23,7 @@ const EMULATION = [
 function Group({ title, icon: Icon, children }: { title: string; icon: typeof BookOpen; open?: boolean; children: React.ReactNode }) {
   return (
     <details open className="group">
-      <summary className="flex cursor-pointer list-none items-center gap-2 rounded-md px-1 py-[3px] text-[13px] font-semibold tracking-wide text-primary-dark uppercase hover:bg-primary-light/60 [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center gap-2 rounded-sm px-1 py-[3px] text-[13px] font-semibold tracking-wide text-primary-dark uppercase hover:bg-primary-light/60 [&::-webkit-details-marker]:hidden">
         <Icon className="size-4 text-primary" />{title}<ChevronDown className="ml-auto size-4 text-slate-400 transition-transform group-open:rotate-180" />
       </summary>
       <div className="mt-0 mb-0.5 ml-[0.75rem] border-l border-slate-200 pl-0.5">{children}</div>
@@ -31,7 +31,7 @@ function Group({ title, icon: Icon, children }: { title: string; icon: typeof Bo
   );
 }
 
-const itemClass = (active: boolean) => cn("-ml-px block rounded-r-md border-l-[3px] border-transparent py-0.5 pr-1 pl-1 text-sm text-slate-600 transition-colors hover:bg-primary-light/60 hover:text-primary-dark", active && "border-primary bg-primary-light/70 font-medium text-primary-dark");
+const itemClass = (active: boolean) => cn("-ml-px block rounded-r-sm border-l-[3px] border-transparent py-0.5 pr-1 pl-1 text-sm text-slate-600 transition-colors hover:bg-primary-light/60 hover:text-primary-dark", active && "border-primary bg-primary-light/70 font-medium text-primary-dark");
 
 /** Thanh bên trái của trang công khai: Giới thiệu / Báo cáo Chi đoàn (Khối → lớp) / Thi đua. */
 export function PublicSidebar({ grades }: { grades: SidebarGrade[] }) {
@@ -39,7 +39,7 @@ export function PublicSidebar({ grades }: { grades: SidebarGrade[] }) {
   const khoi = useSearchParams().get("khoi");
   const inReports = pathname.startsWith("/bao-cao-chi-doan");
   return (
-    <nav aria-label="Danh mục" className="space-y-0.5 rounded-lg bg-white/70 p-[3px] shadow-sm">
+    <nav aria-label="Danh mục" className="space-y-0.5 rounded bg-white/70 p-[3px] shadow-sm">
       <Group title="Giới thiệu" icon={BookOpen} open>
         {INTRO.map((i) => <Link key={i.href} href={i.href} className={itemClass(pathname === i.href)}>{i.label}</Link>)}
       </Group>
@@ -47,7 +47,7 @@ export function PublicSidebar({ grades }: { grades: SidebarGrade[] }) {
         {grades.length === 0 && <p className="px-3 py-1.5 text-sm text-muted">Chưa có Chi đoàn</p>}
         {grades.map((g) => (
           <details key={g.grade} open={inReports && (khoi === g.grade || g.depts.some((d) => pathname.includes(d.id)))} className="group/sub">
-            <summary className="flex cursor-pointer list-none items-center gap-1 rounded-md py-0.5 pr-1 pl-1 text-sm font-medium text-slate-700 hover:bg-primary-light/60 [&::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer list-none items-center gap-1 rounded-sm py-0.5 pr-1 pl-1 text-sm font-medium text-slate-700 hover:bg-primary-light/60 [&::-webkit-details-marker]:hidden">
               <ChevronDown className="size-3.5 -rotate-90 transition-transform group-open/sub:rotate-0" />Khối {g.grade}
             </summary>
             <div className="grid grid-cols-3 gap-0.5 pr-1 pb-0.5 pl-3">

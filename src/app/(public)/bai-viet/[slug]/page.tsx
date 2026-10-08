@@ -30,10 +30,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       </div>
       {a.coverUrl && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={a.coverUrl} alt="" className="my-5 max-h-80 w-full rounded-lg border border-border object-cover" />
+        <img src={a.coverUrl} alt="" className="my-5 max-h-80 w-full rounded border border-border object-cover" />
       )}
       {a.summary && <p className="my-5 text-lg font-medium text-slate-700">{a.summary}</p>}
-      <div className="rounded-lg bg-white/85 p-5"><RichText text={a.content} /></div>
+      <div className="rounded bg-white/85 p-5"><RichText text={a.content} /></div>
       <Attachments files={a.attachments.map((f) => ({ id: f.id, name: f.name, url: f.url, size: f.size }))} />
     </article>
     <aside className="space-y-6">

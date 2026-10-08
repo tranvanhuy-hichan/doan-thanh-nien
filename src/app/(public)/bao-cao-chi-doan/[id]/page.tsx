@@ -20,7 +20,7 @@ export default async function DepartmentReportsPage({ params, searchParams }: { 
     <>
       <nav className="mb-3 text-[13px] text-muted"><Link href="/bao-cao-chi-doan" className="hover:text-primary">Báo cáo Chi đoàn</Link> › Chi đoàn {dept.name}</nav>
       <PageTitle title={`Báo cáo Chi đoàn ${dept.name}`} />
-      <div className="rounded-lg border border-border bg-white/85 px-4">
+      <div className="rounded border border-border bg-white/85 px-4">
         {reports.length === 0 ? <EmptyPublic text="Chi đoàn chưa đăng báo cáo nào." /> : reports.map((r) => (
           <article key={r.id} className="border-b border-border py-3 last:border-0">
             <Link href={`/bao-cao-chi-doan/bao-cao/${r.id}`} className="font-semibold hover:text-primary">{r.title}</Link>

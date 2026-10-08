@@ -24,7 +24,7 @@ export default async function ReportsIndexPage({ searchParams }: { searchParams:
               <h2 className="mb-3 border-l-4 border-primary pl-3 text-lg font-bold text-primary-dark">Khối {g}</h2>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {depts.map((d) => (
-                  <Link key={d.id} href={`/bao-cao-chi-doan/${d.id}`} className="rounded-lg border border-border bg-white/85 p-4 text-center hover:border-primary hover:bg-primary-light">
+                  <Link key={d.id} href={`/bao-cao-chi-doan/${d.id}`} className="rounded border border-border bg-white/85 p-4 text-center hover:border-primary hover:bg-primary-light">
                     <div className="text-lg font-bold text-primary-dark">{d.name}</div>
                     <div className="text-xs text-muted">{d._count.chapterReports} báo cáo</div>
                   </Link>

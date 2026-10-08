@@ -28,7 +28,7 @@ export function Thumb({ a, className }: { a: ThumbSource; className?: string }) 
   const [failed, setFailed] = useState(false);
   if (!t) return null;
   return (
-    <div className={cn("shrink-0 overflow-hidden rounded-md border border-border bg-white", className)}>
+    <div className={cn("shrink-0 overflow-hidden rounded-sm border border-border bg-white", className)}>
       {t.src && !failed ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={t.src} alt="" loading="lazy" className="size-full object-cover object-top" onError={() => setFailed(true)} />

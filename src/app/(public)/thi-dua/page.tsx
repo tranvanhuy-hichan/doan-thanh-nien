@@ -21,7 +21,7 @@ export default async function PublicEmulationPage({ searchParams }: { searchPara
     <>
       <PageTitle title="Bảng thi đua Chi đoàn" description={period.label} />
       <PeriodFilter type={period.type} value={period.value} calendars={calendars} />
-      {ranking.length === 0 ? <div className="rounded-lg border border-border bg-white/85"><EmptyState title="Chưa có dữ liệu thi đua" /></div> : (
+      {ranking.length === 0 ? <div className="rounded border border-border bg-white/85"><EmptyState title="Chưa có dữ liệu thi đua" /></div> : (
         <>
           <RankingList items={ranking.map((r) => ({ ...r, mine: false, canOpen: false }))} />
           <div className="max-sm:hidden">

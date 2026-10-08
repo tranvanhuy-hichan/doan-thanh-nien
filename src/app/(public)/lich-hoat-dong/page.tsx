@@ -46,7 +46,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
 
       {isWeek ? (
         // Một tuần: mỗi ngày một khối, hiện cả ngày không có hoạt động để thấy trọn tuần
-        <div className="overflow-hidden rounded-lg border border-border bg-white/85">
+        <div className="overflow-hidden rounded border border-border bg-white/85">
           {Array.from({ length: 7 }, (_, i) => {
             const d = new Date(range.from.getTime() + i * DAY);
             const list = byDay.get(dayKey(d)) ?? [];
@@ -69,7 +69,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
           })}
         </div>
       ) : (
-        <div className="rounded-lg border border-border bg-white/85 px-4">
+        <div className="rounded border border-border bg-white/85 px-4">
           {activities.length === 0 ? <EmptyPublic text="Không có hoạt động trong thời gian này." /> : activities.map((a) => (
             <div key={a.id} className="border-b border-border py-3 last:border-0">
               <div className="font-semibold">{a.title}</div>

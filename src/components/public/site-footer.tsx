@@ -22,7 +22,7 @@ export function SiteFooter({ address, phone, email }: { address: string; phone: 
         </ul>
         <div className="text-sm sm:col-span-2 lg:col-span-1">
           <p className="mb-2 text-blue-200">Dành cho đoàn viên và cán bộ Đoàn:</p>
-          <Link href="/login" className="inline-flex h-10 w-full items-center justify-center rounded-md bg-white px-4 sm:w-auto font-medium text-primary-dark hover:bg-blue-50">Đăng nhập hệ thống quản lý</Link>
+          <Link href="/login" className="inline-flex h-10 w-full items-center justify-center rounded-sm bg-white px-4 sm:w-auto font-medium text-primary-dark hover:bg-blue-50">Đăng nhập hệ thống quản lý</Link>
         </div>
       </div>
       <div className="border-t border-white/10 py-3 text-center text-xs text-blue-200">© {new Date().getFullYear()} Đoàn trường THPT Sơn Hà</div>

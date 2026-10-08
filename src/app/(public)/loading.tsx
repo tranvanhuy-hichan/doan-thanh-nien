@@ -6,7 +6,7 @@ export default function Loading() {
     <div aria-busy="true" aria-label="Đang tải">
       <Skeleton className="mb-2 h-7 w-56" />
       <Skeleton className="mb-5 h-4 w-80 max-w-full" />
-      <div className="rounded-lg border border-border bg-white/85 p-4">
+      <div className="rounded border border-border bg-white/85 p-4">
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="flex gap-3 border-b border-border py-3 last:border-0">
             <Skeleton className="hidden h-24 w-36 shrink-0 sm:block" />

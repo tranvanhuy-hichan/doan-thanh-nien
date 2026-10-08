@@ -20,13 +20,13 @@ export function WeekPicker({ calendars, year, week, className = "mb-4" }: { cale
       {/* ‹ Tuần › : nút chuyển tuần hai bên ô chọn tuần */}
       <div className="flex w-full items-center gap-1 sm:w-auto">
         <button type="button" aria-label="Tuần trước" disabled={week <= 1} onClick={() => go(year, week - 1)}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-white/85 hover:bg-slate-50 disabled:opacity-40"><ChevronLeft className="size-4" /></button>
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border border-border bg-white/85 hover:bg-slate-50 disabled:opacity-40"><ChevronLeft className="size-4" /></button>
         <Select aria-label="Tuần" value={week} onChange={(e) => go(year, Number(e.target.value))} className="w-auto min-w-0 flex-1 sm:min-w-52">
           <optgroup label="Học kỳ 1">{Array.from({ length: cal.sem1Weeks }, (_, i) => <option key={i} value={i + 1}>{weekLabel(cal, i + 1)}{i + 1 === nowWeek ? " · hiện tại" : ""}</option>)}</optgroup>
           <optgroup label="Học kỳ 2">{Array.from({ length: cal.totalWeeks - cal.sem1Weeks }, (_, i) => <option key={i} value={cal.sem1Weeks + i + 1}>{weekLabel(cal, cal.sem1Weeks + i + 1)}{cal.sem1Weeks + i + 1 === nowWeek ? " · hiện tại" : ""}</option>)}</optgroup>
         </Select>
         <button type="button" aria-label="Tuần sau" disabled={week >= cal.totalWeeks} onClick={() => go(year, week + 1)}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-white/85 hover:bg-slate-50 disabled:opacity-40"><ChevronRight className="size-4" /></button>
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border border-border bg-white/85 hover:bg-slate-50 disabled:opacity-40"><ChevronRight className="size-4" /></button>
       </div>
     </div>
   );

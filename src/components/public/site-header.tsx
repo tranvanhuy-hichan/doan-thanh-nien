@@ -195,10 +195,10 @@ export function SiteHeader({ address, bannerUrl, phone, email, facebook, youtube
         <nav className="bg-[#073a70]" aria-label="Menu chính">
           <div className="flex w-full items-center px-1 lg:px-6">
             <ul className="hidden items-stretch lg:flex">
-              <li><Link href="/" aria-label="Trang chủ" className={cn("flex h-full items-center px-4 py-2.5 text-white hover:bg-white/10", pathname === "/" && "bg-white/15")}><Home className="size-5" /></Link></li>
+              <li><Link href="/" aria-label="Trang chủ" className={cn("flex h-full items-center px-4 py-1.5 text-white hover:bg-white/10", pathname === "/" && "bg-white/15")}><Home className="size-5" /></Link></li>
               {main.filter((it) => it.href !== "/").map((it) => (
                 <li key={it.label} className="group relative">
-                  <Link href={it.href} className={cn("flex h-full items-center gap-1 px-4 py-2.5 text-sm font-semibold tracking-wide whitespace-nowrap text-white/90 uppercase hover:bg-white/10 hover:text-white", isActive(pathname, it.href) && "bg-white text-primary-dark hover:bg-white hover:text-primary-dark")}>
+                  <Link href={it.href} className={cn("flex h-full items-center gap-1 px-4 py-1.5 text-sm font-semibold tracking-wide whitespace-nowrap text-white/90 uppercase hover:bg-white/10 hover:text-white", isActive(pathname, it.href) && "bg-white text-primary-dark hover:bg-white hover:text-primary-dark")}>
                     {it.label}{it.children && <ChevronDown className="size-3.5 opacity-70" />}
                   </Link>
                   {it.children && (
@@ -209,7 +209,7 @@ export function SiteHeader({ address, bannerUrl, phone, email, facebook, youtube
                 </li>
               ))}
               <li className="group relative">
-                <button type="button" className="flex h-full items-center gap-1 px-4 py-2.5 text-sm font-semibold tracking-wide whitespace-nowrap text-white/90 uppercase hover:bg-white/10 hover:text-white focus:bg-white/10" aria-haspopup="menu">
+                <button type="button" className="flex h-full items-center gap-1 px-4 py-1.5 text-sm font-semibold tracking-wide whitespace-nowrap text-white/90 uppercase hover:bg-white/10 hover:text-white focus:bg-white/10" aria-haspopup="menu">
                   Liên kết<ChevronDown className="size-3.5 opacity-70" />
                 </button>
                 <ul className="invisible absolute left-0 z-10 min-w-72 border border-border bg-white py-1 text-foreground opacity-0 shadow-lg transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
@@ -217,7 +217,7 @@ export function SiteHeader({ address, bannerUrl, phone, email, facebook, youtube
                 </ul>
               </li>
             </ul>
-            <Link href={loggedIn ? "/dashboard" : "/login"} className="ml-auto flex shrink-0 items-center px-3 py-2.5 text-xs font-semibold tracking-wide whitespace-nowrap text-white/90 uppercase hover:bg-white/10 hover:text-white sm:px-4 sm:text-sm">
+            <Link href={loggedIn ? "/dashboard" : "/login"} className="ml-auto flex shrink-0 items-center px-3 py-1.5 text-xs font-semibold tracking-wide whitespace-nowrap text-white/90 uppercase hover:bg-white/10 hover:text-white sm:px-4 sm:text-sm">
               {loggedIn ? "Trang quản lý" : "Đăng nhập"}
             </Link>
           </div>

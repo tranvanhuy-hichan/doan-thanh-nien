@@ -34,7 +34,7 @@ export default async function HomePage() {
                   <Link href={articleHref(featured.slug)} className="group block md:col-span-3">
                     {featured.coverUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={featured.coverUrl} alt="" className="mb-1 aspect-[16/9] w-full rounded-lg object-cover sm:aspect-[16/10]" />
+                      <img src={featured.coverUrl} alt="" className="mb-1 aspect-[16/9] w-full rounded object-cover sm:aspect-[16/10]" />
                     ) : <Thumb a={featured} className="mb-1 aspect-[16/9] w-full sm:aspect-[16/10]" />}
                     <h3 className="text-base leading-snug font-bold group-hover:text-primary sm:text-lg">{featured.title}</h3>
                     <p className="text-xs text-muted">{featured.publishedAt && formatDate(featured.publishedAt)}</p>
@@ -78,7 +78,7 @@ export default async function HomePage() {
               <ul className="space-y-1">
                 {upcoming.map((a) => (
                   <li key={a.id} className="flex gap-3">
-                    <div className="flex w-12 shrink-0 flex-col items-center rounded-md bg-primary-light py-1 text-primary-dark">
+                    <div className="flex w-12 shrink-0 flex-col items-center rounded-sm bg-primary-light py-1 text-primary-dark">
                       <span className="text-lg leading-none font-bold">{new Intl.DateTimeFormat("vi-VN", { day: "2-digit", timeZone: "Asia/Ho_Chi_Minh" }).format(a.startAt)}</span>
                       <span className="text-[10px] uppercase">Th{new Intl.DateTimeFormat("vi-VN", { month: "numeric", timeZone: "Asia/Ho_Chi_Minh" }).format(a.startAt)}</span>
                     </div>

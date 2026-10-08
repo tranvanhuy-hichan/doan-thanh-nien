@@ -16,7 +16,7 @@ export default async function IntroPage({ params }: { params: Promise<{ slug: st
   return (
     <div>
       <PageTitle title={SITE_PAGES[slug]} />
-      <div className="rounded-lg border border-border bg-white/85 p-5">
+      <div className="rounded border border-border bg-white/85 p-5">
         {page?.content.trim() ? <RichText text={page.content} /> : <p className="py-6 text-center text-sm text-muted">Nội dung đang được cập nhật.</p>}
       </div>
     </div>

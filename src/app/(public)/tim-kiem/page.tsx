@@ -16,7 +16,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   return (
     <>
       <PageTitle title="Kết quả tìm kiếm" description={q ? `Từ khóa: “${q}” · ${items.length} kết quả` : "Nhập ít nhất 2 ký tự"} />
-      <div className="rounded-lg border border-border bg-white/85 px-4">
+      <div className="rounded border border-border bg-white/85 px-4">
         {items.length === 0 ? <EmptyPublic text={q.length >= 2 ? "Không tìm thấy bài viết phù hợp." : "Nhập từ khóa vào ô tìm kiếm."} /> : items.map((a) => <ArticleRow key={a.id} a={a} showKind />)}
       </div>
     </>

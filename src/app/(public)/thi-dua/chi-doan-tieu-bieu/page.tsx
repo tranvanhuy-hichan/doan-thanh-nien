@@ -23,7 +23,7 @@ export default async function ExemplaryPage() {
               {top.length === 0 ? <p className="text-sm text-muted">Chưa có dữ liệu.</p> : (
                 <div className="grid gap-3 md:grid-cols-3">
                   {top.map((r, i) => (
-                    <div key={r.id} className={`rounded-lg border p-5 text-center ${i === 0 ? "border-primary bg-primary-light" : "border-border bg-white/85"}`}>
+                    <div key={r.id} className={`rounded border p-5 text-center ${i === 0 ? "border-primary bg-primary-light" : "border-border bg-white/85"}`}>
                       <div className={`mx-auto mb-2 flex size-12 items-center justify-center rounded-full ${i === 0 ? "bg-primary text-white" : "bg-slate-100 text-slate-600"}`}>{i === 0 ? <Trophy className="size-6" /> : <span className="text-lg font-bold">{r.rank}</span>}</div>
                       <div className="text-xl font-bold">Chi đoàn {r.name}</div>
                       <div className="mt-1 text-2xl font-bold text-primary-dark tabular-nums">{r.total} <span className="text-sm font-normal text-muted">điểm</span></div>
