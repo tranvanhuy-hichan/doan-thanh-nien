@@ -119,3 +119,14 @@ body::before {
 .rich-editor.resize-cursor { cursor: col-resize; }
 .rich-editor table { position: relative; }
 .rich-editor th, .rich-editor td { position: relative; }
+
+/* Ảnh trong trình soạn thảo: khung chọn và 4 tay nắm ở góc để kéo đổi kích thước */
+.rich-editor [data-resize-container] { margin: 0.5rem 0 1rem; justify-content: flex-start; }
+.rich-editor [data-resize-wrapper] img { display: block; max-width: none; margin: 0; }
+.rich-editor [data-resize-container]:hover [data-resize-wrapper], .rich-editor [data-resize-container].ProseMirror-selectednode [data-resize-wrapper] { outline: 2px solid var(--color-primary); }
+.rich-editor [data-resize-handle] { width: 14px; height: 14px; background: #fff; border: 2px solid var(--color-primary); border-radius: 3px; z-index: 5; display: none; }
+.rich-editor [data-resize-container].ProseMirror-selectednode [data-resize-handle] { display: block; }
+.rich-editor [data-resize-handle="top-left"] { transform: translate(-50%, -50%); cursor: nwse-resize; }
+.rich-editor [data-resize-handle="top-right"] { transform: translate(50%, -50%); cursor: nesw-resize; }
+.rich-editor [data-resize-handle="bottom-left"] { transform: translate(-50%, 50%); cursor: nesw-resize; }
+.rich-editor [data-resize-handle="bottom-right"] { transform: translate(50%, 50%); cursor: nwse-resize; }
