@@ -16,7 +16,7 @@ export function AppShell({ role, user, roleLabel, notifications, unread, pushKey
       <div className="md:pl-16 lg:pl-60">
         <Topbar user={user} roleLabel={roleLabel} notifications={notifications} unread={unread} />
         {/* Mobile chừa chỗ cho thanh điều hướng dưới + vùng an toàn của iOS */}
-        <main className="min-h-[calc(100vh-3.5rem)] w-full px-4 py-6 pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-6 lg:px-8">{children}</main>
+        <main className="min-h-[calc(100vh-3.5rem)] w-full px-1.5 py-2.5 pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-2.5 lg:px-3">{children}</main>
       </div>
       <BottomNav role={role} />
     </div>
