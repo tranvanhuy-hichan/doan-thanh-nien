@@ -13,6 +13,14 @@ import { toast } from "sonner";
 import { cn } from "@/utils";
 import { legacyToHtml } from "@/lib/rich-html";
 
+/** Tải ảnh lên Cloudinary qua API server; trả về đường dẫn ảnh. */
+async function uploadImage(file: File): Promise<string> {
+  const fd = new FormData(); fd.set("file", file); fd.set("folder", "activities");
+  const res = await fetch("/api/upload", { method: "POST", body: fd }); const json = await res.json();
+  if (!res.ok) throw new Error(json.error ?? "Tải ảnh thất bại");
+  return json.imageUrl as string;
+}
+
 const sep = <span className="mx-1 h-5 w-px shrink-0 bg-border" />;
 
 function Btn({ title, active, disabled, onClick, children }: { title: string; active?: boolean; disabled?: boolean; onClick: () => void; children: React.ReactNode }) {
@@ -51,12 +59,8 @@ function Toolbar({ editor }: { editor: Editor }) {
   async function pickImage(file: File | undefined) {
     if (!file) return;
     setBusy(true);
-    try {
-      const fd = new FormData(); fd.set("file", file); fd.set("folder", "activities");
-      const res = await fetch("/api/upload", { method: "POST", body: fd }); const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Tải ảnh thất bại");
-      c().setImage({ src: json.imageUrl, alt: "" }).run();
-    } catch (e) { toast.error(e instanceof Error ? e.message : "Tải ảnh thất bại"); }
+    try { c().setImage({ src: await uploadImage(file), alt: "" }).run(); }
+    catch (e) { toast.error(e instanceof Error ? e.message : "Tải ảnh thất bại"); }
     finally { setBusy(false); if (fileRef.current) fileRef.current.value = ""; }
   }
 
@@ -110,17 +114,31 @@ function Toolbar({ editor }: { editor: Editor }) {
 
 /** Trình soạn thảo kiểu Word: định dạng bằng thanh công cụ, lưu dưới dạng HTML đã được làm sạch ở server. */
 export function RichEditor({ value, onChange, minHeight = 320, placeholder = "Nhập nội dung..." }: { value: string; onChange: (html: string) => void; minHeight?: number; placeholder?: string }) {
+  const ref = useRef<Editor | null>(null);
+  const insertFiles = (files: File[]) => {
+    const imgs = files.filter((f) => f.type.startsWith("image/"));
+    if (!imgs.length) return false;
+    imgs.forEach((f) => uploadImage(f).then((src) => ref.current?.chain().focus().setImage({ src, alt: "" }).run()).catch((e) => toast.error(e instanceof Error ? e.message : "Tải ảnh thất bại")));
+    return true;
+  };
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({ heading: { levels: [2, 3, 4] }, link: { openOnClick: false, autolink: true, HTMLAttributes: { rel: "noopener noreferrer nofollow", target: "_blank" } } }),
       TextAlign.configure({ types: ["heading", "paragraph"] }), TextStyleKit.configure({ fontFamily: false, fontSize: false, lineHeight: false }),
-      Highlight.configure({ multicolor: true }), Image, TableKit.configure({ table: { resizable: false } }), Placeholder.configure({ placeholder }),
+      Highlight.configure({ multicolor: true }),
+      // Kéo góc ảnh để đổi kích thước (giữ tỉ lệ); kéo đường kẻ giữa các cột của bảng để đổi độ rộng cột
+      Image.configure({ resize: { enabled: true, directions: ["top-left", "top-right", "bottom-left", "bottom-right"], minWidth: 60, minHeight: 40, alwaysPreserveAspectRatio: true } }),
+      TableKit.configure({ table: { resizable: true, cellMinWidth: 60 } }), Placeholder.configure({ placeholder }),
     ],
     content: legacyToHtml(value),
     onUpdate: ({ editor: e }) => onChange(e.isEmpty ? "" : e.getHTML()),
-    editorProps: { attributes: { class: "prose-doan rich-editor px-4 py-3 outline-none", style: `min-height:${minHeight}px` } },
+    editorProps: {
+      handlePaste: (_v, e) => insertFiles([...(e.clipboardData?.files ?? [])]),
+      handleDrop: (_v, e) => insertFiles([...((e as DragEvent).dataTransfer?.files ?? [])]),
+      attributes: { class: "prose-doan rich-editor px-4 py-3 outline-none", style: `min-height:${minHeight}px` } },
   });
+  ref.current = editor;
   if (!editor) return <div className="rounded-md border border-border bg-white" style={{ minHeight: minHeight + 44 }} />;
   return (
     <div className="rounded-md border border-border bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">

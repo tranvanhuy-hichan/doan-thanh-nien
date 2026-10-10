@@ -102,7 +102,7 @@ body::before {
 .prose-doan h4 { margin: 1rem 0 0.4rem; font-weight: 600; }
 .prose-doan a { color: var(--color-primary); text-decoration: underline; }
 .prose-doan blockquote { margin: 0 0 1rem; padding: 0.25rem 1rem; border-left: 4px solid var(--color-accent, #ffd400); background: #f8fafc; color: #475569; }
-.prose-doan img { max-width: 100%; height: auto; margin: 0.5rem auto 1rem; border-radius: 4px; }
+.prose-doan img { display: block; max-width: 100%; height: auto; margin: 0.5rem auto 1rem; border-radius: 4px; }
 .prose-doan hr { margin: 1.5rem 0; border: 0; border-top: 1px solid #cbd5e1; }
 .prose-doan mark { padding: 0 0.15em; border-radius: 2px; }
 .prose-doan table { width: 100%; margin: 0 0 1rem; border-collapse: collapse; table-layout: fixed; }
@@ -115,3 +115,7 @@ body::before {
 .prose-doan ul { list-style: disc; }
 .prose-doan ol { list-style: decimal; }
 .prose-doan li > p { margin: 0; }
+.rich-editor .column-resize-handle { position: absolute; top: 0; right: -2px; bottom: -2px; width: 4px; background: var(--color-primary); pointer-events: none; }
+.rich-editor.resize-cursor { cursor: col-resize; }
+.rich-editor table { position: relative; }
+.rich-editor th, .rich-editor td { position: relative; }
