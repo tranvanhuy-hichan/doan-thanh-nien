@@ -6,12 +6,12 @@ import { saveArticleAction, saveSitePageAction } from "@/actions/cms";
 import { saveReportAction } from "@/actions/chapter-reports";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea, WrapInput } from "@/components/ui/form";
+import { RichEditor } from "@/components/ui/rich-editor";
 import { ImageUpload, type UploadedImage } from "@/components/ui/image-upload";
 import { FileUpload, type AttachmentValue } from "@/components/ui/file-upload";
 import { fromLocalInput } from "@/utils";
 import { KIND_ACTION, kindSlug } from "@/lib/services/kind";
 
-export const FORMAT_HINT = "Định dạng: “## Tiêu đề”, “- gạch đầu dòng”, “1. đánh số”, “**chữ đậm**”. Cách một dòng trống để tách đoạn.";
 
 type Errors = Record<string, string>;
 const toErrors = (f?: Record<string, string[]>): Errors => Object.fromEntries(Object.entries(f ?? {}).map(([k, m]) => [k, m[0]]));
@@ -55,7 +55,7 @@ export function ArticleForm({ id, kind, initial, image, files, draftOnly }: {
           </>
         )}
         <Field label="Tóm tắt" error={errors.summary} className="sm:col-span-2" hint="Hiện ở danh sách và trang chủ"><Textarea className="min-h-20" value={v.summary} onChange={set("summary")} /></Field>
-        <Field label="Nội dung" required error={errors.content} className="sm:col-span-2" hint={FORMAT_HINT}><Textarea className="min-h-72" value={v.content} onChange={set("content")} /></Field>
+        <Field group label="Nội dung" required error={errors.content} className="sm:col-span-2"><RichEditor value={v.content} onChange={(content) => setV((p) => ({ ...p, content }))} /></Field>
       </div>
       <Field label="Ảnh bìa"><ImageUpload folder="activities" value={img} onChange={setImg} /></Field>
       <Field label="Tệp đính kèm" hint="Người xem có thể xem trực tiếp hoặc tải về"><FileUpload value={attachments} onChange={setAttachments} /></Field>
@@ -73,7 +73,7 @@ export function SitePageForm({ slug, title, initial }: { slug: string; title: st
   const [busy, setBusy] = useState(false);
   return (
     <div className="w-full space-y-4">
-      <Field label={`Nội dung trang “${title}”`} hint={FORMAT_HINT}><Textarea className="min-h-96" value={content} onChange={(e) => setContent(e.target.value)} /></Field>
+      <Field group label={`Nội dung trang “${title}”`}><RichEditor value={content} onChange={setContent} minHeight={384} /></Field>
       <div className="flex gap-2">
         <Button loading={busy} onClick={async () => {
           setBusy(true); const res = await saveSitePageAction(slug, { content }); setBusy(false);
@@ -103,7 +103,7 @@ export function ReportForm({ id, departments, fixedDepartment, initial, image }:
         )}
       </Field>
       <Field label="Tiêu đề báo cáo" required error={errors.title}><WrapInput value={v.title} onChange={(e) => setV({ ...v, title: e.target.value })} placeholder="Ví dụ: Báo cáo hoạt động tháng 10" /></Field>
-      <Field label="Nội dung" required error={errors.content} hint={FORMAT_HINT}><Textarea className="min-h-72" value={v.content} onChange={(e) => setV({ ...v, content: e.target.value })} /></Field>
+      <Field group label="Nội dung" required error={errors.content}><RichEditor value={v.content} onChange={(content) => setV((p) => ({ ...p, content }))} /></Field>
       <Field label="Ảnh minh họa"><ImageUpload folder="activities" value={img} onChange={setImg} /></Field>
       <div className="flex gap-2">
         <Button loading={busy} onClick={async () => {

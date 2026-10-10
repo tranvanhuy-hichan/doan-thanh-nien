@@ -105,7 +105,7 @@ export const articleSchema = z.object({
   kind: z.enum(["NEWS", "PLAN", "EVENT", "ANNOUNCEMENT"]),
   title: z.string().trim().min(3, "Tiêu đề tối thiểu 3 ký tự").max(200),
   summary: optionalText(500),
-  content: z.string().trim().min(1, "Nhập nội dung").max(50000),
+  content: z.string().trim().min(1, "Nhập nội dung").max(200000),
   coverUrl: optionalText(500),
   coverPublicId: optionalText(300),
   eventAt: optionalDate,
@@ -120,12 +120,12 @@ export const articleSchema = z.object({
   })).max(10, "Tối đa 10 tệp đính kèm").default([]),
 });
 
-export const sitePageSchema = z.object({ content: z.string().max(50000) });
+export const sitePageSchema = z.object({ content: z.string().max(200000) });
 
 export const reportSchema = z.object({
   departmentId: z.string().optional(), // bí thư: server tự gán Chi đoàn của mình
   title: z.string().trim().min(3, "Tiêu đề tối thiểu 3 ký tự").max(200),
-  content: z.string().trim().min(1, "Nhập nội dung").max(50000),
+  content: z.string().trim().min(1, "Nhập nội dung").max(200000),
   imageUrl: optionalText(500),
   imagePublicId: optionalText(300),
 });

@@ -12,6 +12,7 @@ import { uniqueSlug } from "@/lib/slug";
 import { deleteImage, isOwnPublicId } from "@/lib/cloudinary";
 import { notifyUsers } from "@/lib/notify";
 import { kindSlug } from "@/lib/services/kind";
+import { cleanContent, cleanHtml } from "@/lib/sanitize";
 
 const refreshPublic = () => revalidatePath("/", "layout");
 
@@ -20,6 +21,7 @@ export async function saveArticleAction(id: string | null, input: unknown) {
     const admin = await requireRole(["ADMIN", "SECRETARY"]);
     const isSec = admin.role === "SECRETARY"; // Bí thư chỉ lưu bản nháp của chính mình, Admin duyệt rồi mới đăng
     const d = articleSchema.parse(input);
+    d.content = cleanContent(d.content);
     if (isSec) d.published = false;
     if (d.coverPublicId && !isOwnPublicId(d.coverPublicId, "activities")) throw new UserError("Ảnh không hợp lệ");
     if (d.kind === "EVENT" && !d.eventAt) throw new UserError("Sự kiện cần có thời gian diễn ra");
@@ -99,7 +101,8 @@ export async function saveSitePageAction(slug: string, input: unknown) {
   return run(async () => {
     const admin = await requireRole(["ADMIN"]);
     if (!SITE_PAGES[slug]) throw new UserError("Trang không tồn tại");
-    const { content } = sitePageSchema.parse(input);
+    const { content: raw } = sitePageSchema.parse(input);
+    const content = cleanHtml(raw);
     await db.sitePage.upsert({ where: { slug }, update: { content, updatedById: admin.id }, create: { slug, title: SITE_PAGES[slug], content, updatedById: admin.id } });
     await audit(admin.id, "sitepage.update", "SitePage", slug);
     refreshPublic();

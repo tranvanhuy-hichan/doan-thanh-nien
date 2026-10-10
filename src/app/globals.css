@@ -97,3 +97,21 @@ body::before {
 
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Định dạng bổ sung do trình soạn thảo tạo ra (bảng, trích dẫn, ảnh, liên kết, tô nền) */
+.prose-doan h4 { margin: 1rem 0 0.4rem; font-weight: 600; }
+.prose-doan a { color: var(--color-primary); text-decoration: underline; }
+.prose-doan blockquote { margin: 0 0 1rem; padding: 0.25rem 1rem; border-left: 4px solid var(--color-accent, #ffd400); background: #f8fafc; color: #475569; }
+.prose-doan img { max-width: 100%; height: auto; margin: 0.5rem auto 1rem; border-radius: 4px; }
+.prose-doan hr { margin: 1.5rem 0; border: 0; border-top: 1px solid #cbd5e1; }
+.prose-doan mark { padding: 0 0.15em; border-radius: 2px; }
+.prose-doan table { width: 100%; margin: 0 0 1rem; border-collapse: collapse; table-layout: fixed; }
+.prose-doan th, .prose-doan td { border: 1px solid #cbd5e1; padding: 0.4rem 0.6rem; vertical-align: top; word-break: break-word; }
+.prose-doan th { background: #eff6ff; font-weight: 600; text-align: left; }
+.prose-doan p:last-child { margin-bottom: 0; }
+.rich-editor p.is-editor-empty:first-child::before { content: attr(data-placeholder); float: left; height: 0; color: #94a3b8; pointer-events: none; }
+.rich-editor .selectedCell { background: #dbeafe; }
+.rich-editor img.ProseMirror-selectednode { outline: 2px solid var(--color-primary); }
+.prose-doan ul { list-style: disc; }
+.prose-doan ol { list-style: decimal; }
+.prose-doan li > p { margin: 0; }

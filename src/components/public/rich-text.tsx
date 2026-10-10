@@ -1,4 +1,6 @@
 import { Fragment } from "react";
+import { isHtml } from "@/lib/rich-html";
+import { cleanHtml } from "@/lib/sanitize";
 
 /** Định dạng nhẹ, an toàn (không render HTML): `## Tiêu đề`, `### Mục nhỏ`, `- gạch đầu dòng`, `1. đánh số`, `**đậm**`. */
 function inline(text: string) {
@@ -8,6 +10,8 @@ function inline(text: string) {
 }
 
 export function RichText({ text }: { text: string }) {
+  // Nội dung soạn bằng trình soạn thảo là HTML (lọc lại lần nữa khi hiển thị); nội dung cũ là văn bản kiểu Markdown nhẹ.
+  if (isHtml(text)) return <div className="prose-doan" dangerouslySetInnerHTML={{ __html: cleanHtml(text) }} />;
   const blocks: React.ReactNode[] = [];
   let list: { ordered: boolean; items: string[] } | null = null;
   let para: string[] = [];

@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { formatDate, pageParam } from "@/utils";
 import { EmptyPublic, PageTitle } from "@/components/public/blocks";
 import { Pagination } from "@/components/ui/misc";
+import { plainText } from "@/lib/rich-html";
 
 const PAGE_SIZE = 10;
 
@@ -25,7 +26,7 @@ export default async function DepartmentReportsPage({ params, searchParams }: { 
           <article key={r.id} className="border-b border-border py-3 last:border-0">
             <Link href={`/bao-cao-chi-doan/bao-cao/${r.id}`} className="font-semibold hover:text-primary">{r.title}</Link>
             <div className="text-xs text-muted">{formatDate(r.createdAt)}</div>
-            <p className="mt-1 line-clamp-2 text-sm text-slate-600">{r.content.replace(/[#*\-]/g, "").slice(0, 200)}</p>
+            <p className="mt-1 line-clamp-2 text-sm text-slate-600">{plainText(r.content, 200)}</p>
           </article>
         ))}
       </div>

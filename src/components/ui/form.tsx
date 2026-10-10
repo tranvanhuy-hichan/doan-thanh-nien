@@ -46,15 +46,16 @@ export const Select = forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<H
   return <select ref={ref} className={cn(control, "h-9 pr-8", className)} {...p}>{children}</select>;
 });
 
-export function Field({ label, error, hint, required, children, className }: {
-  label: string; error?: string; hint?: string; required?: boolean; children: React.ReactNode; className?: string;
+export function Field({ label, error, hint, required, children, className, group }: {
+  label: string; error?: string; hint?: string; required?: boolean; children: React.ReactNode; className?: string; /** Ô chứa nhiều nút/vùng soạn thảo: dùng <div> thay <label> để bấm vào không kích hoạt nhầm nút đầu tiên. */ group?: boolean;
 }) {
+  const Root = group ? "div" : "label";
   return (
-    <label className={cn("block", className)}>
+    <Root className={cn("block", className)}>
       <span className="mb-1 block text-[13px] font-medium">{label}{required && <span className="text-danger"> *</span>}</span>
       {children}
       {hint && !error && <span className="mt-1 block text-xs text-muted">{hint}</span>}
       {error && <span className="mt-1 block text-xs text-danger">{error}</span>}
-    </label>
+    </Root>
   );
 }

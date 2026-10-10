@@ -8,6 +8,7 @@ import { requireRole } from "@/lib/auth/session";
 import { ForbiddenError, assertManageDepartment } from "@/lib/permissions";
 import { reportSchema } from "@/lib/validation";
 import { deleteImage, isOwnPublicId } from "@/lib/cloudinary";
+import { cleanContent } from "@/lib/sanitize";
 
 const refresh = () => { revalidatePath("/bao-cao-chi-doan", "layout"); revalidatePath("/chapter-reports"); };
 
@@ -15,6 +16,7 @@ export async function saveReportAction(id: string | null, input: unknown) {
   return run<{ id: string }>(async () => {
     const user = await requireRole(["ADMIN", "SECRETARY"]);
     const d = reportSchema.parse(input);
+    d.content = cleanContent(d.content);
     // Bí thư luôn đăng cho Chi đoàn của mình, bất kể client gửi gì.
     const departmentId = user.role === "SECRETARY" ? user.departmentId : d.departmentId;
     if (!departmentId) throw user.role === "ADMIN" ? new UserError("Chọn Chi đoàn") : new ForbiddenError();
